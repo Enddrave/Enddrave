@@ -1,0 +1,83 @@
+<!DOCTYPE html><html lang='en'><head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Enddrave Tech</title>
+<meta name="description" content="Enddrave Tech — IoT Firmware, BLE/Wi‑Fi Connectivity, RTOS & Azure IoT with AI insights." />
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="assets/images/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css" />
+<script defer src="assets/js/main.js"></script>
+</head><body>
+<header class="site-header">
+  <div class="container nav">
+    <a class="brand" href="/"><img src="assets/images/logo.png" alt="Enddrave Tech logo" /><span>Enddrave Tech</span></a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="services.html">Services</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<section class="sub-hero">
+ <div class="container">
+   <img class="page-banner" src="assets/images/banner-contact.jpg" alt="Contact">
+   <h1>Contact</h1><p>Share your device brief and timeline. We reply within 24 hours.</p>
+ </div>
+</section>
+<section class="container contact-grid">
+<form id="contactForm" class="card form" method="POST" action="contact.php" novalidate>
+<label>Full Name*<input type="text" name="name" required></label>
+<label>Work Email*<input type="email" name="email" required></label>
+<label>Company<input type="text" name="company"></label>
+<label>Country / Time Zone*<input type="text" name="country" required></label>
+<label>Project Type*
+<select name="project_type" required>
+<option value="">Select…</option><option>Firmware</option><option>Cloud</option><option>Both</option><option>AI Add‑On</option>
+</select></label>
+<label>Target Timeline*
+<select name="timeline" required>
+<option value="">Select…</option><option>2–4 weeks</option><option>4–6 weeks</option><option>6–8 weeks</option>
+</select></label>
+<label>Message*<textarea name="message" rows="5" required></textarea></label>
+<div class="form-actions"><button class="btn primary" type="submit">Send Inquiry</button><small class="muted">We’ll never share your information.</small></div>
+<div id="formStatus" class="status-area" aria-live="polite"></div>
+</form>
+<div class="map card">
+<iframe 
+  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14685.54651731632!2d79.5854721!3d24.9121979!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3981f5b47e0db66d%3A0x5e8fbd77f52d967b!2sVHGV%2BWR%20Chhatarpur%2C%20Madhya%20Pradesh!5e0!3m2!1sen!2sin!4v1731220000000!5m2!1sen!2sin" 
+  width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" 
+  referrerpolicy="no-referrer-when-downgrade">
+</iframe>
+<div class="map-note">Location pin shown for verification. Update with your exact address when ready.</div>
+</div>
+</section>
+</main>
+<script>
+const form = document.getElementById('contactForm');
+const statusBox = document.getElementById('formStatus');
+form?.addEventListener('submit', function(e) {
+  if (!form.checkValidity()) {
+    e.preventDefault();
+    statusBox.textContent = "Please fill all required fields correctly.";
+    statusBox.className = "status-area error";
+  }
+});
+</script>
+
+<footer class="site-footer">
+<div class="container footer-grid">
+<div><strong>Enddrave Tech Innovation Private Limited</strong><br>Global IoT & Firmware Engineering</div>
+<div><a href="privacy.html">Privacy</a> · <a href="terms.html">Terms & NDA</a></div>
+<div><a href="mailto:admin@enddrave.com">admin@enddrave.com</a></div>
+</div>
+</footer>
+<button class="back-btn" onclick="history.back()">← Back</button>
+<button id="scrollTopBtn" aria-label="Scroll to top">▲</button>
+</body></html>
