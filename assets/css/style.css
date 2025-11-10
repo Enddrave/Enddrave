@@ -55,3 +55,27 @@ a{color:var(--primary);text-decoration:none}
   .features,.cards-3,.grid-3,.footer-grid{grid-template-columns:1fr}
   .hero .hero-inner{padding:80px 0}
 }
+.page-banner {
+  width: 100%;
+  max-height: 320px;
+  object-fit: cover;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 18px rgba(0, 0, 0, .04);
+}
+
+/* Mobile optimization */
+@media (max-width: 768px) {
+  .page-banner {
+    max-height: 200px;   /* reduce height on small screens */
+    border-radius: 10px;
+  }
+
+  .sub-hero .container {
+    padding: 40px 10px;
+  }
+
+  .sub-hero h1 {
+    font-size: 1.5rem;
+  }
+}
