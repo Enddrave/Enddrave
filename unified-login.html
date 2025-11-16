@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Unified Login - Enddrave</title>
+<link rel="icon" href="assets/images/favicon.png" />
+<style>
+:root{--green:#0d3229;--accent:#8bc34a;}
+body{margin:0;font-family:Inter,Segoe UI,Arial;background:linear-gradient(135deg,#f6fbf3,#fffbe0);color:#123;}
+.center-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px;}
+.card{width:420px;max-width:96%;background:#fff;border-radius:18px;padding:34px;box-shadow:0 18px 60px rgba(7,50,38,0.12);}
+h1{margin:0 0 22px 0;font-size:32px;color:var(--green);text-align:center;}
+.toggle{display:flex;border-radius:999px;overflow:hidden;border:1px solid rgba(13,50,41,0.06);margin-bottom:20px;}
+.toggle button{flex:1;padding:12px 18px;border:none;background:transparent;font-weight:700;color:#0b2b24;cursor:pointer;}
+.toggle button.active{background:linear-gradient(90deg,#0d3229,#145c48);color:#fff;}
+.field{margin:12px 0;}
+input[type="email"],input[type="password"]{width:100%;padding:12px 14px;border-radius:10px;border:1px solid #e0e0e0;font-size:15px;}
+.action{margin-top:18px;}
+.btn-primary{width:100%;padding:12px;border-radius:10px;border:none;background:linear-gradient(90deg,#0d3229,#145c48);color:white;font-size:16px;font-weight:700;cursor:pointer;}
+.small{font-size:13px;color:#2b5b4f;margin-top:12px;text-align:center;}
+</style>
+</head>
+<body>
+<div class="center-wrap">
+  <div class="card" role="main">
+    <h1 id="title">Login Form</h1>
+    <div class="toggle" aria-hidden="false">
+      <button id="tabLogin" class="active">Login</button>
+      <button id="tabSignup">Signup</button>
+    </div>
+    <div class="field"><input id="email" type="email" placeholder="Email Address" /></div>
+    <div class="field"><input id="password" type="password" placeholder="Password" /></div>
+    <div class="action"><button class="btn-primary" id="submitBtn">Login</button></div>
+    <div class="small">Don't have an account? <a href="#" id="signupLink">Signup now</a></div>
+  </div>
+</div>
+
+<script>
+// role handling from query string
+function getQueryRole(){
+  var q = location.search.replace('?','').split('&').map(function(p){return p.split('=');});
+  for(var i=0;i<q.length;i++){
+    if(q[i][0]==='role') return decodeURIComponent(q[i][1]||'');
+  }
+  return '';
+}
+document.addEventListener('DOMContentLoaded', function(){
+  var role = getQueryRole();
+  if(role==='employee') document.getElementById('title').textContent = 'Employee / Intern Login';
+  else if(role==='client') document.getElementById('title').textContent = 'Client Login';
+  // toggle behavior
+  document.getElementById('tabLogin').addEventListener('click', function(){ this.classList.add('active'); document.getElementById('tabSignup').classList.remove('active'); document.getElementById('submitBtn').textContent='Login';});
+  document.getElementById('tabSignup').addEventListener('click', function(){ this.classList.add('active'); document.getElementById('tabLogin').classList.remove('active'); document.getElementById('submitBtn').textContent='Signup';});
+  document.getElementById('submitBtn').addEventListener('click', function(){ alert('This is a demo form. Implement backend to authenticate.'); });
+});
+</script>
+</body>
+</html>
