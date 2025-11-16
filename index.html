@@ -51,4 +51,35 @@
 </footer>
 <button class="back-btn" onclick="history.back()">← Back</button>
 <button id="scrollTopBtn" aria-label="Scroll to top">▲</button>
+
+<script>
+function openUserTypeModal(){
+  var m = document.getElementById('userTypeModal');
+  if(m){ m.style.display='flex'; m.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; }
+}
+function closeUserTypeModal(){
+  var m = document.getElementById('userTypeModal');
+  if(m){ m.style.display='none'; m.setAttribute('aria-hidden','true'); document.body.style.overflow=''; }
+}
+// outside click closes
+document.addEventListener('click', function(e){
+  var modal = document.getElementById('userTypeModal');
+  if(!modal) return;
+  if(modal.style.display==='flex'){
+    var card = modal.querySelector('.user-modal-card');
+    if(!card.contains(e.target) && !e.target.classList.contains('login-nav-btn')){
+      closeUserTypeModal();
+    }
+  }
+});
+// redirect to unified login - pass role via query param
+function goToUnified(role){
+  closeUserTypeModal();
+  var url = 'unified-login.html';
+  if(role) url += '?role=' + encodeURIComponent(role);
+  window.location.href = url;
+}
+</script>
+<!-- USER-TYPE-MODAL-END -->
+
 </body></html>
