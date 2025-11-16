@@ -47,7 +47,19 @@ if(ctx){
   }, 1500);
 
 
-  document.getElementById('ledOn')?.addEventListener('click', ()=>{ cmdLog.textContent += 'LED ON sent\n'; logEvent('Command: LED ON'); });
-  document.getElementById('ledOff')?.addEventListener('click', ()=>{ cmdLog.textContent += 'LED OFF sent\n'; logEvent('Command: LED OFF'); });
-  document.getElementById('simulateOta')?.addEventListener('click', ()=>{ cmdLog.textContent += 'OTA start...\n'; logEvent('OTA Update simulated'); });
+document.getElementById('ledOn')?.addEventListener('click', ()=>{
+  cmdLog.innerHTML += 'LED ON sent<br>';
+  logEvent('Command: LED ON');
+});
+
+document.getElementById('ledOff')?.addEventListener('click', ()=>{
+  cmdLog.innerHTML += 'LED OFF sent<br>';
+  logEvent('Command: LED OFF');
+});
+
+document.getElementById('simulateOta')?.addEventListener('click', ()=>{
+  cmdLog.innerHTML += 'OTA start...<br>';
+  logEvent('OTA Update simulated');
+});
+  
 }
