@@ -14,19 +14,38 @@ if(ctx){
     eventLog.prepend(li);
   }
 
+    // --- Smooth Winter Temperature Simulation (~19°C) ---
+  let baseTemp = 19;    // target winter indoor temperature
+  let drift = 0;        // slow heater/cooling drift
+
   setInterval(()=>{
     const t = new Date();
     data.labels.push(t.toLocaleTimeString());
-    const last = data.datasets[0].data.slice(-1)[0] || 26;
-    const next = +(last + (Math.random()*2 - 1)).toFixed(2);
+
+    // tiny natural noise (±0.05°C)
+    const microNoise = (Math.random() * 0.1 - 0.05);
+
+    // slow drift (±0.02°C)
+    drift += (Math.random() * 0.04 - 0.02);
+    drift = Math.max(-0.3, Math.min(0.3, drift));  // drift limit
+
+    // final temperature (smooth variation)
+    const next = +(baseTemp + drift + microNoise).toFixed(2);
+
     data.datasets[0].data.push(next);
-    if(data.labels.length > 30){ data.labels.shift(); data.datasets[0].data.shift(); }
+
+    if(data.labels.length > 30){
+      data.labels.shift();
+      data.datasets[0].data.shift();
+    }
+
     chart.update('none');
+
     lastSeen.textContent = t.toLocaleTimeString();
-    const score = Math.max(0, Math.min(100, Math.round(Math.abs(next-26)*12)));
+    const score = Math.round(Math.abs(next - baseTemp) * 10);
     anomalyScore.textContent = score + '%';
-    if(score>70) logEvent('Anomaly detected at ' + next + '°C');
   }, 1500);
+
 
   document.getElementById('ledOn')?.addEventListener('click', ()=>{ cmdLog.textContent += 'LED ON sent\n'; logEvent('Command: LED ON'); });
   document.getElementById('ledOff')?.addEventListener('click', ()=>{ cmdLog.textContent += 'LED OFF sent\n'; logEvent('Command: LED OFF'); });
