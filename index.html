@@ -10,6 +10,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/style.css" />
 <script defer src="assets/js/main.js"></script>
+</head><body>
+<header class="site-header">
+  <div class="container nav">
+    <a class="brand" href=""><img src="assets/images/logo.png" alt="Enddrave Tech logo" /></a>
+    
 <style>
 /* Login nav button - matches green theme */
 .login-nav-btn{
@@ -30,17 +35,13 @@
   .login-nav-btn{padding:6px 12px;font-size:14px;}
 }
 </style>
-</head><body>
-<header class="site-header">
-  <div class="container nav">
-    <a class="brand" href=""><img src="assets/images/logo.png" alt="Enddrave Tech logo" /><span>Enddrave Tech</span></a>
-    <nav>
+<nav>
       <a href="">Home</a>
       <a href="services.html">Services</a>
       <a href="dashboard.html">Dashboard</a>
       <a href="about.html">About</a>
       <a href="contact.html">Contact</a>
-      <a onclick="openUserTypeModal()">Login</a>
+      <a href="javascript:void(0)" class="login-nav-btn" onclick="openUserTypeModal()">Login</a>
     </nav>
   </div>
 </header>
