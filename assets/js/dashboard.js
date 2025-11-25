@@ -65,7 +65,7 @@ document.getElementById('simulateOta')?.addEventListener('click', ()=>{
 const connection = new signalR.HubConnectionBuilder()
         .withUrl("https://enddrave-signalir.service.signalr.net/client/?hub=dashboard")
         .build();
-
+console.log("Connection");
     // Listen to live updates
     connection.on("newTelemetry", (data) => {
         console.log("Live Data:", data);
