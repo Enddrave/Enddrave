@@ -1,77 +1,34 @@
+// Initialize SignalR connection
+const connection = new signalR.HubConnectionBuilder()
+    .withUrl("https://<your-functionapp>.azurewebsites.net/api")
+    .withAutomaticReconnect()
+    .build();
 
-// Simulated Azure IoT telemetry for demo
-const ctx = document.getElementById('telemetryChart');
-if(ctx){
-  const data = { labels: [], datasets: [{ label:'Temp °C', data: []}] };
-  const chart = new Chart(ctx, { type:'line', data, options:{responsive:true, animation:false}});
-  const eventLog = document.getElementById('eventLog');
-  const cmdLog = document.getElementById('cmdLog');
-  const lastSeen = document.getElementById('lastSeen');
-  const anomalyScore = document.getElementById('anomalyScore');
+connection.on("newTelemetry", (msg) => {
+  console.log("Live Data:", msg);
 
-  function logEvent(msg){
-    const li = document.createElement('li'); li.textContent = new Date().toLocaleTimeString()+ ' — ' + msg;
-    eventLog.prepend(li);
+  const t = new Date();
+  const next = msg.temperature;     // <-- temperature from Azure IoT via SignalR
+
+  data.labels.push(t.toLocaleTimeString());
+  data.datasets[0].data.push(next);
+
+  if(data.labels.length > 30){
+    data.labels.shift();
+    data.datasets[0].data.shift();
   }
 
-    // --- Smooth Winter Temperature Simulation (~19°C) ---
-  let baseTemp = 19;    // target winter indoor temperature
-  let drift = 0;        // slow heater/cooling drift
+  chart.update('none');
 
-  setInterval(()=>{
-    const t = new Date();
-    data.labels.push(t.toLocaleTimeString());
+  lastSeen.textContent = t.toLocaleTimeString();
 
-    // tiny natural noise (±0.05°C)
-    const microNoise = (Math.random() * 0.1 - 0.05);
+  const score = Math.round(Math.abs(next - baseTemp) * 10);
+  anomalyScore.textContent = score + '%';
 
-    // slow drift (±0.02°C)
-    drift += (Math.random() * 0.04 - 0.02);
-    drift = Math.max(-0.3, Math.min(0.3, drift));  // drift limit
-
-    // final temperature (smooth variation)
-    const next = +(baseTemp + drift + microNoise).toFixed(2);
-
-    data.datasets[0].data.push(next);
-
-    if(data.labels.length > 30){
-      data.labels.shift();
-      data.datasets[0].data.shift();
-    }
-
-    chart.update('none');
-
-    lastSeen.textContent = t.toLocaleTimeString();
-    const score = Math.round(Math.abs(next - baseTemp) * 10);
-    anomalyScore.textContent = score + '%';
-  }, 1500);
-
-
-document.getElementById('ledOn')?.addEventListener('click', ()=>{
-  cmdLog.innerHTML += 'LED ON sent<br>';
-  logEvent('Command: LED ON');
+  logEvent(`Live Update: ${next}°C`);
 });
 
-document.getElementById('ledOff')?.addEventListener('click', ()=>{
-  cmdLog.innerHTML += 'LED OFF sent<br>';
-  logEvent('Command: LED OFF');
-});
-
-document.getElementById('simulateOta')?.addEventListener('click', ()=>{
-  cmdLog.innerHTML += 'OTA start...<br>';
-  logEvent('OTA Update simulated');
-});
-
-const connection = new signalR.HubConnectionBuilder()
-        .withUrl("https://enddrave-signalir.service.signalr.net/client/?hub=dashboard")
-        .build();
-console.log("Connection");
-    // Listen to live updates
-    connection.on("newTelemetry", (data) => {
-        console.log("Live Data:", data);
-        // Update chart or dashboard UI here
-    });
-
-    connection.start().catch(err => console.error(err));
-  
-}
+// Start connection
+connection.start().then(() => {
+    console.log("SignalR Connected");
+}).catch(err => console.error(err));
