@@ -8,7 +8,7 @@ connection.on("newTelemetry", (msg) => {
   console.log("Live Data:", msg);
 
   const t = new Date();
-  const next = msg.temperature;     // <-- temperature from Azure IoT via SignalR
+  const next = msg.id;     // <-- temperature from Azure IoT via SignalR
 
   data.labels.push(t.toLocaleTimeString());
   data.datasets[0].data.push(next);
