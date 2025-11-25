@@ -61,5 +61,17 @@ document.getElementById('simulateOta')?.addEventListener('click', ()=>{
   cmdLog.innerHTML += 'OTA start...<br>';
   logEvent('OTA Update simulated');
 });
+
+const connection = new signalR.HubConnectionBuilder()
+        .withUrl("https://enddrave-signalir.service.signalr.net/client/?hub=dashboard")
+        .build();
+
+    // Listen to live updates
+    connection.on("newTelemetry", (data) => {
+        console.log("Live Data:", data);
+        // Update chart or dashboard UI here
+    });
+
+    connection.start().catch(err => console.error(err));
   
 }
