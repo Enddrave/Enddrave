@@ -35,3 +35,4 @@ if __name__ == "__main__":
         machine_data = generate_machine_data()
         send_to_azure(machine_data)
         time.sleep(10)
+
