@@ -39,4 +39,3 @@ def eventhub_trigger(azeventhub: func.EventHubEvent):
     except Exception as e:
         logging.error(f"Error processing event: {e}")
 
-
