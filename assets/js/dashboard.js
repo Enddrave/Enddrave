@@ -32,32 +32,49 @@ const chart = new Chart(ctx, {
 
 // Receive realtime telemetry
 connection.on("newTelemetry", (msg) => {
-    const data = msg.arguments[0]; // Correct extraction
+    const data = msg.arguments && msg.arguments[0] ? msg.arguments[0] : null;
+    if (!data) return console.warn("⚠ Invalid SignalR message received:", msg);
+
     console.log("📡 Live Data:", data);
 
-    // Extract fields
-    const temperature = data.temperature;
-    const humidity = data.humidity;
-    const ts = data.ts;
-    const status = data.status;
-    const location = data.location;
-    const firmwareVersion = data.firmwareVersion;
-    const deviceId = data.deviceId;
-    const anomaly = data.anomalyScore;
+    // Extract fields safely
+    const {
+        temperature,
+        humidity,
+        ts,
+        status,
+        location,
+        firmwareVersion,
+        deviceId,
+        anomalyScore: anomaly
+    } = data;
 
     // Update chart
     const now = new Date(ts || new Date());
     chart.data.labels.push(now.toLocaleTimeString());
     chart.data.datasets[0].data.push(temperature);
 
-    // Keep max 20 points
     if(chart.data.labels.length > 20){
       chart.data.labels.shift();
       chart.data.datasets[0].data.shift();
     }
     chart.update();
 
-    // Update UI section
+    // Update UI elements
     lastSeen.textContent = now.toLocaleTimeString();
-    anomalyScore.textContent = `${anomaly}%`;
-    s
+    anomalyScore.textContent = anomaly !== undefined ? `${anomaly}%` : "--";
+    stateDot.className = `dot ${status === "online" ? "green" : "red"}`;
+    deviceIdField.textContent = deviceId || "--";
+    locationField.textContent = location || "--";
+    firmwareField.textContent = firmwareVersion || "--";
+
+    // Event Log entry
+    const li = document.createElement("li");
+    li.textContent = `${now.toLocaleTimeString()} | Device: ${deviceId} | Temp: ${temperature}°C | Humidity: ${humidity}% | Status: ${status}`;
+    eventLog.prepend(li);
+});
+
+// Start SignalR connection
+connection.start()
+  .then(() => console.log("SignalR Connected 🚀"))
+  .catch(err => console.error("SignalR Connection Failed ❌", err));
