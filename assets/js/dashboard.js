@@ -1,7 +1,9 @@
-// --- 1️⃣ Start SignalR using negotiate endpoint ---
+// --- 1️⃣ Start SignalR using negotiated URL and JWT from Function App ---
 async function startSignalR() {
   try {
-    const resp = await fetch("https://fun-enddrave-vscode.azurewebsites.net/api/negotiate");
+    const resp = await fetch(
+      "https://fun-enddrave-vscode.azurewebsites.net/api/negotiate"
+    );
 
     if (!resp.ok) {
       console.error("❌ HTTP error calling /api/negotiate:", resp.status);
@@ -9,20 +11,17 @@ async function startSignalR() {
       return;
     }
 
-    let { url, accessToken } = await resp.json();
+    // Get negotiated URL and JWT token from backend Azure Function
+    const { url, accessToken } = await resp.json();
     console.log("Negotiation success. Raw URL:", url);
     console.log("Received accessToken:", accessToken);
 
-    // --- 🛠 Fix URL for WebSocket (remove negotiate & change to wss://) ---
-    url = url.replace("/negotiate", "").replace("https://", "wss://");
-    console.log("Final WebSocket URL:", url);
-
-    // ---  Create the SignalR Connection ---
+    // --- Build SignalR connection using full negotiated URL ---
     const connection = new signalR.HubConnectionBuilder()
       .withUrl(url, {
-        accessTokenFactory: () => accessToken,
+        accessTokenFactory: () => accessToken, // JWT passed to SignalR
         transport: signalR.HttpTransportType.WebSockets,
-        skipNegotiation: true, // 🚀 IMPORTANT!
+        skipNegotiation: true // 🔹 We already negotiated on server
       })
       .withAutomaticReconnect()
       .configureLogging(signalR.LogLevel.Information)
@@ -30,43 +29,44 @@ async function startSignalR() {
 
     registerHandlers(connection);
 
-    // --- Start connection ---
     await connection.start();
-    console.log("🟢 SignalR Connected via WebSocket 🚀");
+    console.log("🟢 SignalR Connected 🚀");
   } catch (err) {
     console.error("❌ Failed to start SignalR:", err);
   }
 }
 
-// --- 2️⃣ Register handler for telemetry messages ---
+
+// --- 2️⃣ Register handlers for incoming IoT telemetry ---
 function registerHandlers(connection) {
-  connection.on("newTelemetry", (msg) => {
-    const data = msg?.arguments?.[0];
+  connection.on("newTelemetry", (data) => {
     if (!data) {
-      console.warn("⚠ No data in SignalR message:", msg);
+      console.warn("⚠ No telemetry payload received");
       return;
     }
-    console.log("📡 Live Telemetry:", data);
+    console.log("📡 Live Telemetry Received:", data);
     updateTelemetryUI(data);
   });
 }
 
-// --- 3️⃣ Update UI elements ---
+
+// --- 3️⃣ Update UI with live telemetry ---
 function updateTelemetryUI(data) {
   const {
-    temperature,
-    humidity,
-    ts,
-    status,
     deviceId,
-    anomalyScore,
-    firmwareVersion,
     location,
+    firmwareVersion,
+    anomalyScore,
+    status,
+    ts,
+    temperature,
+    humidity
   } = data;
 
   document.getElementById("deviceId").textContent = deviceId || "--";
   document.getElementById("location").textContent = location || "--";
   document.getElementById("firmware").textContent = firmwareVersion || "--";
+
   document.getElementById("anomalyScore").textContent =
     anomalyScore !== undefined ? `${anomalyScore}%` : "--";
 
@@ -75,7 +75,14 @@ function updateTelemetryUI(data) {
 
   document.getElementById("lastSeen").textContent =
     ts ? new Date(ts).toLocaleTimeString() : "--";
+
+  document.getElementById("temperature").textContent =
+    temperature !== undefined ? `${temperature} °C` : "--";
+
+  document.getElementById("humidity").textContent =
+    humidity !== undefined ? `${humidity}%` : "--";
 }
 
-// --- 4️⃣ Initialize SignalR connection ---
+
+// --- 4️⃣ Kick off SignalR connection ---
 startSignalR();
