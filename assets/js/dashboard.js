@@ -1,6 +1,6 @@
 // Initialize SignalR connection
 const connection = new signalR.HubConnectionBuilder()
-    .withUrl("https://fun-enddrave-vscode.azurewebsites.net/api/negotiate")
+    .withUrl("https://fun-enddrave-vscode.azurewebsites.net/api")  // 👈 FIXED: only /api
     .withAutomaticReconnect()
     .build();
 
@@ -37,7 +37,6 @@ connection.on("newTelemetry", (msg) => {
 
     console.log("📡 Live Data:", data);
 
-    // Extract fields safely
     const {
         temperature,
         humidity,
@@ -49,18 +48,16 @@ connection.on("newTelemetry", (msg) => {
         anomalyScore: anomaly
     } = data;
 
-    // Update chart
     const now = new Date(ts || new Date());
     chart.data.labels.push(now.toLocaleTimeString());
     chart.data.datasets[0].data.push(temperature);
 
-    if(chart.data.labels.length > 20){
+    if (chart.data.labels.length > 20) {
       chart.data.labels.shift();
       chart.data.datasets[0].data.shift();
     }
     chart.update();
 
-    // Update UI elements
     lastSeen.textContent = now.toLocaleTimeString();
     anomalyScore.textContent = anomaly !== undefined ? `${anomaly}%` : "--";
     stateDot.className = `dot ${status === "online" ? "green" : "red"}`;
@@ -68,7 +65,6 @@ connection.on("newTelemetry", (msg) => {
     locationField.textContent = location || "--";
     firmwareField.textContent = firmwareVersion || "--";
 
-    // Event Log entry
     const li = document.createElement("li");
     li.textContent = `${now.toLocaleTimeString()} | Device: ${deviceId} | Temp: ${temperature}°C | Humidity: ${humidity}% | Status: ${status}`;
     eventLog.prepend(li);
