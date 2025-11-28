@@ -13,8 +13,8 @@ async function startSignalR() {
     }
 
     // Must be: { url: ".../client/?hub=telemetryHub", accessToken: "JWT..." }
-    const { url, accessToken } = await resp.json();
-    console.log("Negotiation success:", url);
+    const { url } = await resp.json();
+   const console.log("Negotiation success:", url);
   accessToken = "AvZeD4cL71aRGFS85a6LQ1yLxNo4WiFC3q1cCqQ2ljSmQPJhyJnIJQQJ99BKACGhslBXJ3w3AAAAASRSLYXJ";
 console.log("accessToken:", accessToken);
 
