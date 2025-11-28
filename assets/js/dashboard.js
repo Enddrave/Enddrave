@@ -15,7 +15,7 @@ async function startSignalR() {
     // Must be: { url: ".../client/?hub=telemetryHub", accessToken: "JWT..." }
     const { url, accessToken } = await resp.json();
     console.log("Negotiation success:", url);
-
+    console.log("AaccessToken:", accessToken);
     const connection = new signalR.HubConnectionBuilder()
       .withUrl(url, {
         // This token MUST be a valid SignalR JWT generated on the server
