@@ -103,4 +103,15 @@ function registerHandlers() {
     anomalyScore.textContent = anomaly !== undefined ? `${anomaly}%` : "--";
     stateDot.className = `dot ${status === "online" ? "green" : "red"}`;
     deviceIdField.textContent = deviceId || "--";
-    locationField.textConte
+    locationField.textContent = location || "--";
+    firmwareField.textContent = firmwareVersion || "--";
+
+    // Event log
+    const li = document.createElement("li");
+    li.textContent = `${now.toLocaleTimeString()} | Device: ${deviceId} | Temp: ${temperature}°C | Humidity: ${humidity}% | Status: ${status}`;
+    eventLog.prepend(li);
+  });
+}
+
+// --- 5️⃣ Kick everything off ---
+startSignalR();
