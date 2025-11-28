@@ -1,7 +1,6 @@
 // --- 1️⃣ Start SignalR using the Azure Function negotiate endpoint ---
 async function startSignalR() {
   try {
-    // Call your Function App negotiate endpoint
     const resp = await fetch(
       "https://fun-enddrave-vscode.azurewebsites.net/api/negotiate"
     );
@@ -12,20 +11,16 @@ async function startSignalR() {
       return;
     }
 
-let { url, accessToken } = await resp.json();
+    // Correctly receive URL & accessToken from backend
+    let { url, accessToken } = await resp.json();
+    console.log("Negotiation success. URL:", url);
+    console.log("Received accessToken:", accessToken);
 
-console.log("Negotiation success:", url);
-
-// 🔐 Override accessToken with static value
-accessToken = "AvZeD4cL71aRGFS85a6LQ1yLxNo4WiFC3q1cCqQ2ljSmQPJhyJnIJQQJ99BKACGhslBXJ3w3AAAAASRSLYXJ";
-console.log("Static accessToken:", accessToken);
-    
+    // --- Create SignalR connection ---
     const connection = new signalR.HubConnectionBuilder()
       .withUrl(url, {
-        // This token MUST be a valid SignalR JWT generated on the server
-        accessTokenFactory: () => accessToken,
+        accessTokenFactory: () => accessToken, // 🔹 Now correctly using real JWT
         transport: signalR.HttpTransportType.WebSockets,
-        skipNegotiation: false, // SignalR JS will call {url}/negotiate
       })
       .withAutomaticReconnect()
       .configureLogging(signalR.LogLevel.Information)
@@ -48,13 +43,12 @@ function registerHandlers(connection) {
       console.warn("⚠ No data in SignalR message:", msg);
       return;
     }
-
     console.log("📡 Live Telemetry:", data);
     updateTelemetryUI(data);
   });
 }
 
-// --- 3️⃣ Update UI (same as you already have) ---
+// --- 3️⃣ Update UI ---
 function updateTelemetryUI(data) {
   const {
     temperature,
