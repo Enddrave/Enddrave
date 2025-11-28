@@ -64,7 +64,7 @@ function updateTelemetryUI(data) {
     temperature,
     humidity
   } = data;
-
+console.log("DeviceID "+deviceId+"Location "+location+"FriemWare "+firmwareVersion);
   document.getElementById("deviceId").textContent = deviceId || "--";
   document.getElementById("location").textContent = location || "--";
   document.getElementById("firmware").textContent = firmwareVersion || "--";
