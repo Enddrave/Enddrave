@@ -18,6 +18,8 @@ async function startSignalR() {
     console.log("URL:", url);
     console.log("AccessToken:", accessToken);
 
+
+    console.log(" WebSocket "+signalR.HttpTransportType.WebSockets);
     // 🧬 Build SignalR connection with negotiated URL
     const connection = new signalR.HubConnectionBuilder()
       .withUrl(url, {
@@ -29,6 +31,7 @@ async function startSignalR() {
       .configureLogging(signalR.LogLevel.Information)
       .build();
 
+    console.log(" Connection Established  "+connection);
     // Register message handlers (SignalR targets)
     registerHandlers(connection);
 
