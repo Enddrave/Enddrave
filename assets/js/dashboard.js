@@ -31,7 +31,10 @@ async function startSignalR() {
       .configureLogging(signalR.LogLevel.Information)
       .build();
 
-    console.log(" Connection Established  "+connection);
+    console.log("Connection Established", connection); // best
+console.log(JSON.stringify(connection));           // if you want raw JSON
+console.dir(connection);     
+    
     // Register message handlers (SignalR targets)
     registerHandlers(connection);
 
