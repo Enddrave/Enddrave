@@ -1,9 +1,7 @@
-// --- 1️⃣ Start SignalR using the Azure Function negotiate endpoint ---
+// --- 1️⃣ Start SignalR using negotiate endpoint ---
 async function startSignalR() {
   try {
-    const resp = await fetch(
-      "https://fun-enddrave-vscode.azurewebsites.net/api/negotiate"
-    );
+    const resp = await fetch("https://fun-enddrave-vscode.azurewebsites.net/api/negotiate");
 
     if (!resp.ok) {
       console.error("❌ HTTP error calling /api/negotiate:", resp.status);
@@ -12,28 +10,29 @@ async function startSignalR() {
     }
 
     let { url, accessToken } = await resp.json();
-    console.log("Negotiated URL:", url);
-    console.log("Received Token:", accessToken);
+    console.log("Negotiation success. Raw URL:", url);
+    console.log("Received accessToken:", accessToken);
 
-    // Convert HTTPS → WSS for WebSocket direct connection
-    url = url.replace("https://", "wss://");
+    // --- 🛠 Fix URL for WebSocket (remove negotiate & change to wss://) ---
+    url = url.replace("/negotiate", "").replace("https://", "wss://");
+    console.log("Final WebSocket URL:", url);
 
-    // --- Create SignalR connection ---
+    // ---  Create the SignalR Connection ---
     const connection = new signalR.HubConnectionBuilder()
       .withUrl(url, {
         accessTokenFactory: () => accessToken,
         transport: signalR.HttpTransportType.WebSockets,
-        skipNegotiation: true
+        skipNegotiation: true, // 🚀 IMPORTANT!
       })
       .withAutomaticReconnect()
       .configureLogging(signalR.LogLevel.Information)
       .build();
 
-    // 🔹 Register handlers BEFORE starting
     registerHandlers(connection);
 
+    // --- Start connection ---
     await connection.start();
-    console.log("🟢 SignalR Connected 🚀");
+    console.log("🟢 SignalR Connected via WebSocket 🚀");
   } catch (err) {
     console.error("❌ Failed to start SignalR:", err);
   }
@@ -52,7 +51,7 @@ function registerHandlers(connection) {
   });
 }
 
-// --- 3️⃣ Update UI (unchanged) ---
+// --- 3️⃣ Update UI elements ---
 function updateTelemetryUI(data) {
   const {
     temperature,
@@ -70,11 +69,13 @@ function updateTelemetryUI(data) {
   document.getElementById("firmware").textContent = firmwareVersion || "--";
   document.getElementById("anomalyScore").textContent =
     anomalyScore !== undefined ? `${anomalyScore}%` : "--";
+
   document.getElementById("stateDot").className =
     `dot ${status === "online" ? "green" : "red"}`;
+
   document.getElementById("lastSeen").textContent =
     ts ? new Date(ts).toLocaleTimeString() : "--";
 }
 
-// --- 4️⃣ Kick off connection ---
+// --- 4️⃣ Initialize SignalR connection ---
 startSignalR();
