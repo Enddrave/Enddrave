@@ -1,47 +1,50 @@
-// --- 1️⃣ Start SignalR using negotiated URL and JWT from Function App ---
+// 🌐 1️⃣ Initialize SignalR connection using negotiated URL & access token
 async function startSignalR() {
   try {
+    console.log("🚀 Starting SignalR negotiation...");
+
     const resp = await fetch(
       "https://fun-enddrave-vscode.azurewebsites.net/api/negotiate"
     );
 
     if (!resp.ok) {
-      console.error("❌ HTTP error calling /api/negotiate:", resp.status);
+      console.error("❌ Error calling /api/negotiate:", resp.status);
       console.error(await resp.text());
       return;
     }
 
-    // Get negotiated URL and JWT token from backend Azure Function
     const { url, accessToken } = await resp.json();
-    console.log("Negotiation success. Raw URL:", url);
-    console.log("Received accessToken:", accessToken);
+    console.log("🔗 Negotiation successful");
+    console.log("URL:", url);
+    console.log("AccessToken:", accessToken);
 
-    // --- Build SignalR connection using full negotiated URL ---
+    // 🧬 Build SignalR connection with negotiated URL
     const connection = new signalR.HubConnectionBuilder()
       .withUrl(url, {
-        accessTokenFactory: () => accessToken, // JWT passed to SignalR
+        accessTokenFactory: () => accessToken,
         transport: signalR.HttpTransportType.WebSockets,
-        skipNegotiation: true // 🔹 We already negotiated on server
+        skipNegotiation: true
       })
       .withAutomaticReconnect()
       .configureLogging(signalR.LogLevel.Information)
       .build();
 
+    // Register message handlers (SignalR targets)
     registerHandlers(connection);
 
+    // Start live connection
     await connection.start();
-    console.log("🟢 SignalR Connected 🚀");
+    console.log("🟢 SignalR Connected Successfully 🚀");
   } catch (err) {
-    console.error("❌ Failed to start SignalR:", err);
+    console.error("❌ Failed to establish SignalR connection:", err);
   }
 }
 
-
-// --- 2️⃣ Register handlers for incoming IoT telemetry ---
+// 📡 2️⃣ Register incoming telemetry handler
 function registerHandlers(connection) {
   connection.on("newTelemetry", (data) => {
     if (!data) {
-      console.warn("⚠ No telemetry payload received");
+      console.warn("⚠ Empty telemetry payload received");
       return;
     }
     console.log("📡 Live Telemetry Received:", data);
@@ -49,8 +52,7 @@ function registerHandlers(connection) {
   });
 }
 
-
-// --- 3️⃣ Update UI with live telemetry ---
+// 🖥️ 3️⃣ Update dashboard UI with real-time data
 function updateTelemetryUI(data) {
   const {
     deviceId,
@@ -66,7 +68,6 @@ function updateTelemetryUI(data) {
   document.getElementById("deviceId").textContent = deviceId || "--";
   document.getElementById("location").textContent = location || "--";
   document.getElementById("firmware").textContent = firmwareVersion || "--";
-
   document.getElementById("anomalyScore").textContent =
     anomalyScore !== undefined ? `${anomalyScore}%` : "--";
 
@@ -83,6 +84,5 @@ function updateTelemetryUI(data) {
     humidity !== undefined ? `${humidity}%` : "--";
 }
 
-
-// --- 4️⃣ Kick off SignalR connection ---
+// 🚀 4️⃣ Kick off SignalR connection when page loads
 startSignalR();
