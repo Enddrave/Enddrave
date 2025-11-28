@@ -1,8 +1,13 @@
+// --- 1️⃣ Start SignalR using the Azure Function negotiate endpoint ---
 async function startSignalR() {
   try {
-    const resp = await fetch("https://fun-enddrave-vscode.azurewebsites.net/api/negotiate");
+    const resp = await fetch(
+      "https://fun-enddrave-vscode.azurewebsites.net/api/negotiate"
+    );
+
     if (!resp.ok) {
-      console.error("HTTP error:", resp.status);
+      console.error("❌ HTTP error calling /api/negotiate:", resp.status);
+      console.error(await resp.text());
       return;
     }
 
@@ -10,19 +15,21 @@ async function startSignalR() {
     console.log("Negotiated URL:", url);
     console.log("Received Token:", accessToken);
 
-    // 🔹 Convert HTTPS to WSS (WebSocket protocol)
+    // Convert HTTPS → WSS for WebSocket direct connection
     url = url.replace("https://", "wss://");
 
+    // --- Create SignalR connection ---
     const connection = new signalR.HubConnectionBuilder()
       .withUrl(url, {
         accessTokenFactory: () => accessToken,
-        transport: signalR.HttpTransportType.WebSockets, // Force WebSockets
-        skipNegotiation: true, // 🔥 Prevent negotiate call
+        transport: signalR.HttpTransportType.WebSockets,
+        skipNegotiation: true
       })
       .withAutomaticReconnect()
       .configureLogging(signalR.LogLevel.Information)
       .build();
 
+    // 🔹 Register handlers BEFORE starting
     registerHandlers(connection);
 
     await connection.start();
@@ -32,4 +39,42 @@ async function startSignalR() {
   }
 }
 
+// --- 2️⃣ Register handler for telemetry messages ---
+function registerHandlers(connection) {
+  connection.on("newTelemetry", (msg) => {
+    const data = msg?.arguments?.[0];
+    if (!data) {
+      console.warn("⚠ No data in SignalR message:", msg);
+      return;
+    }
+    console.log("📡 Live Telemetry:", data);
+    updateTelemetryUI(data);
+  });
+}
+
+// --- 3️⃣ Update UI (unchanged) ---
+function updateTelemetryUI(data) {
+  const {
+    temperature,
+    humidity,
+    ts,
+    status,
+    deviceId,
+    anomalyScore,
+    firmwareVersion,
+    location,
+  } = data;
+
+  document.getElementById("deviceId").textContent = deviceId || "--";
+  document.getElementById("location").textContent = location || "--";
+  document.getElementById("firmware").textContent = firmwareVersion || "--";
+  document.getElementById("anomalyScore").textContent =
+    anomalyScore !== undefined ? `${anomalyScore}%` : "--";
+  document.getElementById("stateDot").className =
+    `dot ${status === "online" ? "green" : "red"}`;
+  document.getElementById("lastSeen").textContent =
+    ts ? new Date(ts).toLocaleTimeString() : "--";
+}
+
+// --- 4️⃣ Kick off connection ---
 startSignalR();
