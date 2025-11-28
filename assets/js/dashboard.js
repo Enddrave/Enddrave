@@ -1,6 +1,7 @@
 // Initialize SignalR connection
 const connection = new signalR.HubConnectionBuilder()
-    .withUrl("https://fun-enddrave-vscode.azurewebsites.net/api/negotiate") // MUST be /negotiate
+   .withUrl("https://fun-enddrave-vscode.azurewebsites.net/api/negotiate?negotiateVersion=1")
+
     .withAutomaticReconnect()
     .build();
 
