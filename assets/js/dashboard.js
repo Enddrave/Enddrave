@@ -1,10 +1,25 @@
-// Initialize SignalR connection
-const connection = new signalR.HubConnectionBuilder()
-    .withUrl("https://fun-enddrave-vscode.azurewebsites.net/api")  // 👈 FIXED: only /api
-    .withAutomaticReconnect()
-    .build();
+// Initialize SignalR connection using negotiate endpoint
+async function createSignalRConnection() {
+    // Get negotiate info (URL + accessToken) from Azure Function
+    const response = await fetch("https://fun-enddrave-vscode.azurewebsites.net/api/negotiate", {
+        method: "POST"
+    });
+    const negotiateData = await response.json();
 
-// DOM elements
+    console.log("🔐 Negotiate response:", negotiateData);
+
+    return new signalR.HubConnectionBuilder()
+        .withUrl(negotiateData.url, {
+            accessTokenFactory: () => negotiateData.accessToken
+        })
+        .withAutomaticReconnect()
+        .configureLogging(signalR.LogLevel.Information)
+        .build();
+}
+
+let connection;
+
+// Setup UI references
 const lastSeen = document.getElementById("lastSeen");
 const anomalyScore = document.getElementById("anomalyScore");
 const eventLog = document.getElementById("eventLog");
@@ -15,62 +30,48 @@ const firmwareField = document.getElementById("firmware");
 
 // Chart.js setup
 const ctx = document.getElementById("telemetryChart").getContext("2d");
-const data = {
-  labels: [],
-  datasets: [{
-      label: "Temperature (°C)",
-      data: [],
-      borderWidth: 2
-  }]
-};
-
-const chart = new Chart(ctx, {
-  type: 'line',
-  data,
-  options: { animation: false }
-});
+const data = { labels: [], datasets: [{ label: "Temperature (°C)", data: [], borderWidth: 2 }] };
+const chart = new Chart(ctx, { type: 'line', data, options: { animation: false } });
 
 // Receive realtime telemetry
-connection.on("newTelemetry", (msg) => {
-    const data = msg.arguments && msg.arguments[0] ? msg.arguments[0] : null;
-    if (!data) return console.warn("⚠ Invalid SignalR message received:", msg);
+function setupSignalRListeners(connection) {
+    connection.on("newTelemetry", (data) => {
+        if (!data) return console.warn("⚠ Invalid SignalR data received");
 
-    console.log("📡 Live Data:", data);
+        console.log("📡 Live Telemetry:", data);
 
-    const {
-        temperature,
-        humidity,
-        ts,
-        status,
-        location,
-        firmwareVersion,
-        deviceId,
-        anomalyScore: anomaly
-    } = data;
+        const now = new Date(data.ts || new Date());
+        chart.data.labels.push(now.toLocaleTimeString());
+        chart.data.datasets[0].data.push(data.temperature);
 
-    const now = new Date(ts || new Date());
-    chart.data.labels.push(now.toLocaleTimeString());
-    chart.data.datasets[0].data.push(temperature);
+        if (chart.data.labels.length > 20) {
+          chart.data.labels.shift();
+          chart.data.datasets[0].data.shift();
+        }
+        chart.update();
 
-    if (chart.data.labels.length > 20) {
-      chart.data.labels.shift();
-      chart.data.datasets[0].data.shift();
+        lastSeen.textContent = now.toLocaleTimeString();
+        anomalyScore.textContent = data.anomalyScore !== undefined ? `${data.anomalyScore}%` : "--";
+        stateDot.className = `dot ${data.status === "online" ? "green" : "red"}`;
+        deviceIdField.textContent = data.deviceId || "--";
+        locationField.textContent = data.location || "--";
+        firmwareField.textContent = data.firmwareVersion || "--";
+
+        const li = document.createElement("li");
+        li.textContent = `${now.toLocaleTimeString()} | Device: ${data.deviceId} | Temp: ${data.temperature}°C | Humidity: ${data.humidity}%`;
+        eventLog.prepend(li);
+    });
+}
+
+// Start connection
+(async () => {
+    try {
+        connection = await createSignalRConnection();
+        setupSignalRListeners(connection);
+
+        await connection.start();
+        console.log("🟢 SignalR Connected Successfully 🚀");
+    } catch (err) {
+        console.error("❌ SignalR Connection Failed", err);
     }
-    chart.update();
-
-    lastSeen.textContent = now.toLocaleTimeString();
-    anomalyScore.textContent = anomaly !== undefined ? `${anomaly}%` : "--";
-    stateDot.className = `dot ${status === "online" ? "green" : "red"}`;
-    deviceIdField.textContent = deviceId || "--";
-    locationField.textContent = location || "--";
-    firmwareField.textContent = firmwareVersion || "--";
-
-    const li = document.createElement("li");
-    li.textContent = `${now.toLocaleTimeString()} | Device: ${deviceId} | Temp: ${temperature}°C | Humidity: ${humidity}% | Status: ${status}`;
-    eventLog.prepend(li);
-});
-
-// Start SignalR connection
-connection.start()
-  .then(() => console.log("SignalR Connected 🚀"))
-  .catch(err => console.error("SignalR Connection Failed ❌", err));
+})();
