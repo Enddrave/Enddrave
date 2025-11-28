@@ -42,9 +42,12 @@ async function startSignalR() {
 
 // 📡 2️⃣ Register incoming telemetry handler
 function registerHandlers(connection) {
+  console.log("Register Handler");
   connection.on("newTelemetry", (data) => {
+    console.log("Data");
+    console.log(data);
     if (!data) {
-      console.warn("⚠ Empty telemetry payload received");
+      console.log("⚠ Empty telemetry payload received");
       return;
     }
     console.log("📡 Live Telemetry Received:", data);
