@@ -11,16 +11,17 @@ async function startSignalR() {
       return;
     }
 
-    // Correctly receive URL & accessToken from backend
+    // Receive URL & accessToken (JWT) from backend
     let { url, accessToken } = await resp.json();
     console.log("Negotiation success. URL:", url);
     console.log("Received accessToken:", accessToken);
 
-    // --- Create SignalR connection ---
+    // --- Create SignalR connection using negotiated URL + token ---
     const connection = new signalR.HubConnectionBuilder()
       .withUrl(url, {
-        accessTokenFactory: () => accessToken, // 🔹 Now correctly using real JWT
+        accessTokenFactory: () => accessToken, // use JWT from Function
         transport: signalR.HttpTransportType.WebSockets,
+        skipNegotiation: true,                 // 👈 IMPORTANT: we already have client URL
       })
       .withAutomaticReconnect()
       .configureLogging(signalR.LogLevel.Information)
