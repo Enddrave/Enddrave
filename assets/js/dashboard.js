@@ -12,12 +12,14 @@ async function startSignalR() {
       return;
     }
 
-    // Must be: { url: ".../client/?hub=telemetryHub", accessToken: "JWT..." }
-    const { url } = await resp.json();
-   const console.log("Negotiation success:", url);
-  accessToken = "AvZeD4cL71aRGFS85a6LQ1yLxNo4WiFC3q1cCqQ2ljSmQPJhyJnIJQQJ99BKACGhslBXJ3w3AAAAASRSLYXJ";
-console.log("accessToken:", accessToken);
+let { url, accessToken } = await resp.json();
 
+console.log("Negotiation success:", url);
+
+// 🔐 Override accessToken with static value
+accessToken = "AvZeD4cL71aRGFS85a6LQ1yLxNo4WiFC3q1cCqQ2ljSmQPJhyJnIJQQJ99BKACGhslBXJ3w3AAAAASRSLYXJ";
+console.log("Static accessToken:", accessToken);
+    
     const connection = new signalR.HubConnectionBuilder()
       .withUrl(url, {
         // This token MUST be a valid SignalR JWT generated on the server
