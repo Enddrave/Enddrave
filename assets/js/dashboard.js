@@ -63,7 +63,16 @@ async function startSignalR() {
     registerHandlers(connection);
     await connection.start();
     console.log("Connected via:", connection.connection.transport.constructor.name);
-alert("Transport used: " + connection.connection.transport.constructor.name);    console.log("🟢 SignalR Connected Successfully 🚀");
+alert("Transport used: " + connection.connection.transport.constructor.name);    
+
+console.log("Checking if SignalR is loaded:", window.signalR);
+
+if (!window.signalR) {
+  alert("SignalR library is NOT loaded! (Blocked on mobile?)");
+}
+
+    
+    console.log("🟢 SignalR Connected Successfully 🚀");
   } catch (err) {
     console.error("❌ Failed to establish SignalR connection:", err);
   }
