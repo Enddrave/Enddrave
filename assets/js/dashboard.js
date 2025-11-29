@@ -186,6 +186,8 @@ function logEvent(data) {
 }
 
 // 🚀 5️⃣ Kick off SignalR connection when page loads
+// 🔴 Initial state: device is Offline, Not Available
+markDeviceOffline();
 startSignalR();
 // start initial offline timer in case no data ever comes
 resetDeviceTimer();
