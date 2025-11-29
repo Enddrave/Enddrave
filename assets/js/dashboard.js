@@ -33,6 +33,38 @@ const telemetryChart = new Chart(ctx, {
   },
 });
 
+// === 🟠 Device Offline Logic (ADDED) ===
+let deviceTimeout;
+const OFFLINE_THRESHOLD = 15000; // 15 seconds
+
+function markDeviceOffline() {
+  console.warn("⚠ Device marked OFFLINE (no telemetry received)");
+
+  const stateDot = document.getElementById("stateDot");
+  if (stateDot) stateDot.className = "dot red";
+
+  const fields = [
+    "deviceId",
+    "location",
+    "firmware",
+    "lastSeen",
+    "temperature",
+    "humidity",
+    "anomalyScore",
+  ];
+
+  fields.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = "NOT AVAILABLE";
+  });
+}
+
+// reset timer whenever we get a packet
+function resetDeviceTimer() {
+  clearTimeout(deviceTimeout);
+  deviceTimeout = setTimeout(markDeviceOffline, OFFLINE_THRESHOLD);
+}
+
 // 🌐 1️⃣ Initialize SignalR connection using negotiated URL & access token
 async function startSignalR() {
   try {
@@ -63,15 +95,13 @@ async function startSignalR() {
     registerHandlers(connection);
     await connection.start();
     console.log("Connected via:", connection.connection.transport.constructor.name);
-alert("Transport used: " + connection.connection.transport.constructor.name);    
+    alert("Transport used: " + connection.connection.transport.constructor.name);
 
-console.log("Checking if SignalR is loaded:", window.signalR);
+    console.log("Checking if SignalR is loaded:", window.signalR);
+    if (!window.signalR) {
+      alert("SignalR library is NOT loaded! (Blocked on mobile?)");
+    }
 
-if (!window.signalR) {
-  alert("SignalR library is NOT loaded! (Blocked on mobile?)");
-}
-
-    
     console.log("🟢 SignalR Connected Successfully 🚀");
   } catch (err) {
     console.error("❌ Failed to establish SignalR connection:", err);
@@ -91,6 +121,9 @@ function registerHandlers(connection) {
       console.warn("⚠ Empty telemetry payload received");
       return;
     }
+
+    // ✅ We received data → device is online → reset offline timer
+    resetDeviceTimer();
 
     console.log("📡 Live Telemetry Parsed:", payload);
 
@@ -154,3 +187,5 @@ function logEvent(data) {
 
 // 🚀 5️⃣ Kick off SignalR connection when page loads
 startSignalR();
+// start initial offline timer in case no data ever comes
+resetDeviceTimer();
