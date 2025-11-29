@@ -4,7 +4,7 @@ const ctx = document.getElementById("telemetryChart").getContext("2d");
 const telemetryChart = new Chart(ctx, {
   type: "line",
   data: {
-    labels: [], // timestamps
+    labels: [],
     datasets: [
       {
         label: "Temperature (°C)",
@@ -12,7 +12,8 @@ const telemetryChart = new Chart(ctx, {
         borderWidth: 2,
         borderColor: "#ff5733",
         fill: false,
-        tension: 0.3,
+        tension: 0.4,
+        pointRadius: 3,
       },
       {
         label: "Humidity (%)",
@@ -20,17 +21,34 @@ const telemetryChart = new Chart(ctx, {
         borderWidth: 2,
         borderColor: "#007bff",
         fill: false,
-        tension: 0.3,
+        tension: 0.4,
+        pointRadius: 3,
       },
     ],
   },
   options: {
     responsive: true,
-    maintainAspectRatio: false, // better on mobile
+    maintainAspectRatio: false,
+    animation: { duration: 300 }, // smooth movement
     scales: {
-      x: { title: { display: true, text: "Time" } },
-      y: { title: { display: true, text: "Value" }, min: 0, max: 100 },
+      x: {
+        title: { display: true, text: "Time" },
+        ticks: { maxRotation: 45, minRotation: 45 },
+      },
+      y: {
+        title: { display: true, text: "Value" },
+        min: 10, // Prevents stretching
+        max: 100,
+        beginAtZero: false,
+        ticks: { stepSize: 10 },
+        grid: { drawBorder: true },
+      },
     },
+    plugins: {
+      legend: { position: "top" },
+      tooltip: { enabled: true },
+    },
+    elements: { point: { radius: 0 } },
   },
 });
 
@@ -53,42 +71,25 @@ async function startSignalR() {
 
     const { url, accessToken } = await resp.json();
     console.log("🔗 Negotiation successful");
-    console.log("URL:", url);
 
-    // If SignalR script failed to load (common on mobile if CDN is blocked)
     if (!window.signalR || !signalR.HubConnectionBuilder) {
       console.error("❌ SignalR JS not loaded (CDN blocked?)");
       if (connStatusEl) connStatusEl.textContent = "SignalR script not loaded";
       return;
     }
 
-    // ⚠️ MOBILE-SAFE: let SignalR negotiate transport, no skipNegotiation
+    // ⚠️ MOBILE-SAFE: No skipNegotiation, allow fallback to SSE/LongPolling
     const connection = new signalR.HubConnectionBuilder()
-      .withUrl(url, {
-        accessTokenFactory: () => accessToken
-        // no explicit transport, no skipNegotiation -> allows fallback (SSE/longPolling)
-      })
+      .withUrl(url, { accessTokenFactory: () => accessToken })
       .withAutomaticReconnect()
       .configureLogging(signalR.LogLevel.Information)
       .build();
 
-    connection.onclose((err) => {
-      console.warn("⚠ SignalR connection closed:", err);
-      if (connStatusEl) connStatusEl.textContent = "Disconnected";
-    });
-    connection.onreconnecting((err) => {
-      console.log("🔄 Reconnecting to SignalR:", err);
-      if (connStatusEl) connStatusEl.textContent = "Reconnecting…";
-    });
-    connection.onreconnected(() => {
-      console.log("🟢 Reconnected to SignalR");
-      if (connStatusEl) connStatusEl.textContent = "Connected";
-    });
+    connection.onclose(() => connStatusEl && (connStatusEl.textContent = "Disconnected"));
+    connection.onreconnecting(() => connStatusEl && (connStatusEl.textContent = "Reconnecting…"));
+    connection.onreconnected(() => connStatusEl && (connStatusEl.textContent = "Connected"));
 
-    // Register message handlers
     registerHandlers(connection);
-
-    // Start live connection
     await connection.start();
     console.log("🟢 SignalR Connected Successfully 🚀");
     if (connStatusEl) connStatusEl.textContent = "Connected";
@@ -116,7 +117,7 @@ function registerHandlers(connection) {
 
     updateTelemetryUI(payload);
     logEvent(payload);
-    updateChart(payload); // real-time graph
+    updateChart(payload); // Add to graph
   });
 }
 
@@ -149,26 +150,25 @@ function updateChart(data) {
   telemetryChart.data.datasets[0].data.push(data.temperature);
   telemetryChart.data.datasets[1].data.push(data.humidity);
 
-  // Limit data points to last 20 readings
   if (telemetryChart.data.labels.length > 20) {
     telemetryChart.data.labels.shift();
     telemetryChart.data.datasets[0].data.shift();
     telemetryChart.data.datasets[1].data.shift();
   }
 
-  telemetryChart.update();
+  telemetryChart.update("none"); // Prevents bouncing/jitter
 }
 
 // 📝 4️⃣ Append data to Event Log
 function logEvent(data) {
   const log = document.getElementById("eventLog");
-  const item = document.createElement("li");
+  if (!log) return;
 
+  const item = document.createElement("li");
   item.innerHTML = `
     <strong>${new Date(data.ts).toLocaleTimeString()}</strong> — 
     Temp: ${data.temperature}°C, Humidity: ${data.humidity}%, Anomaly: ${data.anomalyScore}%
   `;
-
   log.prepend(item);
 }
 
