@@ -26,6 +26,7 @@ const telemetryChart = new Chart(ctx, {
   },
   options: {
     responsive: true,
+    maintainAspectRatio: false, // better on mobile
     scales: {
       x: { title: { display: true, text: "Time" } },
       y: { title: { display: true, text: "Value" }, min: 0, max: 100 },
@@ -33,16 +34,20 @@ const telemetryChart = new Chart(ctx, {
   },
 });
 
+const connStatusEl = document.getElementById("connectionStatus");
+
 // 🌐 1️⃣ Initialize SignalR connection using negotiated URL & access token
 async function startSignalR() {
   try {
     console.log("🚀 Starting SignalR negotiation...");
+    if (connStatusEl) connStatusEl.textContent = "Negotiating connection…";
 
     const resp = await fetch("https://fun-enddrave-vscode.azurewebsites.net/api/negotiate");
 
     if (!resp.ok) {
-      console.error("❌ Error calling /api/negotiate:", resp.status);
-      console.error(await resp.text());
+      const txt = await resp.text();
+      console.error("❌ Error calling /api/negotiate:", resp.status, txt);
+      if (connStatusEl) connStatusEl.textContent = "Negotiate failed: " + resp.status;
       return;
     }
 
@@ -50,21 +55,46 @@ async function startSignalR() {
     console.log("🔗 Negotiation successful");
     console.log("URL:", url);
 
+    // If SignalR script failed to load (common on mobile if CDN is blocked)
+    if (!window.signalR || !signalR.HubConnectionBuilder) {
+      console.error("❌ SignalR JS not loaded (CDN blocked?)");
+      if (connStatusEl) connStatusEl.textContent = "SignalR script not loaded";
+      return;
+    }
+
+    // ⚠️ MOBILE-SAFE: let SignalR negotiate transport, no skipNegotiation
     const connection = new signalR.HubConnectionBuilder()
       .withUrl(url, {
-        accessTokenFactory: () => accessToken,
-        transport: signalR.HttpTransportType.WebSockets,
-        skipNegotiation: true
+        accessTokenFactory: () => accessToken
+        // no explicit transport, no skipNegotiation -> allows fallback (SSE/longPolling)
       })
       .withAutomaticReconnect()
       .configureLogging(signalR.LogLevel.Information)
       .build();
 
+    connection.onclose((err) => {
+      console.warn("⚠ SignalR connection closed:", err);
+      if (connStatusEl) connStatusEl.textContent = "Disconnected";
+    });
+    connection.onreconnecting((err) => {
+      console.log("🔄 Reconnecting to SignalR:", err);
+      if (connStatusEl) connStatusEl.textContent = "Reconnecting…";
+    });
+    connection.onreconnected(() => {
+      console.log("🟢 Reconnected to SignalR");
+      if (connStatusEl) connStatusEl.textContent = "Connected";
+    });
+
+    // Register message handlers
     registerHandlers(connection);
+
+    // Start live connection
     await connection.start();
     console.log("🟢 SignalR Connected Successfully 🚀");
+    if (connStatusEl) connStatusEl.textContent = "Connected";
   } catch (err) {
     console.error("❌ Failed to establish SignalR connection:", err);
+    if (connStatusEl) connStatusEl.textContent = "Connection error";
   }
 }
 
@@ -86,7 +116,7 @@ function registerHandlers(connection) {
 
     updateTelemetryUI(payload);
     logEvent(payload);
-    updateChart(payload); // 👈 NEW LINE for real-time graph
+    updateChart(payload); // real-time graph
   });
 }
 
@@ -111,7 +141,7 @@ function updateTelemetryUI(data) {
     data.humidity !== undefined ? `${data.humidity}%` : "--";
 }
 
-// === 📈 3.1 NEW: Update Graph with Live Data ===
+// === 📈 3.1 Update Graph with Live Data ===
 function updateChart(data) {
   const timestamp = new Date(data.ts).toLocaleTimeString();
 
@@ -119,8 +149,8 @@ function updateChart(data) {
   telemetryChart.data.datasets[0].data.push(data.temperature);
   telemetryChart.data.datasets[1].data.push(data.humidity);
 
-  // Limit data points to last 15 readings
-  if (telemetryChart.data.labels.length > 15) {
+  // Limit data points to last 20 readings
+  if (telemetryChart.data.labels.length > 20) {
     telemetryChart.data.labels.shift();
     telemetryChart.data.datasets[0].data.shift();
     telemetryChart.data.datasets[1].data.shift();
