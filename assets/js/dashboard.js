@@ -38,7 +38,7 @@ async function startSignalR() {
   try {
     console.log("🚀 Starting SignalR negotiation...");
 
-    const resp = await fetch("wss://fun-enddrave-vscode.azurewebsites.net/api/negotiate");
+    const resp = await fetch("https://fun-enddrave-vscode.azurewebsites.net/api/negotiate");
 
     if (!resp.ok) {
       console.error("❌ Error calling /api/negotiate:", resp.status);
