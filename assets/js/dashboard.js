@@ -40,11 +40,10 @@ const OFFLINE_THRESHOLD = 15000; // 15 sec
 function markDeviceOffline() {
   console.warn("⚠ Device marked OFFLINE (no telemetry received)");
 
-  // Set dot to RED and show "Offline"
   const stateDot = document.getElementById("stateDot");
   if (stateDot) {
     stateDot.className = "dot red";
-    stateDot.nextSibling.textContent = " Offline"; // Assumes: <span id="stateDot"></span> Online
+    stateDot.nextSibling.textContent = " Offline";
   }
 
   const fields = [
@@ -113,7 +112,6 @@ function updateTelemetryUI(data) {
   document.getElementById("anomalyScore").textContent =
     data.anomalyScore !== undefined ? `${data.anomalyScore}%` : "--";
 
-  // Set dot to green and change status to Online
   const stateDot = document.getElementById("stateDot");
   if (stateDot) {
     stateDot.className = "dot green";
@@ -130,10 +128,57 @@ function updateTelemetryUI(data) {
     data.humidity !== undefined ? `${data.humidity}%` : "--";
 }
 
-// === Chart Update, Event Log & Start SignalR ===
+// === 📈 Update Graph with Live Data ===
+function updateChart(data) {
+  const timestamp = new Date(data.ts).toLocaleTimeString();
 
-// 🚀 On page load — set default state
-markDeviceOffline(); // 👈 Default state: red, offline, Not Available
+  telemetryChart.data.labels.push(timestamp);
+  telemetryChart.data.datasets[0].data.push(data.temperature);
+  telemetryChart.data.datasets[1].data.push(data.humidity);
 
+  if (telemetryChart.data.labels.length > 15) {
+    telemetryChart.data.labels.shift();
+    telemetryChart.data.datasets[0].data.shift();
+    telemetryChart.data.datasets[1].data.shift();
+  }
+
+  telemetryChart.update();
+}
+
+// === 📝 Append telemetry to Event Log ===
+function logEvent(data) {
+  const log = document.getElementById("eventLog");
+  const item = document.createElement("li");
+
+  item.innerHTML = `
+    <strong>${new Date(data.ts).toLocaleTimeString()}</strong> —
+    Temp: ${data.temperature}°C, Humidity: ${data.humidity}%, Anomaly: ${data.anomalyScore}%
+  `;
+
+  log.prepend(item);
+}
+
+// === 💡 Command Buttons (Dummy Actions) ===
+document.getElementById("ledOn").addEventListener("click", () => {
+  logCommand("LED turned ON");
+});
+
+document.getElementById("ledOff").addEventListener("click", () => {
+  logCommand("LED turned OFF");
+});
+
+document.getElementById("simulateOta").addEventListener("click", () => {
+  logCommand("Simulated OTA update started...");
+});
+
+function logCommand(msg) {
+  const log = document.getElementById("eventLog");
+  const item = document.createElement("li");
+  item.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong> — ${msg}`;
+  log.prepend(item);
+}
+
+// 🚀 On page load — default to offline
+markDeviceOffline();
 startSignalR();
-resetDeviceTimer(); // Start timeout watcher
+resetDeviceTimer();
