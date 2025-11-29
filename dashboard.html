@@ -2,7 +2,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Enddrave Tech</title>
-<meta name="description" content="Enddrave Tech — IoT Firmware, BLE/Wi‑Fi Connectivity, RTOS & Azure IoT with AI insights." />
+<meta name="description" content="Enddrave Tech — IoT Firmware, BLE/Wi-Fi Connectivity, RTOS & Azure IoT with AI insights." />
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="assets/images/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -35,26 +35,41 @@
  </div>
 </section>
 <section class="container grid-3">
- <div class="panel"><h3>Telemetry</h3><canvas id="telemetryChart" height="120"></canvas></div>
- <div class="panel"><h3>Device Status</h3>
-   <ul class="status">
-     <li><strong>Device:</strong> ENV-NODE-01</li>
-     <li><strong>State:</strong> <span id="stateDot" class="dot green"></span> Online</li>
-     <li><strong>Firmware:</strong> v1.0.3</li>
-     <li><strong>Last seen:</strong> <span id="lastSeen">—</span></li>
-   </ul>
-   <h4>AI Insight</h4><p>Anomaly score: <strong id="anomalyScore">0%</strong></p>
+ <div class="panel">
+   <h3>Telemetry</h3>
+   <canvas id="telemetryChart" height="120"></canvas>
  </div>
- <div class="panel"><h3>Command Center</h3>
+
+ <div class="panel">
+   <h3>Device Status</h3>
+   <ul class="status">
+     <li><strong>Device:</strong> <span id="deviceId">ENV-NODE-01</span></li>
+     <li><strong>Location:</strong> <span id="location">Factory Lab</span></li>
+     <li><strong>Firmware:</strong> <span id="firmware">v1.0.3</span></li>
+     <li><strong>State:</strong> <span id="stateDot" class="dot green"></span> Online</li>
+     <li><strong>Last seen:</strong> <span id="lastSeen">—</span></li>
+     <li><strong>Temperature:</strong> <span id="temperature">—</span></li>
+     <li><strong>Humidity:</strong> <span id="humidity">—</span></li>
+   </ul>
+   <h4>AI Insight</h4>
+   <p>Anomaly score: <strong id="anomalyScore">0%</strong></p>
+ </div>
+
+ <div class="panel">
+   <h3>Command Center</h3>
    <button class="btn primary" id="ledOn">LED ON</button>
    <button class="btn" id="ledOff">LED OFF</button>
    <button class="btn ghost" id="simulateOta">Simulate OTA</button>
    <div id="cmdLog" class="log"></div>
  </div>
 </section>
+
 <section class="container">
- <div class="panel"><h3>Event Log</h3><ul id="eventLog" class="event-log"></ul>
- <p class="muted">Demo data is simulated. Real deployments use Azure IoT Hub, Direct Methods, and Stream Analytics.</p></div>
+ <div class="panel">
+   <h3>Event Log</h3>
+   <ul id="eventLog" class="event-log"></ul>
+   <p class="muted">Demo data is simulated. Real deployments use Azure IoT Hub, Direct Methods, and Stream Analytics.</p>
+ </div>
 </section>
 </main>
 
