@@ -53,8 +53,8 @@ async function startSignalR() {
     const connection = new signalR.HubConnectionBuilder()
       .withUrl(url, {
         accessTokenFactory: () => accessToken,
-        transport: signalR.HttpTransportType.WebSockets,
-        skipNegotiation: true
+        //transport: signalR.HttpTransportType.WebSockets,
+        //skipNegotiation: true
       })
       .withAutomaticReconnect()
       .configureLogging(signalR.LogLevel.Information)
@@ -62,7 +62,8 @@ async function startSignalR() {
 
     registerHandlers(connection);
     await connection.start();
-    console.log("🟢 SignalR Connected Successfully 🚀");
+    console.log("Connected via:", connection.connection.transport.constructor.name);
+alert("Transport used: " + connection.connection.transport.constructor.name);    console.log("🟢 SignalR Connected Successfully 🚀");
   } catch (err) {
     console.error("❌ Failed to establish SignalR connection:", err);
   }
