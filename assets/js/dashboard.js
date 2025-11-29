@@ -59,7 +59,7 @@ function markDeviceOffline() {
 
   fields.forEach((id) => {
     const el = document.getElementById(id);
-    if (el) el.textContent = "NOT AVAILABLE";
+    if (el) el.textContent = "-";
   });
 }
 
