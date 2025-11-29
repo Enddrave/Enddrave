@@ -33,15 +33,19 @@ const telemetryChart = new Chart(ctx, {
   },
 });
 
-// === 🟠 Device Offline Logic (ADDED) ===
+// === 🟠 Device Offline Logic ===
 let deviceTimeout;
-const OFFLINE_THRESHOLD = 15000; // 15 seconds
+const OFFLINE_THRESHOLD = 15000; // 15 sec
 
 function markDeviceOffline() {
   console.warn("⚠ Device marked OFFLINE (no telemetry received)");
 
+  // Set dot to RED and show "Offline"
   const stateDot = document.getElementById("stateDot");
-  if (stateDot) stateDot.className = "dot red";
+  if (stateDot) {
+    stateDot.className = "dot red";
+    stateDot.nextSibling.textContent = " Offline"; // Assumes: <span id="stateDot"></span> Online
+  }
 
   const fields = [
     "deviceId",
@@ -59,81 +63,49 @@ function markDeviceOffline() {
   });
 }
 
-// reset timer whenever we get a packet
+// Reset timer when telemetry arrives
 function resetDeviceTimer() {
   clearTimeout(deviceTimeout);
   deviceTimeout = setTimeout(markDeviceOffline, OFFLINE_THRESHOLD);
 }
 
-// 🌐 1️⃣ Initialize SignalR connection using negotiated URL & access token
+// 🌐 SignalR Connection
 async function startSignalR() {
   try {
-    console.log("🚀 Starting SignalR negotiation...");
-
     const resp = await fetch("https://fun-enddrave-vscode.azurewebsites.net/api/negotiate");
-
-    if (!resp.ok) {
-      console.error("❌ Error calling /api/negotiate:", resp.status);
-      console.error(await resp.text());
-      return;
-    }
+    if (!resp.ok) return console.error("❌ /negotiate failed");
 
     const { url, accessToken } = await resp.json();
-    console.log("🔗 Negotiation successful");
-    console.log("URL:", url);
 
     const connection = new signalR.HubConnectionBuilder()
-      .withUrl(url, {
-        accessTokenFactory: () => accessToken,
-        //transport: signalR.HttpTransportType.WebSockets,
-        //skipNegotiation: true
-      })
+      .withUrl(url, { accessTokenFactory: () => accessToken })
       .withAutomaticReconnect()
       .configureLogging(signalR.LogLevel.Information)
       .build();
 
     registerHandlers(connection);
     await connection.start();
-    console.log("Connected via:", connection.connection.transport.constructor.name);
-    alert("Transport used: " + connection.connection.transport.constructor.name);
-
-    console.log("Checking if SignalR is loaded:", window.signalR);
-    if (!window.signalR) {
-      alert("SignalR library is NOT loaded! (Blocked on mobile?)");
-    }
-
-    console.log("🟢 SignalR Connected Successfully 🚀");
+    console.log("🟢 SignalR Connected");
   } catch (err) {
-    console.error("❌ Failed to establish SignalR connection:", err);
+    console.error("❌ SignalR Error:", err);
   }
 }
 
-// 📡 2️⃣ Register incoming telemetry handler
+// 📡 Register incoming telemetry
 function registerHandlers(connection) {
-  console.log("🔔 Registering SignalR Handler");
-
   connection.on("newTelemetry", (data) => {
-    console.log("📥 Raw SignalR Packet:", data);
-
     const payload = Array.isArray(data) ? data[0] : data;
+    if (!payload) return;
 
-    if (!payload) {
-      console.warn("⚠ Empty telemetry payload received");
-      return;
-    }
-
-    // ✅ We received data → device is online → reset offline timer
-    resetDeviceTimer();
-
-    console.log("📡 Live Telemetry Parsed:", payload);
+    resetDeviceTimer(); // received telemetry → online
 
     updateTelemetryUI(payload);
     logEvent(payload);
-    updateChart(payload); // 👈 NEW LINE for real-time graph
+    updateChart(payload);
   });
 }
 
-// 🖥️ 3️⃣ Update dashboard UI with real-time data
+// 🖥️ Update UI with telemetry
 function updateTelemetryUI(data) {
   document.getElementById("deviceId").textContent = data.deviceId || "--";
   document.getElementById("location").textContent = data.location || "--";
@@ -141,8 +113,12 @@ function updateTelemetryUI(data) {
   document.getElementById("anomalyScore").textContent =
     data.anomalyScore !== undefined ? `${data.anomalyScore}%` : "--";
 
-  document.getElementById("stateDot").className =
-    `dot ${data.status === "online" ? "green" : "red"}`;
+  // Set dot to green and change status to Online
+  const stateDot = document.getElementById("stateDot");
+  if (stateDot) {
+    stateDot.className = "dot green";
+    stateDot.nextSibling.textContent = " Online";
+  }
 
   document.getElementById("lastSeen").textContent =
     data.ts ? new Date(data.ts).toLocaleTimeString() : "--";
@@ -154,40 +130,10 @@ function updateTelemetryUI(data) {
     data.humidity !== undefined ? `${data.humidity}%` : "--";
 }
 
-// === 📈 3.1 NEW: Update Graph with Live Data ===
-function updateChart(data) {
-  const timestamp = new Date(data.ts).toLocaleTimeString();
+// === Chart Update, Event Log & Start SignalR ===
 
-  telemetryChart.data.labels.push(timestamp);
-  telemetryChart.data.datasets[0].data.push(data.temperature);
-  telemetryChart.data.datasets[1].data.push(data.humidity);
+// 🚀 On page load — set default state
+markDeviceOffline(); // 👈 Default state: red, offline, Not Available
 
-  // Limit data points to last 15 readings
-  if (telemetryChart.data.labels.length > 15) {
-    telemetryChart.data.labels.shift();
-    telemetryChart.data.datasets[0].data.shift();
-    telemetryChart.data.datasets[1].data.shift();
-  }
-
-  telemetryChart.update();
-}
-
-// 📝 4️⃣ Append data to Event Log
-function logEvent(data) {
-  const log = document.getElementById("eventLog");
-  const item = document.createElement("li");
-
-  item.innerHTML = `
-    <strong>${new Date(data.ts).toLocaleTimeString()}</strong> — 
-    Temp: ${data.temperature}°C, Humidity: ${data.humidity}%, Anomaly: ${data.anomalyScore}%
-  `;
-
-  log.prepend(item);
-}
-
-// 🚀 5️⃣ Kick off SignalR connection when page loads
-// 🔴 Initial state: device is Offline, Not Available
-markDeviceOffline();
 startSignalR();
-// start initial offline timer in case no data ever comes
-resetDeviceTimer();
+resetDeviceTimer(); // Start timeout watcher
