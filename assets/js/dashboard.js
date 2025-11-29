@@ -3,9 +3,7 @@ async function startSignalR() {
   try {
     console.log("🚀 Starting SignalR negotiation...");
 
-    const resp = await fetch(
-      "https://fun-enddrave-vscode.azurewebsites.net/api/negotiate"
-    );
+    const resp = await fetch("https://fun-enddrave-vscode.azurewebsites.net/api/negotiate");
 
     if (!resp.ok) {
       console.error("❌ Error calling /api/negotiate:", resp.status);
@@ -16,10 +14,7 @@ async function startSignalR() {
     const { url, accessToken } = await resp.json();
     console.log("🔗 Negotiation successful");
     console.log("URL:", url);
-    console.log("AccessToken:", accessToken);
 
-
-    console.log(" WebSocket "+signalR.HttpTransportType.WebSockets);
     // 🧬 Build SignalR connection with negotiated URL
     const connection = new signalR.HubConnectionBuilder()
       .withUrl(url, {
@@ -31,11 +26,7 @@ async function startSignalR() {
       .configureLogging(signalR.LogLevel.Information)
       .build();
 
-    console.log("Connection Established", connection); // best
-console.log(JSON.stringify(connection));           // if you want raw JSON
-console.dir(connection);     
-    
-    // Register message handlers (SignalR targets)
+    // Register message handlers
     registerHandlers(connection);
 
     // Start live connection
@@ -48,50 +39,58 @@ console.dir(connection);
 
 // 📡 2️⃣ Register incoming telemetry handler
 function registerHandlers(connection) {
-  console.log("Register Handler");
+  console.log("🔔 Registering SignalR Handler");
+
   connection.on("newTelemetry", (data) => {
-    console.log("Data");
-    console.log(data);
-    if (!data) {
-      console.log("⚠ Empty telemetry payload received");
+    console.log("📥 Raw SignalR Packet:", data);
+
+    // If data comes as [ { ... } ] unpack it
+    const payload = Array.isArray(data) ? data[0] : data;
+
+    if (!payload) {
+      console.warn("⚠ Empty telemetry payload received");
       return;
     }
-    console.log("📡 Live Telemetry Received:", data);
-    updateTelemetryUI(data);
+
+    console.log("📡 Live Telemetry Parsed:", payload);
+    updateTelemetryUI(payload);
+    logEvent(payload);
   });
 }
 
 // 🖥️ 3️⃣ Update dashboard UI with real-time data
 function updateTelemetryUI(data) {
-  const {
-    deviceId,
-    location,
-    firmwareVersion,
-    anomalyScore,
-    status,
-    ts,
-    temperature,
-    humidity
-  } = data;
-console.log("DeviceID "+deviceId+"Location "+location+"FriemWare "+firmwareVersion);
-  document.getElementById("deviceId").textContent = deviceId || "--";
-  document.getElementById("location").textContent = location || "--";
-  document.getElementById("firmware").textContent = firmwareVersion || "--";
+  document.getElementById("deviceId").textContent = data.deviceId || "--";
+  document.getElementById("location").textContent = data.location || "--";
+  document.getElementById("firmware").textContent = data.firmwareVersion || "--";
   document.getElementById("anomalyScore").textContent =
-    anomalyScore !== undefined ? `${anomalyScore}%` : "--";
+    data.anomalyScore !== undefined ? `${data.anomalyScore}%` : "--";
 
   document.getElementById("stateDot").className =
-    `dot ${status === "online" ? "green" : "red"}`;
+    `dot ${data.status === "online" ? "green" : "red"}`;
 
   document.getElementById("lastSeen").textContent =
-    ts ? new Date(ts).toLocaleTimeString() : "--";
+    data.ts ? new Date(data.ts).toLocaleTimeString() : "--";
 
   document.getElementById("temperature").textContent =
-    temperature !== undefined ? `${temperature} °C` : "--";
+    data.temperature !== undefined ? `${data.temperature} °C` : "--";
 
   document.getElementById("humidity").textContent =
-    humidity !== undefined ? `${humidity}%` : "--";
+    data.humidity !== undefined ? `${data.humidity}%` : "--";
 }
 
-// 🚀 4️⃣ Kick off SignalR connection when page loads
+// 📝 4️⃣ Append data to Event Log
+function logEvent(data) {
+  const log = document.getElementById("eventLog");
+  const item = document.createElement("li");
+
+  item.innerHTML = `
+    <strong>${new Date(data.ts).toLocaleTimeString()}</strong> — 
+    Temp: ${data.temperature}°C, Humidity: ${data.humidity}%, Anomaly: ${data.anomalyScore}%
+  `;
+
+  log.prepend(item);
+}
+
+// 🚀 5️⃣ Kick off SignalR connection when page loads
 startSignalR();
