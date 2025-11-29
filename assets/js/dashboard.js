@@ -172,12 +172,22 @@ document.getElementById("simulateOta").addEventListener("click", () => {
 });
 
 function logCommand(msg) {
+  const timestamp = new Date().toLocaleTimeString();
+
+  // 💬 1️⃣ Show in Event Log (existing behavior)
   const log = document.getElementById("eventLog");
   const item = document.createElement("li");
-  item.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong> — ${msg}`;
+  item.innerHTML = `<strong>${timestamp}</strong> — ${msg}`;
   log.prepend(item);
-}
 
+  // 🪟 2️⃣ Also show in Command Center window (NEW)
+  const cmdBox = document.getElementById("commandBox");
+  if (cmdBox) {
+    const cmdMsg = document.createElement("p");
+    cmdMsg.textContent = `${timestamp} — ${msg}`;
+    cmdBox.prepend(cmdMsg);
+  }
+}
 // 🚀 On page load — default to offline
 markDeviceOffline();
 startSignalR();
