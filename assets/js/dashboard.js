@@ -1,3 +1,38 @@
+// === 📊 0️⃣ Chart.js Setup ===
+const ctx = document.getElementById("telemetryChart").getContext("2d");
+
+const telemetryChart = new Chart(ctx, {
+  type: "line",
+  data: {
+    labels: [], // timestamps
+    datasets: [
+      {
+        label: "Temperature (°C)",
+        data: [],
+        borderWidth: 2,
+        borderColor: "#ff5733",
+        fill: false,
+        tension: 0.3,
+      },
+      {
+        label: "Humidity (%)",
+        data: [],
+        borderWidth: 2,
+        borderColor: "#007bff",
+        fill: false,
+        tension: 0.3,
+      },
+    ],
+  },
+  options: {
+    responsive: true,
+    scales: {
+      x: { title: { display: true, text: "Time" } },
+      y: { title: { display: true, text: "Value" }, min: 0, max: 100 },
+    },
+  },
+});
+
 // 🌐 1️⃣ Initialize SignalR connection using negotiated URL & access token
 async function startSignalR() {
   try {
@@ -15,7 +50,6 @@ async function startSignalR() {
     console.log("🔗 Negotiation successful");
     console.log("URL:", url);
 
-    // 🧬 Build SignalR connection with negotiated URL
     const connection = new signalR.HubConnectionBuilder()
       .withUrl(url, {
         accessTokenFactory: () => accessToken,
@@ -26,10 +60,7 @@ async function startSignalR() {
       .configureLogging(signalR.LogLevel.Information)
       .build();
 
-    // Register message handlers
     registerHandlers(connection);
-
-    // Start live connection
     await connection.start();
     console.log("🟢 SignalR Connected Successfully 🚀");
   } catch (err) {
@@ -44,7 +75,6 @@ function registerHandlers(connection) {
   connection.on("newTelemetry", (data) => {
     console.log("📥 Raw SignalR Packet:", data);
 
-    // If data comes as [ { ... } ] unpack it
     const payload = Array.isArray(data) ? data[0] : data;
 
     if (!payload) {
@@ -53,8 +83,10 @@ function registerHandlers(connection) {
     }
 
     console.log("📡 Live Telemetry Parsed:", payload);
+
     updateTelemetryUI(payload);
     logEvent(payload);
+    updateChart(payload); // 👈 NEW LINE for real-time graph
   });
 }
 
@@ -77,6 +109,24 @@ function updateTelemetryUI(data) {
 
   document.getElementById("humidity").textContent =
     data.humidity !== undefined ? `${data.humidity}%` : "--";
+}
+
+// === 📈 3.1 NEW: Update Graph with Live Data ===
+function updateChart(data) {
+  const timestamp = new Date(data.ts).toLocaleTimeString();
+
+  telemetryChart.data.labels.push(timestamp);
+  telemetryChart.data.datasets[0].data.push(data.temperature);
+  telemetryChart.data.datasets[1].data.push(data.humidity);
+
+  // Limit data points to last 15 readings
+  if (telemetryChart.data.labels.length > 15) {
+    telemetryChart.data.labels.shift();
+    telemetryChart.data.datasets[0].data.shift();
+    telemetryChart.data.datasets[1].data.shift();
+  }
+
+  telemetryChart.update();
 }
 
 // 📝 4️⃣ Append data to Event Log
