@@ -4,7 +4,7 @@ const ctx = document.getElementById("telemetryChart").getContext("2d");
 const telemetryChart = new Chart(ctx, {
   type: "line",
   data: {
-    labels: [],
+    labels: [], // timestamps
     datasets: [
       {
         label: "Temperature (°C)",
@@ -12,8 +12,7 @@ const telemetryChart = new Chart(ctx, {
         borderWidth: 2,
         borderColor: "#ff5733",
         fill: false,
-        tension: 0.4,
-        pointRadius: 3,
+        tension: 0.3,
       },
       {
         label: "Humidity (%)",
@@ -21,81 +20,51 @@ const telemetryChart = new Chart(ctx, {
         borderWidth: 2,
         borderColor: "#007bff",
         fill: false,
-        tension: 0.4,
-        pointRadius: 3,
+        tension: 0.3,
       },
     ],
   },
   options: {
     responsive: true,
-    maintainAspectRatio: false,
-    animation: { duration: 300 }, // smooth movement
     scales: {
-      x: {
-        title: { display: true, text: "Time" },
-        ticks: { maxRotation: 45, minRotation: 45 },
-      },
-      y: {
-        title: { display: true, text: "Value" },
-        min: 10, // Prevents stretching
-        max: 100,
-        beginAtZero: false,
-        ticks: { stepSize: 10 },
-        grid: { drawBorder: true },
-      },
+      x: { title: { display: true, text: "Time" } },
+      y: { title: { display: true, text: "Value" }, min: 0, max: 100 },
     },
-    plugins: {
-      legend: { position: "top" },
-      tooltip: { enabled: true },
-    },
-    elements: { point: { radius: 0 } },
   },
 });
-
-const connStatusEl = document.getElementById("connectionStatus");
 
 // 🌐 1️⃣ Initialize SignalR connection using negotiated URL & access token
 async function startSignalR() {
   try {
     console.log("🚀 Starting SignalR negotiation...");
-    if (connStatusEl) connStatusEl.textContent = "Negotiating connection…";
 
     const resp = await fetch("https://fun-enddrave-vscode.azurewebsites.net/api/negotiate");
 
     if (!resp.ok) {
-      const txt = await resp.text();
-      console.error("❌ Error calling /api/negotiate:", resp.status, txt);
-      if (connStatusEl) connStatusEl.textContent = "Negotiate failed: " + resp.status;
+      console.error("❌ Error calling /api/negotiate:", resp.status);
+      console.error(await resp.text());
       return;
     }
 
     const { url, accessToken } = await resp.json();
     console.log("🔗 Negotiation successful");
+    console.log("URL:", url);
 
-    if (!window.signalR || !signalR.HubConnectionBuilder) {
-      console.error("❌ SignalR JS not loaded (CDN blocked?)");
-      if (connStatusEl) connStatusEl.textContent = "SignalR script not loaded";
-      return;
-    }
-
-    // ⚠️ MOBILE-SAFE: No skipNegotiation, allow fallback to SSE/LongPolling
     const connection = new signalR.HubConnectionBuilder()
-      .withUrl(url, { accessTokenFactory: () => accessToken })
+      .withUrl(url, {
+        accessTokenFactory: () => accessToken,
+        transport: signalR.HttpTransportType.WebSockets,
+        skipNegotiation: true
+      })
       .withAutomaticReconnect()
       .configureLogging(signalR.LogLevel.Information)
       .build();
 
-    connection.onclose(() => connStatusEl && (connStatusEl.textContent = "Disconnected"));
-    connection.onreconnecting(() => connStatusEl && (connStatusEl.textContent = "Reconnecting…"));
-    connection.onreconnected(() => connStatusEl && (connStatusEl.textContent = "Connected"));
-
     registerHandlers(connection);
     await connection.start();
     console.log("🟢 SignalR Connected Successfully 🚀");
-    if (connStatusEl) connStatusEl.textContent = "Connected";
   } catch (err) {
     console.error("❌ Failed to establish SignalR connection:", err);
-    if (connStatusEl) connStatusEl.textContent = "Connection error";
   }
 }
 
@@ -117,7 +86,7 @@ function registerHandlers(connection) {
 
     updateTelemetryUI(payload);
     logEvent(payload);
-    updateChart(payload); // Add to graph
+    updateChart(payload); // 👈 NEW LINE for real-time graph
   });
 }
 
@@ -142,7 +111,7 @@ function updateTelemetryUI(data) {
     data.humidity !== undefined ? `${data.humidity}%` : "--";
 }
 
-// === 📈 3.1 Update Graph with Live Data ===
+// === 📈 3.1 NEW: Update Graph with Live Data ===
 function updateChart(data) {
   const timestamp = new Date(data.ts).toLocaleTimeString();
 
@@ -150,25 +119,26 @@ function updateChart(data) {
   telemetryChart.data.datasets[0].data.push(data.temperature);
   telemetryChart.data.datasets[1].data.push(data.humidity);
 
-  if (telemetryChart.data.labels.length > 20) {
+  // Limit data points to last 15 readings
+  if (telemetryChart.data.labels.length > 15) {
     telemetryChart.data.labels.shift();
     telemetryChart.data.datasets[0].data.shift();
     telemetryChart.data.datasets[1].data.shift();
   }
 
-  telemetryChart.update("none"); // Prevents bouncing/jitter
+  telemetryChart.update();
 }
 
 // 📝 4️⃣ Append data to Event Log
 function logEvent(data) {
   const log = document.getElementById("eventLog");
-  if (!log) return;
-
   const item = document.createElement("li");
+
   item.innerHTML = `
     <strong>${new Date(data.ts).toLocaleTimeString()}</strong> — 
     Temp: ${data.temperature}°C, Humidity: ${data.humidity}%, Anomaly: ${data.anomalyScore}%
   `;
+
   log.prepend(item);
 }
 
