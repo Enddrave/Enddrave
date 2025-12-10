@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BMS Monitor UI – Web Version</title>
+<script src="https://cdn.jsdelivr.net/npm/gaugeJS/dist/gauge.min.js"></script>
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #3a3a3a;
+    color: #eaeaea;
+}
+
+/* ----- TOP MENU ----- */
+.header {
+    background: #2b2b2b;
+    padding: 8px 20px;
+    display: flex;
+    align-items: center;
+    color: white;
+}
+
+.header .title {
+    color: #ff9933;
+    font-size: 20px;
+    margin-right: 40px;
+}
+
+.menu {
+    display: flex;
+    gap: 25px;
+}
+
+.menu div {
+    cursor: pointer;
+}
+
+.menu div:hover {
+    color: #ffcc66;
+}
+
+/* ----- MAIN LAYOUT ----- */
+.main {
+    display: flex;
+    height: calc(100vh - 60px);
+}
+
+/* ----- LEFT PANEL ----- */
+.left-panel {
+    width: 280px;
+    background: #4a4a4a;
+    padding: 20px;
+}
+
+.left-panel h3 {
+    text-align: center;
+}
+
+.battery {
+    width: 150px;
+    height: 50px;
+    border: 3px solid #aaa;
+    border-radius: 8px;
+    position: relative;
+    margin: 20px auto;
+    background: #222;
+}
+.battery::after {
+    content:"";
+    width: 12px;
+    height: 25px;
+    background:#aaa;
+    border-radius:3px;
+    position:absolute;
+    right:-14px; top:12px;
+}
+.battery-level {
+    height:100%;
+    background: linear-gradient(90deg,#66ff66,#00cc00);
+    width:0%;
+    transition:width .3s;
+}
+.battery-text {
+    position:absolute;
+    width:100%;
+    height:100%;
+    top:0; left:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:bold;
+    color:white;
+}
+
+/* ----- RIGHT PANEL CONTENT ----- */
+.right-panel {
+    flex: 1;
+    padding: 20px;
+}
+
+.section-title {
+    font-size: 18px;
+    margin-bottom: 8px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border: 1px solid #777;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+.info-grid div {
+    padding: 5px 0;
+}
+
+/* ----- TABLES ----- */
+.table-block {
+    border: 1px solid #777;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+.table-block table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-block td {
+    border: 1px solid #555;
+    height: 28px;
+    text-align: center;
+    color: #eee;
+}
+
+/* ----- BOTTOM BAR ----- */
+.footer {
+    background: #e67300;
+    padding: 10px 15px;
+    color: white;
+    font-weight: bold;
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER BAR -->
+<div class="header">
+    <div class="title">Board 1</div>
+    <div class="menu">
+        <div>Data monitoring</div>
+        <div>Active Equilibrium</div>
+        <div>Parameter settings</div>
+        <div>Readparam</div>
+        <div>Engineering model</div>
+        <div>Alarm history</div>
+        <div>BMS upgrade</div>
+    </div>
+</div>
+
+<div class="main">
+
+    <!-- LEFT PANEL -->
+    <div class="left-panel">
+
+        <h3>SumVolt:</h3>
+        <canvas id="voltGauge" width="220" height="160"></canvas>
+
+        <h3>Curr:</h3>
+        <canvas id="currGauge" width="220" height="160"></canvas>
+
+        <h3>SOC:</h3>
+        <div class="battery">
+            <div class="battery-level" id="socFill"></div>
+            <div class="battery-text" id="socText">0%</div>
+        </div>
+
+        <h4 style="color:#00ff00; margin-top:20px;">Alarm list</h4>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="right-panel">
+
+        <div class="section-title">Battery status</div>
+
+        <div class="info-grid">
+            <div>Max Volt:</div> <div id="maxVolt">—</div>
+            <div>Max Cell Pos:</div> <div id="maxCellPos">—</div>
+
+            <div>Min Volt:</div> <div id="minVolt">—</div>
+            <div>Min Cell Pos:</div> <div id="minCellPos">—</div>
+
+            <div>Cells num:</div> <div id="cellsNum">—</div>
+            <div>NTC num:</div> <div id="ntcNum">—</div>
+
+            <div>DI1 status:</div> <div id="di1">—</div>
+            <div>DI2 status:</div> <div id="di2">—</div>
+
+            <div>Max Temp:</div> <div id="maxTemp">—</div>
+            <div>Max Temp Pos:</div> <div id="maxTempPos">—</div>
+
+            <div>Min Temp:</div> <div id="minTemp">—</div>
+            <div>Min Temp Pos:</div> <div id="minTempPos">—</div>
+
+            <div>Remain cap:</div> <div id="remainCap">—</div>
+            <div>BMS Life:</div> <div id="bmsLife">—</div>
+
+            <div>DI3 status:</div> <div id="di3">—</div>
+            <div>DI4 status:</div> <div id="di4">—</div>
+
+            <div>DO1 status:</div> <div id="do1">—</div>
+            <div>DO2 status:</div> <div id="do2">—</div>
+
+            <div>DO3 status:</div> <div id="do3">—</div>
+            <div>DO4 status:</div> <div id="do4">—</div>
+
+            <div>Chg Mos:</div> <div>ON/OFF</div>
+            <div>Dischg Mos:</div> <div>ON/OFF</div>
+
+            <div>Relay Switch:</div> <div>—</div>
+            <div>Cycle Times:</div> <div>—</div>
+        </div>
+
+        <div class="table-block">
+            <div class="section-title">Cell Voltage</div>
+            <table>
+                <tbody>
+                    <!-- 5 rows × 10 columns -->
+                    <tr><td>1~10</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td>11~20</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td>21~30</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td>31~40</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td>41~48</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="table-block">
+            <div class="section-title">Battery temperature</div>
+            <table>
+                <tbody>
+                    <tr><td>1~10</td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td>11~16</td><td></td><td></td><td></td><td></td><td></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<div class="footer">Comm status: serial port</div>
+
+<script>
+/* ---------- GAUGES ---------- */
+function createGauge(canvas, min, max, value) {
+    const opts = {
+        angle: 0,
+        lineWidth: 0.3,
+        radiusScale: 1,
+        pointer: { length: 0.6, strokeWidth: 4, color: "#ff4d4d" },
+        staticLabels: {
+            font: "11px sans-serif",
+            labels: [min, max / 2, max],
+            color: "#eee"
+        },
+        strokeColor: "#333"
+    };
+    const gauge = new Gauge(canvas).setOptions(opts);
+    gauge.maxValue = max;
+    gauge.setMinValue(min);
+    gauge.set(value);
+    return gauge;
+}
+
+let voltGauge = createGauge(document.getElementById("voltGauge"), 0, 100, 62);
+let currGauge = createGauge(document.getElementById("currGauge"), -300, 300, 0);
+
+/* ---------- SOC ---------- */
+function setSOC(val) {
+    document.getElementById("socFill").style.width = val + "%";
+    document.getElementById("socText").textContent = val + "%";
+}
+setSOC(80);
+</script>
+
+</body>
+</html>
