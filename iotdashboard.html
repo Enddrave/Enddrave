@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Sensor Gateway Industrial IoT 4.0 Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root{
+  --page-bg:#ffffff;
+  --card-bg:#f4fbf6;
+  --card-border:#cfe8d6;
+
+  --green-dark:#0b5d1e;
+  --green-main:#1f8f3a;
+  --green-light:#8fd19e;
+
+  --yellow:#f4e04d;
+  --red:#e4572e;
+
+  --text-main:#0b2f16;
+  --text-muted:#4f6f57;
+}
+
+*{box-sizing:border-box;font-family:"Segoe UI",sans-serif}
+
+body{
+  margin:0;
+  background:var(--page-bg);
+  color:var(--text-main);
+}
+
+.dashboard{
+  max-width:1400px;
+  margin:auto;
+  padding:24px;
+}
+
+h1{
+  font-size:22px;
+  margin-bottom:20px;
+}
+
+/* GRID */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(12,1fr);
+  gap:16px;
+}
+
+/* CARD */
+.card{
+  background:var(--card-bg);
+  border:1px solid var(--card-border);
+  border-radius:14px;
+  padding:16px;
+}
+
+.card h3{
+  font-size:14px;
+  margin:0 0 12px;
+  color:var(--text-muted);
+}
+
+/* BATTERY */
+.battery{grid-column:span 4;text-align:center}
+
+.gauge{
+  width:150px;height:150px;
+  border-radius:50%;
+  margin:auto;
+  background:conic-gradient(var(--green-main) 0deg 245deg,#e2f2e7 245deg);
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;font-weight:700;
+}
+
+.battery-info{
+  margin-top:10px;
+  font-size:14px;
+  color:var(--text-muted);
+}
+
+/* METRICS */
+.metrics{
+  grid-column:span 8;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+}
+
+.metric{
+  background:#eaf6ee;
+  border-radius:10px;
+  padding:14px;
+  text-align:center;
+}
+
+.metric h2{margin:6px 0 0;font-size:22px}
+
+/* VOLTAGE & CURRENT GRAPH */
+.voltage-current{
+  grid-column:span 6;
+}
+
+.graph{
+  background:linear-gradient(180deg,#e9f7ef,#dff2e7);
+  border-radius:12px;
+  height:160px;
+  padding:12px;
+  position:relative;
+}
+
+.graph svg{
+  width:100%;
+  height:100%;
+}
+
+.graph text{
+  font-size:11px;
+  fill:var(--text-muted);
+}
+
+.line-voltage{stroke:var(--yellow);stroke-width:3;fill:none}
+.line-current{stroke:var(--green-main);stroke-width:3;fill:none}
+
+/* SENSORS */
+.sensors{
+  grid-column:span 6;
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+
+.sensor{
+  background:#eaf6ee;
+  border-radius:10px;
+  padding:12px;
+}
+
+.sensor p{font-size:18px;font-weight:600;margin:4px 0 0}
+
+/* DOOR */
+.door{grid-column:span 3;text-align:center}
+
+.door-status{
+  display:flex;
+  justify-content:space-around;
+  margin-top:12px;
+}
+
+.door-box{
+  width:64px;height:84px;
+  border-radius:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.closed{border:2px solid var(--green-main)}
+.open{background:var(--red);color:#fff}
+
+/* EVENTS */
+.events{grid-column:span 3}
+
+.events li{
+  list-style:none;
+  font-size:13px;
+  color:var(--text-muted);
+  margin-bottom:8px;
+}
+
+/* SOC */
+.soc{grid-column:span 6}
+
+/* ALERTS */
+.alerts{
+  grid-column:span 3;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.alert-box{
+  background:#fff1d6;
+  padding:10px 14px;
+  border-radius:8px;
+}
+
+.wifi{font-weight:bold;color:var(--green-main)}
+</style>
+</head>
+
+<body>
+<div class="dashboard">
+<h1>Sensor Gateway Industrial IoT 4.0 Dashboard</h1>
+
+<div class="grid">
+
+<!-- Battery -->
+<div class="card battery">
+  <h3>Battery Status</h3>
+  <div class="gauge">68%</div>
+  <div class="battery-info">
+    State: <b>CHARGING</b><br>
+    Remaining: <b>2.8 h</b>
+  </div>
+</div>
+
+<!-- Metrics -->
+<div class="card metrics">
+  <div class="metric"><h3>Voltage</h3><h2>52.4 V</h2></div>
+  <div class="metric"><h3>Current</h3><h2>13.7 A</h2></div>
+  <div class="metric"><h3>Temperature</h3><h2>34.7°C</h2></div>
+</div>
+
+<!-- Voltage & Current Graph -->
+<div class="card voltage-current">
+<h3>Voltage & Current</h3>
+<div class="graph">
+<svg viewBox="0 0 300 120">
+  <!-- Axes -->
+  <line x1="30" y1="10" x2="30" y2="100" stroke="#9fd2af"/>
+  <line x1="30" y1="100" x2="290" y2="100" stroke="#9fd2af"/>
+
+  <!-- Voltage line -->
+  <path class="line-voltage"
+        d="M30 70 L80 65 L130 67 L180 62 L230 60 L290 58"/>
+
+  <!-- Current line -->
+  <path class="line-current"
+        d="M30 85 L80 82 L130 84 L180 80 L230 78 L290 76"/>
+
+  <!-- Labels -->
+  <text x="20" y="105">0</text>
+  <text x="15" y="75">40</text>
+  <text x="15" y="45">60</text>
+
+  <text x="40" y="115">00:00</text>
+  <text x="140" y="115">06:00</text>
+  <text x="240" y="115">12:00</text>
+</svg>
+</div>
+</div>
+
+<!-- Sensors -->
+<div class="card sensors">
+  <div class="sensor"><h3>T1</h3><p>32°C</p></div>
+  <div class="sensor"><h3>T2</h3><p>36°C</p></div>
+  <div class="sensor"><h3>T3</h3><p>30°C</p></div>
+  <div class="sensor"><h3>T4</h3><p>33°C</p></div>
+  <div class="sensor"><h3>Humidity</h3><p>55%</p></div>
+  <div class="sensor"><h3>Humidity</h3><p>48%</p></div>
+</div>
+
+<!-- Door -->
+<div class="card door">
+<h3>Door Sensors</h3>
+<div class="door-status">
+  <div class="door-box closed">Closed</div>
+  <div class="door-box open">Open</div>
+</div>
+</div>
+
+<!-- Events -->
+<div class="card events">
+<h3>Recent Events</h3>
+<ul>
+<li>11:04 Sensor normal</li>
+<li>11:00 Door opened</li>
+<li>10:56 Charging started</li>
+</ul>
+</div>
+
+<!-- SOC -->
+<div class="card soc">
+<h3>SOC Trend</h3>
+<div class="graph"></div>
+</div>
+
+<!-- Alerts -->
+<div class="card alerts">
+<div class="alert-box">⚠ 1 Active</div>
+<div class="wifi">📶 Wi-Fi</div>
+</div>
+
+</div>
+</div>
+</body>
+</html>
