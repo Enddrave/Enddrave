@@ -159,7 +159,7 @@ data.dht22.forEach(sensor => {
     Temp: ${sensor.temperature}°C, Humidity: ${sensor.humidity}%, Anomaly: ${sensor.anomaly}%
   `;
   console.log(item);
-  container.prepend(item);
+  log.prepend(item);
 });
 }
 
