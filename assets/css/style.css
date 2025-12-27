@@ -27,7 +27,7 @@ a{color:var(--primary);text-decoration:none}
 .hero .hero-inner{padding:120px 0}
 .sub-hero .container{padding:80px 0}
 .features,.cards-3,.grid-3{display:grid;gap:20px}
-.features{grid-template-columns:repeat(3,1fr);margin:40px auto}
+.features{grid-template-columns:repeat(3,1fr);}
 .cards-3{grid-template-columns:repeat(3,1fr);margin:20px auto}
 .card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:18px;box-shadow:0 10px 18px rgba(0,0,0,.04)}
 .card.big ul{padding-left:18px}
