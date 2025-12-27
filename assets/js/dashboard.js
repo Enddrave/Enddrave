@@ -36,11 +36,11 @@ const telemetryChart = new Chart(ctx, {
 });
 
 // =====================================================
-// 🔧 Helper: Pick Primary Sensor (ID 0 default)
+// 🔧 Helper: Always pick Sensor 0
 // =====================================================
-function getPrimarySensor(data, preferredId = 0) {
+function getSensor0(data) {
   if (!data?.dht22 || data.dht22.length === 0) return null;
-  return data.dht22.find(s => s.id === preferredId) || data.dht22[0];
+  return data.dht22.find(s => s.id === 0) || null;
 }
 
 // =====================================================
@@ -120,11 +120,11 @@ function registerHandlers(connection) {
 }
 
 // =====================================================
-// 🖥️ Update Device Status UI
+// 🖥️ Device Status (Sensor 0)
 // =====================================================
 function updateTelemetryUI(data) {
-  const sensor = getPrimarySensor(data);
-  if (!sensor) return;
+  const sensor0 = getSensor0(data);
+  if (!sensor0) return;
 
   document.getElementById("deviceId").textContent = data.deviceId || "--";
   document.getElementById("location").textContent = data.location || "--";
@@ -132,7 +132,7 @@ function updateTelemetryUI(data) {
     data.firmwareVersion || "--";
 
   document.getElementById("anomalyScore").textContent =
-    sensor.anomaly !== undefined ? `${sensor.anomaly}%` : "--";
+    sensor0.anomaly !== undefined ? `${sensor0.anomaly}%` : "--";
 
   const stateDot = document.getElementById("stateDot");
   stateDot.className = "dot green";
@@ -142,24 +142,24 @@ function updateTelemetryUI(data) {
     data.ts ? new Date(data.ts * 1000).toLocaleTimeString() : "--";
 
   document.getElementById("temperature").textContent =
-    `${sensor.temperature.toFixed(1)} °C`;
+    `${sensor0.temperature.toFixed(1)} °C`;
 
   document.getElementById("humidity").textContent =
-    `${sensor.humidity.toFixed(1)} %`;
+    `${sensor0.humidity.toFixed(1)} %`;
 }
 
 // =====================================================
-// 📈 Update Telemetry Chart
+// 📈 Telemetry Chart (Sensor 0)
 // =====================================================
 function updateChart(data) {
-  const sensor = getPrimarySensor(data);
-  if (!sensor) return;
+  const sensor0 = getSensor0(data);
+  if (!sensor0) return;
 
   const timestamp = new Date(data.ts * 1000).toLocaleTimeString();
 
   telemetryChart.data.labels.push(timestamp);
-  telemetryChart.data.datasets[0].data.push(sensor.temperature);
-  telemetryChart.data.datasets[1].data.push(sensor.humidity);
+  telemetryChart.data.datasets[0].data.push(sensor0.temperature);
+  telemetryChart.data.datasets[1].data.push(sensor0.humidity);
 
   if (telemetryChart.data.labels.length > 15) {
     telemetryChart.data.labels.shift();
@@ -171,26 +171,27 @@ function updateChart(data) {
 }
 
 // =====================================================
-// 📝 Event Log (All Sensors)
+// 📝 Event Log (ONLY Sensor 0)
 // =====================================================
 function logEvent(data) {
   const log = document.getElementById("eventLog");
+  const sensor0 = getSensor0(data);
+  if (!sensor0) return;
 
-  data.dht22.forEach(sensor => {
-    const item = document.createElement("li");
-    item.innerHTML = `
-      <strong>${new Date(data.ts * 1000).toLocaleTimeString()}</strong> —
-      Sensor ${sensor.id} →
-      Temp: ${sensor.temperature}°C,
-      Humidity: ${sensor.humidity}%,
-      Anomaly: ${sensor.anomaly}%
-    `;
-    log.prepend(item);
-  });
+  const item = document.createElement("li");
+  item.innerHTML = `
+    <strong>${new Date(data.ts * 1000).toLocaleTimeString()}</strong> —
+    Sensor 0 →
+    Temp: ${sensor0.temperature}°C,
+    Humidity: ${sensor0.humidity}%,
+    Anomaly: ${sensor0.anomaly}%
+  `;
+
+  log.prepend(item);
 }
 
 // =====================================================
-// 💡 Command Buttons (UI-only)
+// 💡 Command Buttons (UI only)
 // =====================================================
 document.getElementById("ledOn").addEventListener("click", () => {
   logCommand("LED turned ON");
