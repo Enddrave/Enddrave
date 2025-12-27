@@ -150,34 +150,18 @@ function updateChart(data) {
 // === 📝 Append telemetry to Event Log ===
 function logEvent(data) {
 console.log('event log');
-  console.log(data);
-
-  const container = document.getElementById("dht22Container");
-
+console.log(data);
+const log = document.getElementById("eventLog");
+const item = document.createElement("li");
 data.dht22.forEach(sensor => {
-  
-  const card = document.createElement("div");
-  card.className = "sensor-card";
-
-  card.innerHTML = `
-    <h3>DHT22 Sensor ${sensor.id}</h3>
-    <p>🌡 Temperature: <b>${sensor.temperature} °C</b></p>
-    <p>💧 Humidity: <b>${sensor.humidity} %</b></p>
-    <p>⚠️ Anomaly: <b>${sensor.anomaly}</b></p>
-  `;
-console.log(card);
-  container.appendChild(card);
-});
-  
-  const log = document.getElementById("eventLog");
-  const item = document.createElement("li");
-
   item.innerHTML = `
-    <strong>${new Date(data.ts).toLocaleTimeString()}</strong> —
-    Temp: ${data.temperature}°C, Humidity: ${data.humidity}%, Anomaly: ${data.anomalyScore}%
+   <h3>DHT22 Sensor ${sensor.id}</h3>
+   <strong>${new Date(data.ts).toLocaleTimeString()}</strong> —
+    Temp: ${sensor.temperature}°C, Humidity: ${sensor.humidity}%, Anomaly: ${sensor.anomaly}%
   `;
-
-  log.prepend(item);
+  console.log(item);
+  container.appendChild(item);
+});
 }
 
 // === 💡 Command Buttons (Dummy Actions) ===
