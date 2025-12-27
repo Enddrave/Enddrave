@@ -113,11 +113,7 @@ function updateTelemetryUI(data) {
   document.getElementById("location").textContent = data.location || "--";
   document.getElementById("firmware").textContent = data.firmwareVersion || "--";
   document.getElementById("anomalyScore").textContent =
-    data.anomalyScore !== undefined ? `${data.anomalyScore}%` : "--";
-  console.log('smart');
- console.log(data.anomaly);
-  console.log(data.temperature);
-  console.log(data.humidity);
+  data.anomalyScore !== undefined ? `${data.anomalyScore}%` : "--";
   const stateDot = document.getElementById("stateDot");
   if (stateDot) {
     stateDot.className = "dot green";
@@ -153,6 +149,7 @@ function updateChart(data) {
 
 // === 📝 Append telemetry to Event Log ===
 function logEvent(data) {
+console.log('event log');
   console.log(data);
   const log = document.getElementById("eventLog");
   const item = document.createElement("li");
