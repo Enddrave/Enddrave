@@ -153,6 +153,7 @@ function updateChart(data) {
 
 // === 📝 Append telemetry to Event Log ===
 function logEvent(data) {
+  console.log(data);
   const log = document.getElementById("eventLog");
   const item = document.createElement("li");
 
