@@ -115,7 +115,9 @@ function updateTelemetryUI(data) {
   document.getElementById("anomalyScore").textContent =
     data.anomalyScore !== undefined ? `${data.anomalyScore}%` : "--";
   console.log('smart');
- console.log(data.anomalyScore);
+ console.log(data.anomaly);
+  console.log(data.temperature);
+  console.log(data.humidity);
   const stateDot = document.getElementById("stateDot");
   if (stateDot) {
     stateDot.className = "dot green";
