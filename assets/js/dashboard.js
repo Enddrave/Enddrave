@@ -151,6 +151,24 @@ function updateChart(data) {
 function logEvent(data) {
 console.log('event log');
   console.log(data);
+
+  const container = document.getElementById("dht22Container");
+
+data.dht22.forEach(sensor => {
+  
+  const card = document.createElement("div");
+  card.className = "sensor-card";
+
+  card.innerHTML = `
+    <h3>DHT22 Sensor ${sensor.id}</h3>
+    <p>🌡 Temperature: <b>${sensor.temperature} °C</b></p>
+    <p>💧 Humidity: <b>${sensor.humidity} %</b></p>
+    <p>⚠️ Anomaly: <b>${sensor.anomaly}</b></p>
+  `;
+console.log(card);
+  container.appendChild(card);
+});
+  
   const log = document.getElementById("eventLog");
   const item = document.createElement("li");
 
