@@ -85,6 +85,7 @@ async function startSignalR() {
     registerHandlers(connection);
     await connection.start();
     console.log("🟢 SignalR Connected");
+    console.log("Data Showing--"+);
   } catch (err) {
     console.error("❌ SignalR Error:", err);
   }
