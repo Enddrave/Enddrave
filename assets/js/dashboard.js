@@ -1,10 +1,12 @@
-// === 📊 0️⃣ Chart.js Setup ===
+// =====================================================
+// 📊 Chart.js Setup
+// =====================================================
 const ctx = document.getElementById("telemetryChart").getContext("2d");
 
 const telemetryChart = new Chart(ctx, {
   type: "line",
   data: {
-    labels: [], // timestamps
+    labels: [],
     datasets: [
       {
         label: "Temperature (°C)",
@@ -33,12 +35,22 @@ const telemetryChart = new Chart(ctx, {
   },
 });
 
-// === 🟠 Device Offline Logic ===
+// =====================================================
+// 🔧 Helper: Pick Primary Sensor (ID 0 default)
+// =====================================================
+function getPrimarySensor(data, preferredId = 0) {
+  if (!data?.dht22 || data.dht22.length === 0) return null;
+  return data.dht22.find(s => s.id === preferredId) || data.dht22[0];
+}
+
+// =====================================================
+// 🟠 Device Offline Logic
+// =====================================================
 let deviceTimeout;
-const OFFLINE_THRESHOLD = 15000; // 15 sec
+const OFFLINE_THRESHOLD = 15000;
 
 function markDeviceOffline() {
-  console.warn("⚠ Device marked OFFLINE (no telemetry received)");
+  console.warn("⚠ Device marked OFFLINE");
 
   const stateDot = document.getElementById("stateDot");
   if (stateDot) {
@@ -46,7 +58,7 @@ function markDeviceOffline() {
     stateDot.nextSibling.textContent = " Offline";
   }
 
-  const fields = [
+  [
     "deviceId",
     "location",
     "firmware",
@@ -54,24 +66,25 @@ function markDeviceOffline() {
     "temperature",
     "humidity",
     "anomalyScore",
-  ];
-
-  fields.forEach((id) => {
+  ].forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.textContent = "-";
+    if (el) el.textContent = "--";
   });
 }
 
-// Reset timer when telemetry arrives
 function resetDeviceTimer() {
   clearTimeout(deviceTimeout);
   deviceTimeout = setTimeout(markDeviceOffline, OFFLINE_THRESHOLD);
 }
 
+// =====================================================
 // 🌐 SignalR Connection
+// =====================================================
 async function startSignalR() {
   try {
-    const resp = await fetch("https://fun-enddrave-vscode.azurewebsites.net/api/negotiate");
+    const resp = await fetch(
+      "https://fun-enddrave-vscode.azurewebsites.net/api/negotiate"
+    );
     if (!resp.ok) return console.error("❌ /negotiate failed");
 
     const { url, accessToken } = await resp.json();
@@ -90,53 +103,63 @@ async function startSignalR() {
   }
 }
 
-// 📡 Register incoming telemetry
+// =====================================================
+// 📡 Register Incoming Telemetry
+// =====================================================
 function registerHandlers(connection) {
-
   connection.on("newTelemetry", (data) => {
     const payload = Array.isArray(data) ? data[0] : data;
     if (!payload) return;
 
-    resetDeviceTimer(); // received telemetry → online
+    resetDeviceTimer();
 
     updateTelemetryUI(payload);
-    logEvent(payload);
     updateChart(payload);
+    logEvent(payload);
   });
 }
 
-// 🖥️ Update UI with telemetry
+// =====================================================
+// 🖥️ Update Device Status UI
+// =====================================================
 function updateTelemetryUI(data) {
+  const sensor = getPrimarySensor(data);
+  if (!sensor) return;
 
-  console.log(data);
   document.getElementById("deviceId").textContent = data.deviceId || "--";
   document.getElementById("location").textContent = data.location || "--";
-  document.getElementById("firmware").textContent = data.firmwareVersion || "--";
+  document.getElementById("firmware").textContent =
+    data.firmwareVersion || "--";
+
   document.getElementById("anomalyScore").textContent =
-  data.anomalyScore !== undefined ? `${data.anomalyScore}%` : "--";
+    sensor.anomaly !== undefined ? `${sensor.anomaly}%` : "--";
+
   const stateDot = document.getElementById("stateDot");
-  if (stateDot) {
-    stateDot.className = "dot green";
-    stateDot.nextSibling.textContent = " Online";
-  }
+  stateDot.className = "dot green";
+  stateDot.nextSibling.textContent = " Online";
 
   document.getElementById("lastSeen").textContent =
-    data.ts ? new Date(data.ts).toLocaleTimeString() : "--";
+    data.ts ? new Date(data.ts * 1000).toLocaleTimeString() : "--";
 
   document.getElementById("temperature").textContent =
-    data.temperature !== undefined ? `${data.temperature} °C` : "--";
+    `${sensor.temperature.toFixed(1)} °C`;
 
   document.getElementById("humidity").textContent =
-    data.humidity !== undefined ? `${data.humidity}%` : "--";
+    `${sensor.humidity.toFixed(1)} %`;
 }
 
-// === 📈 Update Graph with Live Data ===
+// =====================================================
+// 📈 Update Telemetry Chart
+// =====================================================
 function updateChart(data) {
-  const timestamp = new Date(data.ts).toLocaleTimeString();
+  const sensor = getPrimarySensor(data);
+  if (!sensor) return;
+
+  const timestamp = new Date(data.ts * 1000).toLocaleTimeString();
 
   telemetryChart.data.labels.push(timestamp);
-  telemetryChart.data.datasets[0].data.push(data.temperature);
-  telemetryChart.data.datasets[1].data.push(data.humidity);
+  telemetryChart.data.datasets[0].data.push(sensor.temperature);
+  telemetryChart.data.datasets[1].data.push(sensor.humidity);
 
   if (telemetryChart.data.labels.length > 15) {
     telemetryChart.data.labels.shift();
@@ -147,23 +170,28 @@ function updateChart(data) {
   telemetryChart.update();
 }
 
-// === 📝 Append telemetry to Event Log ===
+// =====================================================
+// 📝 Event Log (All Sensors)
+// =====================================================
 function logEvent(data) {
-console.log('event log');
-console.log(data);
-const log = document.getElementById("eventLog");
-const item = document.createElement("li");
-data.dht22.forEach(sensor => {
-  item.innerHTML = `
-   <strong>${new Date(data.ts).toLocaleTimeString()}</strong> —
-    Temp: ${sensor.temperature}°C, Humidity: ${sensor.humidity}%, Anomaly: ${sensor.anomaly}%
-  `;
-  console.log(item);
-  log.prepend(item);
-});
+  const log = document.getElementById("eventLog");
+
+  data.dht22.forEach(sensor => {
+    const item = document.createElement("li");
+    item.innerHTML = `
+      <strong>${new Date(data.ts * 1000).toLocaleTimeString()}</strong> —
+      Sensor ${sensor.id} →
+      Temp: ${sensor.temperature}°C,
+      Humidity: ${sensor.humidity}%,
+      Anomaly: ${sensor.anomaly}%
+    `;
+    log.prepend(item);
+  });
 }
 
-// === 💡 Command Buttons (Dummy Actions) ===
+// =====================================================
+// 💡 Command Buttons (UI-only)
+// =====================================================
 document.getElementById("ledOn").addEventListener("click", () => {
   logCommand("LED turned ON");
 });
@@ -179,13 +207,11 @@ document.getElementById("simulateOta").addEventListener("click", () => {
 function logCommand(msg) {
   const timestamp = new Date().toLocaleTimeString();
 
-  // 💬 1️⃣ Show in Event Log (existing behavior)
   const log = document.getElementById("eventLog");
   const item = document.createElement("li");
   item.innerHTML = `<strong>${timestamp}</strong> — ${msg}`;
   log.prepend(item);
 
-  // 🪟 2️⃣ Also show in Command Center window (NEW)
   const cmdBox = document.getElementById("commandBox");
   if (cmdBox) {
     const cmdMsg = document.createElement("p");
@@ -193,7 +219,10 @@ function logCommand(msg) {
     cmdBox.prepend(cmdMsg);
   }
 }
-// 🚀 On page load — default to offline
+
+// =====================================================
+// 🚀 Init
+// =====================================================
 markDeviceOffline();
 startSignalR();
 resetDeviceTimer();
