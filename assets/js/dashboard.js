@@ -85,7 +85,6 @@ async function startSignalR() {
     registerHandlers(connection);
     await connection.start();
     console.log("🟢 SignalR Connected");
-    console.log("Data Showing--");
   } catch (err) {
     console.error("❌ SignalR Error:", err);
   }
@@ -93,8 +92,7 @@ async function startSignalR() {
 
 // 📡 Register incoming telemetry
 function registerHandlers(connection) {
-  console.log('Register handler--');
- 
+
   connection.on("newTelemetry", (data) => {
     const payload = Array.isArray(data) ? data[0] : data;
     if (!payload) return;
@@ -109,8 +107,7 @@ function registerHandlers(connection) {
 
 // 🖥️ Update UI with telemetry
 function updateTelemetryUI(data) {
-  console.log('updated telemertry data');
-  console.log(data);
+
   
   document.getElementById("deviceId").textContent = data.deviceId || "--";
   document.getElementById("location").textContent = data.location || "--";
