@@ -155,7 +155,6 @@ const log = document.getElementById("eventLog");
 const item = document.createElement("li");
 data.dht22.forEach(sensor => {
   item.innerHTML = `
-   <h3>DHT22 Sensor ${sensor.id}</h3>
    <strong>${new Date(data.ts).toLocaleTimeString()}</strong> —
     Temp: ${sensor.temperature}°C, Humidity: ${sensor.humidity}%, Anomaly: ${sensor.anomaly}%
   `;
