@@ -112,7 +112,6 @@ function registerHandlers(connection) {
     if (!payload) return;
 
     resetDeviceTimer();
-
     updateTelemetryUI(payload);
     updateChart(payload);
     logEvent(payload);
@@ -171,7 +170,7 @@ function updateChart(data) {
 }
 
 // =====================================================
-// 📝 Event Log (ONLY Sensor 0)
+// 📝 Event Log (AUTO-SCROLL FIXED)
 // =====================================================
 function logEvent(data) {
   const log = document.getElementById("eventLog");
@@ -188,6 +187,9 @@ function logEvent(data) {
   `;
 
   log.prepend(item);
+
+  // ✅ AUTO SCROLL TO TOP (because we prepend)
+  log.scrollTop = 0;
 }
 
 // =====================================================
@@ -207,18 +209,14 @@ document.getElementById("simulateOta").addEventListener("click", () => {
 
 function logCommand(msg) {
   const timestamp = new Date().toLocaleTimeString();
-
   const log = document.getElementById("eventLog");
+
   const item = document.createElement("li");
   item.innerHTML = `<strong>${timestamp}</strong> — ${msg}`;
   log.prepend(item);
 
-  const cmdBox = document.getElementById("commandBox");
-  if (cmdBox) {
-    const cmdMsg = document.createElement("p");
-    cmdMsg.textContent = `${timestamp} — ${msg}`;
-    cmdBox.prepend(cmdMsg);
-  }
+  // ✅ AUTO SCROLL
+  log.scrollTop = 0;
 }
 
 // =====================================================
