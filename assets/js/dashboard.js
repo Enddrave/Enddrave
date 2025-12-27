@@ -108,13 +108,14 @@ function registerHandlers(connection) {
 // 🖥️ Update UI with telemetry
 function updateTelemetryUI(data) {
 
-  
+  console.log(data);
   document.getElementById("deviceId").textContent = data.deviceId || "--";
   document.getElementById("location").textContent = data.location || "--";
   document.getElementById("firmware").textContent = data.firmwareVersion || "--";
   document.getElementById("anomalyScore").textContent =
     data.anomalyScore !== undefined ? `${data.anomalyScore}%` : "--";
-
+  console.log('smart');
+ console.log(data.anomalyScore);
   const stateDot = document.getElementById("stateDot");
   if (stateDot) {
     stateDot.className = "dot green";
