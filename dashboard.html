@@ -1,0 +1,109 @@
+<!DOCTYPE html><html lang='en'><head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Enddrave Tech</title>
+<meta name="description" content="Enddrave Tech — IoT Firmware, BLE/Wi-Fi Connectivity, RTOS & Azure IoT with AI insights." />
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="assets/images/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css" />
+<script defer src="assets/js/main.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script defer src="assets/js/dashboard.js"></script>
+</head><body>
+<header class="site-header">
+  <div class="container nav">
+    <a class="brand" href="index.html"><img src="assets/images/logo.png" alt="Enddrave Tech logo" /></a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="services.html">Services</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="about.html">About</a>
+      <!-- <a href="contact.html">Contact</a> -->
+    </nav>
+  </div>
+</header>
+
+<main>
+<section class="sub-hero">
+ <div class="container">
+   <img class="page-banner" src="assets/images/banner-dashboard.jpg" alt="Dashboard">
+   <h1>IoT Dashboard Demo</h1><p>Live telemetry, device status, cloud commands, and AI insights (simulated).</p>
+ </div>
+</section>
+
+<section class="container grid-3">
+  <!-- Telemetry -->
+  <div class="panel">
+    <h3>Telemetry</h3>
+    <canvas id="telemetryChart" height="120"></canvas>
+  </div>
+
+  <!-- Device Status -->
+  <div class="panel">
+    <h3>Device Status</h3>
+    <ul class="status">
+      <li><strong>Device:</strong> <span id="deviceId">-</span></li>
+      <li><strong>Location:</strong> <span id="location">-</span></li>
+      <li><strong>Firmware:</strong> <span id="firmware">-</span></li>
+      <li><strong>State:</strong> <span id="stateDot" class="dot red"></span> Offline</li>
+      <li><strong>Last seen:</strong> <span id="lastSeen">—</span></li>
+      <li><strong>Temperature:</strong> <span id="temperature">—</span></li>
+      <li><strong>Humidity:</strong> <span id="humidity">—</span></li>
+    </ul>
+    <h4>AI Insight</h4>
+    <p>Anomaly score: <strong id="anomalyScore">-</strong></p>
+  </div>
+
+  <!-- Command Center -->
+  <div class="panel">
+    <h3>Command Center</h3>
+
+    <!-- Single command log box used by JS (id="commandBox") -->
+    <div
+      id="commandBox"
+      class="command-box"
+      style="
+        width: 100%;
+        height: 200px;
+        border: 1px solid #ddd;
+        background: #f9f9f9;
+        padding: 10px;
+        overflow-y: auto;
+        font-size: 14px;
+        border-radius: 6px;
+        margin-bottom: 12px;"
+    >
+      <!-- Command messages will appear here -->
+    </div>
+
+    <!-- Single set of buttons -->
+    <button class="btn primary" id="ledOn">LED ON</button>
+    <button class="btn" id="ledOff">LED OFF</button>
+    <button class="btn ghost" id="simulateOta">Simulate OTA</button>
+  </div>
+</section>
+
+<section class="container">
+  <div class="panel">
+    <h3>Event Log</h3>
+    <ul id="eventLog" class="event-log"></ul>
+    <p class="muted">Demo data is simulated. Real deployments use Azure IoT Hub, Direct Methods, and Stream Analytics.</p>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div><strong>Enddrave Tech Innovation Private Limited</strong><br>Global IoT & Firmware Engineering</div>
+    <div><a href="privacy.html">Privacy</a> · <a href="terms.html">Terms & NDA</a></div>
+    <!-- <div><a href="mailto:admin@enddrave.com">admin@enddrave.com</a></div> -->
+  </div>
+</footer>
+
+<button class="back-btn" onclick="history.back()">← Back</button>
+<button id="scrollTopBtn" aria-label="Scroll to top">▲</button>
+</body></html>

@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Cold Storage Monitoring &amp; Energy Analytics – Industrial IoT 4.0</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Enddrave Tech — Cold storage monitoring, BMS telemetry, and energy analytics over Industrial IoT 4.0." />
+<link rel="stylesheet" href="assets/css/style.css" />
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="assets/images/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+<script defer src="assets/js/main.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script defer src="assets/js/dashboard.js"></script>
+<style>
+:root{
+--bg:#f5f5ef;
+--card:#ffffff;
+--card-soft:#ffffff;
+--border:#e5e5de;
+--text:#111827;
+--muted:#6b7280;
+--blue:#0f766e;
+--green:#16a34a;
+--orange:#ea580c;
+--amber:#d97706;
+--red:#dc2626;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{
+margin:0;
+padding:32px 24px 40px;
+background:var(--bg);
+font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+color:var(--text);
+}
+
+/* page title */
+.page-header{
+max-width:1200px;
+margin:24px auto 20px;
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:12px;
+}
+.page-title{
+font-size:20px;
+font-weight:600;
+letter-spacing:.08em;
+text-transform:uppercase;
+}
+.page-pill{
+padding:4px 12px;
+border-radius:999px;
+border:1px solid var(--border);
+font-size:11px;
+color:var(--muted);
+background:#ffffff;
+white-space:nowrap;
+}
+
+/* ===== LAYOUT ===== */
+.dashboard{
+display:flex;
+flex-direction:column;
+gap:18px;
+max-width:1200px;
+margin:0 auto 40px;
+}
+
+/* main grid below */
+.main-grid{
+display:grid;
+grid-template-columns:300px minmax(0,1fr);
+gap:18px;
+}
+
+.left-column{
+display:flex;
+flex-direction:column;
+gap:16px;
+}
+
+.right-column{
+display:flex;
+flex-direction:column;
+gap:16px;
+}
+
+.battery-row{
+display:grid;
+grid-template-columns:minmax(0,2.1fr) minmax(260px,0.9fr);
+gap:16px;
+}
+
+/* ===== CARD ===== */
+.card{
+background:var(--card);
+border-radius:18px;
+border:1px solid var(--border);
+box-shadow:0 12px 25px rgba(15,23,42,0.06);
+padding:16px 18px;
+}
+
+.card-soft{
+background:var(--card-soft);
+border-radius:18px;
+border:1px solid var(--border);
+box-shadow:0 10px 22px rgba(15,23,42,0.05);
+padding:16px 18px;
+}
+
+.card-title{
+font-size:12px;
+font-weight:600;
+letter-spacing:.18em;
+text-transform:uppercase;
+color:var(--muted);
+margin-bottom:8px;
+}
+
+.card-sub{
+font-size:12px;
+color:var(--muted);
+}
+
+/* ===== SUMMARY VALUE ===== */
+.summary-value{
+font-size:28px;
+font-weight:600;
+}
+.summary-unit{
+font-size:13px;
+color:var(--muted);
+}
+
+/* ===== DEVICE / GATEWAY STATUS ===== */
+.status-list{
+list-style:none;
+margin-top:8px;
+font-size:13px;
+}
+.status-list li{margin-bottom:4px;}
+.status-label{color:var(--muted);}
+
+.badge{
+display:inline-flex;
+align-items:center;
+gap:6px;
+font-size:12px;
+margin-top:10px;
+padding:4px 10px;
+border-radius:999px;
+background:#ecfdf5;
+color:#15803d;
+}
+.badge-dot{
+width:8px;
+height:8px;
+border-radius:50%;
+background:#22c55e;
+}
+
+/* ===== DOORS ===== */
+.door-list{
+display:flex;
+flex-direction:column;
+gap:10px;
+margin-top:10px;
+}
+.door-item{
+display:flex;
+align-items:center;
+gap:10px;
+}
+.door-image{
+width:56px;
+height:56px;
+border-radius:50%;
+overflow:hidden;
+flex-shrink:0;
+box-shadow:0 10px 20px rgba(15,23,42,0.12);
+border:1px solid #d4d4cf;
+background:#f9fafb;
+}
+.door-image img{
+width:100%;
+height:100%;
+object-fit:cover;
+}
+.door-label{
+font-size:13px;
+color:var(--muted);
+}
+.door-state{
+font-size:13px;
+margin-top:2px;
+}
+
+/* ===== THD TELEMETRY MINI CHARTS ===== */
+.env-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:12px;
+margin-top:10px;
+}
+.env-mini{
+background:#fbfbf7;
+border-radius:14px;
+padding:10px 10px 12px;
+border:1px solid var(--border);
+}
+.env-mini-title{
+font-size:11px;
+color:var(--muted);
+margin-bottom:6px;
+}
+.telemetry-chart{
+width:100%;
+height:120px;
+display:block;
+}
+
+.env-bottom{
+display:grid;
+grid-template-columns:1.2fr minmax(0,1.6fr);
+gap:14px;
+margin-top:14px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+font-size:13px;
+}
+th,td{
+padding:7px 8px;
+border-bottom:1px solid var(--border);
+text-align:left;
+}
+th{
+color:var(--muted);
+font-weight:500;
+}
+
+.log-box{
+max-height:150px;
+overflow-y:auto;
+border-radius:12px;
+background:#fbfbf7;
+border:1px solid var(--border);
+}
+.log-row{
+padding:7px 9px;
+border-bottom:1px solid #f3f4f6;
+font-size:12px;
+color:var(--muted);
+}
+
+/* ===== BATTERY INFO ===== */
+.section-title{
+font-size:13px;
+font-weight:600;
+letter-spacing:.18em;
+text-transform:uppercase;
+color:var(--muted);
+margin-bottom:6px;
+}
+.section-sub{
+font-size:12px;
+color:var(--muted);
+margin-bottom:10px;
+}
+
+.grid-small{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+gap:12px;
+margin-top:10px;
+}
+
+.value{
+font-size:24px;
+font-weight:600;
+}
+.unit{
+font-size:12px;
+color:var(--muted);
+}
+
+.bar{
+height:6px;
+background:#f3f4f6;
+border-radius:999px;
+overflow:hidden;
+margin-top:8px;
+}
+.fill{
+height:100%;
+border-radius:999px;
+}
+
+/* SOC semicircle */
+.soc-wrap{
+position:relative;
+width:200px;
+margin:8px auto 0;
+}
+.soc-value{
+position:absolute;
+bottom:8px;
+width:100%;
+text-align:center;
+font-size:22px;
+font-weight:600;
+}
+
+/* Errors */
+.error-table th:nth-child(1){width:90px;}
+.bad{color:var(--red)}
+.ok{color:var(--green)}
+.warn{color:var(--amber)}
+
+/* thermal pills */
+.pill{
+display:inline-flex;
+align-items:center;
+gap:6px;
+padding:4px 10px;
+border-radius:999px;
+border:1px solid var(--border);
+font-size:11px;
+color:var(--muted);
+background:#ffffff;
+}
+.pill-dot{
+width:6px;
+height:6px;
+border-radius:50%;
+background:#16a34a;
+}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:900px){
+body{
+padding:20px 14px 28px;
+}
+.page-header{
+flex-direction:column;
+align-items:flex-start;
+}
+.page-title{
+font-size:16px;
+}
+.main-grid{
+grid-template-columns:1fr;
+}
+.battery-row{
+grid-template-columns:1fr;
+}
+.env-bottom{
+grid-template-columns:1fr;
+}
+}
+
+@media(max-width:520px){
+body{
+padding:16px 10px 24px;
+}
+.page-title{
+font-size:14px;
+letter-spacing:.06em;
+}
+.card, .card-soft{
+padding:14px 14px;
+border-radius:14px;
+}
+.page-pill{
+align-self:stretch;
+text-align:center;
+font-size:10px;
+}
+.summary-value{
+font-size:24px;
+}
+.value{
+font-size:20px;
+}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== SITE HEADER FROM MAIN SITE ===== -->
+<header class="site-header">
+<div class="container nav">
+<a class="brand" href="index.html"><img src="assets/images/logo.png" alt="Enddrave Tech logo" /></a>
+<nav>
+<a href="index.html">Home</a>
+<a href="services.html">Services</a>
+<a href="dashboard.html">Dashboard</a>
+<a href="about.html">About</a>
+<!-- <a href="contact.html">Contact</a> -->
+</nav>
+</div>
+</header>
+
+<main>
+<!-- ===== DASHBOARD CONTENT ===== -->
+<div class="page-header">
+<div class="page-title">Cold Storage Monitoring &amp; Energy Analytics – Industrial IoT 4.0</div>
+<div class="page-pill">Live Demo · BMS + Environment</div>
+</div>
+
+<div class="dashboard">
+
+<!-- ===== MAIN GRID (no top summary strip) ===== -->
+<div class="main-grid">
+
+<!-- LEFT COLUMN -->
+<div class="left-column">
+
+<!-- Gateway & Connectivity -->
+<div class="card">
+<div class="card-title">Gateway &amp; Connectivity</div>
+<ul class="status-list">
+<li><span class="status-label">Device ID:</span> CS‑GW‑01</li>
+<li><span class="status-label">Location:</span> Cold Room – Gurugram DC</li>
+<li><span class="status-label">Chemistry:</span> LFP 16s – 48 V ESS</li>
+<li><span class="status-label">Firmware:</span> v1.0.3</li>
+<li><span class="status-label">Last update:</span> 10:12:37</li>
+<li><span class="status-label">RSSI:</span> -72 dBm</li>
+</ul>
+<div class="badge">
+<div class="badge-dot"></div>
+<span>Online – MQTT over LTE</span>
+</div>
+</div>
+
+<!-- Doors Status -->
+<div class="card">
+<div class="card-title">Doors Status</div>
+<div class="door-list">
+
+<div class="door-item" data-door="D1">
+<div class="door-image">
+<img src="https://www.enddrave.com/door-closed.png" alt="Door D1" class="door-img">
+</div>
+<div>
+<div class="door-label">Cold storage D1</div>
+<div class="door-state">Closed</div>
+</div>
+</div>
+
+<div class="door-item" data-door="D2">
+<div class="door-image">
+<img src="https://www.enddrave.com/door-closed.png" alt="Door D2" class="door-img">
+</div>
+<div>
+<div class="door-label">Cold storage D2</div>
+<div class="door-state">Closed</div>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+
+<!-- RIGHT COLUMN -->
+<div class="right-column">
+
+<!-- Environment THD Profile -->
+<div class="card">
+<div class="card-title">Environment THD Profile</div>
+
+<div class="env-grid">
+<div class="env-mini">
+<div class="env-mini-title">Telemetry · THD 1</div>
+<canvas class="telemetry-chart" data-tag="THD1"></canvas>
+</div>
+<div class="env-mini">
+<div class="env-mini-title">Telemetry · THD 2</div>
+<canvas class="telemetry-chart" data-tag="THD2"></canvas>
+</div>
+<div class="env-mini">
+<div class="env-mini-title">Telemetry · THD 3</div>
+<canvas class="telemetry-chart" data-tag="THD3"></canvas>
+</div>
+<div class="env-mini">
+<div class="env-mini-title">Telemetry · THD 4</div>
+<canvas class="telemetry-chart" data-tag="THD4"></canvas>
+</div>
+<div class="env-mini">
+<div class="env-mini-title">Telemetry · THD 5</div>
+<canvas class="telemetry-chart" data-tag="THD5"></canvas>
+</div>
+
+<!-- anomaly score chart tile -->
+<div class="env-mini">
+<div class="env-mini-title">Telemetry · Anomaly Score</div>
+<canvas class="telemetry-chart" data-tag="THD_ANOMALY"></canvas>
+</div>
+</div>
+
+<div class="env-bottom">
+<div>
+<div class="card-sub" style="margin-bottom:6px;">Latest Record</div>
+<table>
+<thead>
+<tr>
+<th>Tag</th>
+<th>Temp (°C)</th>
+<th>Hum (%)</th>
+<th>Time Stamp</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>TH1</td><td>18.2</td><td>74.3</td><td>11:56:48</td></tr>
+<tr><td>TH2</td><td>18.2</td><td>74.3</td><td>11:56:44</td></tr>
+<tr><td>TH3</td><td>18.2</td><td>74.5</td><td>11:56:37</td></tr>
+<tr><td>TH4</td><td>18.2</td><td>74.4</td><td>11:56:20</td></tr>
+<tr><td>TH5</td><td>18.2</td><td>74.5</td><td>11:56:13</td></tr>
+</tbody>
+</table>
+</div>
+
+<div>
+<div class="card-sub" style="margin-bottom:6px;">Event Log</div>
+<div class="log-box">
+<div class="log-row">11:56:48 – Sensor 0 → Temp 18.2°C, Hum 74.3%</div>
+<div class="log-row">11:56:44 – Sensor 0 → Temp 18.2°C, Hum 74.3%</div>
+<div class="log-row">11:56:37 – Sensor 0 → Temp 18.2°C, Hum 74.5%</div>
+<div class="log-row">11:56:20 – Sensor 0 → Temp 18.2°C, Hum 74.4%</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Battery + Errors -->
+<div class="battery-row">
+
+<div class="card">
+<div class="section-title">Battery Information</div>
+<div class="section-sub">Pack status and capacity</div>
+
+<div class="grid-small">
+
+<div>
+<div class="card-sub">Pack Voltage</div>
+<div class="value">48.6 <span class="unit">V</span></div>
+<div class="bar">
+<div class="fill" style="width:70%;background:var(--blue);"></div>
+</div>
+</div>
+
+<div>
+<div class="card-sub">Pack Current</div>
+<div class="value" style="color:var(--orange);">
++12.4 <span class="unit">A</span>
+</div>
+<div class="card-sub" style="margin-top:4px;">Charging</div>
+</div>
+
+<div>
+<div class="card-sub">State of Charge</div>
+<div class="soc-wrap">
+<svg viewBox="0 0 100 50" width="200">
+<path d="M10 50 A40 40 0 0 1 90 50"
+fill="none" stroke="#e5e7eb" stroke-width="8"/>
+<path d="M10 50 A40 40 0 0 1 90 50"
+fill="none" stroke="#0f766e"
+stroke-width="8"
+stroke-linecap="round"
+stroke-dasharray="126"
+stroke-dashoffset="35"/>
+</svg>
+<div class="soc-value">72%</div>
+</div>
+</div>
+
+<div>
+<div class="card-sub">Battery Capacity</div>
+<div class="value">34.5 <span class="unit">Ah</span></div>
+<div class="bar">
+<div class="fill" style="width:70%;background:var(--green);"></div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="card">
+<div class="section-title">Errors, Faults &amp; Meta</div>
+<table class="error-table">
+<thead>
+<tr>
+<th>Code</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>F001</td>
+<td class="bad">Cell under-voltage (latched, cleared)</td>
+</tr>
+<tr>
+<td>—</td>
+<td class="ok">No active faults</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+</div>
+
+<!-- THERMAL & SAFETY ENVELOPE -->
+<div class="card">
+<div class="section-title">Thermal &amp; Safety Envelope</div>
+
+<div style="display:grid;grid-template-columns:1.2fr 1fr;gap:16px;margin-top:4px;">
+<div>
+<div class="card-sub">Pack Temperatures</div>
+<div class="value">22.4 <span class="unit">℃ avg</span></div>
+<div class="card-sub" style="margin-top:4px;">
+Max 26.1 ℃ (Module 3) · Min 19.8 ℃
+</div>
+<div class="card-sub" style="margin-top:10px;">Contactors</div>
+<div class="card-sub">
+Pre‑charge · Main + / – · Charger: all ON
+</div>
+</div>
+
+<div>
+<div class="card-sub">Thermal System</div>
+<div class="card-sub">
+Fan: 45 % · Pump: ON · Heater: OFF
+</div>
+<div class="bar" style="margin-top:8px;">
+<div class="fill" style="width:45%;background:var(--blue);"></div>
+</div>
+</div>
+</div>
+
+<div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;">
+<div class="pill"><span class="pill-dot"></span> OV/UV clear</div>
+<div class="pill"><span class="pill-dot"></span> OT/UT clear</div>
+<div class="pill"><span class="pill-dot"></span> OC/SC clear</div>
+<div class="pill"><span class="pill-dot"></span> Isolation OK</div>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+</main>
+
+<!-- ===== SITE FOOTER FROM MAIN SITE ===== -->
+<footer class="site-footer">
+<div class="container footer-grid">
+<div><strong>Enddrave Tech Innovation Private Limited</strong><br>Global IoT &amp; Firmware Engineering</div>
+<div><a href="privacy.html">Privacy</a> · <a href="terms.html">Terms &amp; NDA</a></div>
+<!-- <div><a href="mailto:admin@enddrave.com">admin@enddrave.com</a></div> -->
+</div>
+</footer>
+
+<button class="back-btn" onclick="history.back()">← Back</button>
+<button id="scrollTopBtn" aria-label="Scroll to top">▲</button>
+
+<script>
+// -------- DOOR ICON DYNAMIC IMAGES --------
+const IMG_OPEN = "door-open.png";
+const IMG_CLOSED = "door-closed.png";
+
+const doorStates = { D1: "open", D2: "closed" };
+
+document.querySelectorAll(".door-item").forEach(item => {
+const id = item.dataset.door;
+const state = doorStates[id] || "closed";
+const imgEl = item.querySelector(".door-img");
+const stateEl = item.querySelector(".door-state");
+
+if(state === "open"){
+imgEl.src = IMG_OPEN;
+stateEl.textContent = "Open";
+stateEl.style.color = "#ea580c";
+}else{
+imgEl.src = IMG_CLOSED;
+stateEl.textContent = "Closed";
+stateEl.style.color = "#16a34a";
+}
+});
+
+function updateDoor(doorId, isOpen){
+const item = document.querySelector(`.door-item[data-door="${doorId}"]`);
+if(!item) return;
+const imgEl = item.querySelector(".door-img");
+const stateEl = item.querySelector(".door-state");
+if(isOpen){
+imgEl.src = IMG_OPEN;
+stateEl.textContent = "Open";
+stateEl.style.color = "#ea580c";
+}else{
+imgEl.src = IMG_CLOSED;
+stateEl.textContent = "Closed";
+stateEl.style.color = "#16a34a";
+}
+}
+
+// -------- CLEAN MINI TELEMETRY CHARTS - FIXED LEGEND POSITIONING --------
+class MiniTelemetryChart {
+constructor(canvas) {
+this.canvas = canvas;
+this.ctx = canvas.getContext('2d');
+this.maxPoints = 12;
+this.data = { labels: [], temp: [], hum: [] };
+this.isAnomaly = canvas.dataset.tag === 'THD_ANOMALY';
+this.startTime = Date.now();
+this.init();
+}
+
+init() {
+const dpr = window.devicePixelRatio || 1;
+const rect = this.canvas.getBoundingClientRect();
+this.canvas.width = rect.width * dpr;
+this.canvas.height = 120 * dpr;
+this.ctx.scale(dpr, dpr);
+this.draw();
+}
+
+pushPoint(temp, hum) {
+const elapsed = Date.now() - this.startTime;
+const minutes = Math.floor(elapsed / 60000);
+const seconds = Math.floor((elapsed % 60000) / 1000);
+const label = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+this.data.labels.push(label);
+this.data.temp.push(temp);
+this.data.hum.push(hum);
+
+if (this.data.labels.length > this.maxPoints) {
+['labels','temp','hum'].forEach(k => this.data[k].shift());
+}
+this.draw();
+}
+
+draw() {
+const ctx = this.ctx;
+const w = this.canvas.clientWidth;
+const h = 120;
+ctx.clearRect(0,0,w,h);
+
+// Background
+ctx.fillStyle = '#fbfbf7';
+ctx.fillRect(0,0,w,h);
+
+// Clean padding - more chart space (increased right padding for legend)
+const padding = {top:15, right:50, bottom:25, left:35};
+const innerW = w - padding.left - padding.right;
+const innerH = h - padding.top - padding.bottom;
+
+// Scales
+const tempYMax = 30;
+const humYMax = 100;
+const anomalyYMax = 100;
+
+const xCount = Math.max(this.data.labels.length, 3);
+
+// Value to Y position
+const valueToY = (value, yMax) => {
+return padding.top + innerH - (value / yMax) * innerH;
+};
+
+// Index to X position
+const indexToX = (index) => {
+return padding.left + (innerW * index / (xCount - 1));
+};
+
+// Light grid lines only (no labels)
+ctx.strokeStyle = 'rgba(229, 229, 222, 0.5)';
+ctx.lineWidth = 1;
+ctx.setLineDash([2,2]);
+
+// Vertical grid lines
+for (let i = 0; i <= 4; i++) {
+const x = padding.left + (innerW * i / 4);
+ctx.beginPath();
+ctx.moveTo(x, padding.top);
+ctx.lineTo(x, padding.top + innerH);
+ctx.stroke();
+}
+
+// Horizontal grid lines
+for (let i = 0; i <= 4; i++) {
+const y = padding.top + (innerH * i / 4);
+ctx.beginPath();
+ctx.moveTo(padding.left, y);
+ctx.lineTo(padding.left + innerW, y);
+ctx.stroke();
+}
+ctx.setLineDash([]);
+
+// X-axis line only (no labels)
+ctx.strokeStyle = '#e5e5de';
+ctx.lineWidth = 1;
+ctx.lineCap = 'round';
+ctx.beginPath();
+ctx.moveTo(padding.left, padding.top + innerH);
+ctx.lineTo(padding.left + innerW, padding.top + innerH);
+ctx.stroke();
+
+// Draw data lines and points FIRST (before legend)
+const drawSeries = (dataArray, color, yMax) => {
+if (dataArray.length === 0) return;
+
+ctx.strokeStyle = color;
+ctx.lineWidth = 2.5;
+ctx.lineCap = 'round';
+ctx.lineJoin = 'round';
+ctx.shadowBlur = 6;
+ctx.shadowColor = color + '30';
+ctx.beginPath();
+
+dataArray.forEach((value, i) => {
+const x = indexToX(i);
+const y = valueToY(value, yMax);
+if (i === 0) ctx.moveTo(x, y);
+else ctx.lineTo(x, y);
+});
+ctx.shadowBlur = 0;
+ctx.stroke();
+
+// Data points
+ctx.fillStyle = color;
+ctx.shadowBlur = 8;
+ctx.shadowColor = color + '50';
+dataArray.forEach((value, i) => {
+const x = indexToX(i);
+const y = valueToY(value, yMax);
+ctx.beginPath();
+ctx.arc(x, y, 4, 0, Math.PI * 2);
+ctx.fill();
+});
+ctx.shadowBlur = 0;
+};
+
+if (this.isAnomaly) {
+drawSeries(this.data.temp, '#ea580c', anomalyYMax);
+} else {
+drawSeries(this.data.temp, '#ea580c', tempYMax);
+drawSeries(this.data.hum, '#0f766e', humYMax);
+}
+
+// Color flags/legend (top right corner - CLEAN & VISIBLE with dedicated space)
+const legendX = w - 35;
+const legendY = 8;
+
+// Legend background (white with subtle shadow for visibility)
+ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+ctx.shadowColor = 'rgba(0,0,0,0.1)';
+ctx.shadowBlur = 8;
+ctx.shadowOffsetY = 2;
+ctx.beginPath();
+ctx.roundRect(legendX - 5, legendY - 2, 70, 32, 8);
+ctx.fill();
+ctx.shadowBlur = 0;
+
+// Temperature flag (orange)
+ctx.strokeStyle = '#ea580c';
+ctx.lineWidth = 2;
+ctx.lineCap = 'round';
+ctx.beginPath();
+ctx.moveTo(legendX, legendY + 4);
+ctx.lineTo(legendX + 12, legendY + 4);
+ctx.stroke();
+
+ctx.fillStyle = '#ea580c';
+ctx.shadowBlur = 4;
+ctx.shadowColor = '#ea580c40';
+ctx.beginPath();
+ctx.arc(legendX - 2, legendY + 4, 3.5, 0, Math.PI * 2);
+ctx.fill();
+ctx.shadowBlur = 0;
+
+ctx.fillStyle = '#111827';
+ctx.font = 'bold 9px system-ui, sans-serif';
+ctx.textAlign = 'left';
+ctx.textBaseline = 'middle';
+ctx.fillText('Temp', legendX + 16, legendY + 4);
+
+// Humidity flag (blue) - only for non-anomaly
+if (!this.isAnomaly) {
+ctx.strokeStyle = '#0f766e';
+ctx.lineWidth = 2;
+ctx.lineCap = 'round';
+ctx.beginPath();
+ctx.moveTo(legendX, legendY + 18);
+ctx.lineTo(legendX + 12, legendY + 18);
+ctx.stroke();
+
+ctx.fillStyle = '#0f766e';
+ctx.shadowBlur = 4;
+ctx.shadowColor = '#0f766e40';
+ctx.beginPath();
+ctx.arc(legendX - 2, legendY + 18, 3.5, 0, Math.PI * 2);
+ctx.fill();
+ctx.shadowBlur = 0;
+
+ctx.fillStyle = '#111827';
+ctx.font = 'bold 9px system-ui, sans-serif';
+ctx.fillText('Hum %', legendX + 16, legendY + 18);
+}
+}
+}
+
+const telemetryCharts = [];
+document.querySelectorAll('.telemetry-chart').forEach(canvas => {
+telemetryCharts.push(new MiniTelemetryChart(canvas));
+});
+
+// Demo data generation with proper time progression
+setInterval(() => {
+telemetryCharts.forEach(chart => {
+if (chart.isAnomaly) {
+const anomaly = 25 + Math.sin(Date.now() * 0.0001) * 20;
+chart.pushPoint(Math.max(0, anomaly), 0);
+} else {
+const temp = 16 + Math.sin(Date.now() * 0.00005) * 4 + (Math.random() - 0.5) * 2;
+const hum = 72 + Math.sin(Date.now() * 0.00007) * 8 + (Math.random() - 0.5) * 4;
+chart.pushPoint(Math.max(0, temp), Math.max(0, Math.min(100, hum)));
+}
+});
+}, 3000);
+
+// Initialize charts with starting data
+setTimeout(() => {
+for (let i = 0; i < 6; i++) {
+setTimeout(() => {
+telemetryCharts.forEach(chart => {
+if (chart.isAnomaly) {
+chart.pushPoint(25 + Math.random() * 15, 0);
+} else {
+chart.pushPoint(16 + Math.random() * 3, 72 + Math.random() * 6);
+}
+});
+}, i * 500);
+}
+}, 500);
+
+</script>
+
+</body>
+</html>
