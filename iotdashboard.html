@@ -6,12 +6,11 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description"
-        content="Enddrave Tech – Industrial IoT cold storage monitoring, BMS telemetry, and energy analytics." />
+        content="Cold storage monitoring, BMS telemetry, and energy analytics over Industrial IoT 4.0." />
   <meta name="theme-color" content="#0f766e" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
   <link rel="icon" href="favicon.ico" sizes="any" />
-  <link rel="preload" href="assets/css/style-cold-storage.css" as="style" />
   <link rel="stylesheet" href="assets/css/style-cold-storage.css" />
 
   <!-- Fonts -->
@@ -24,33 +23,17 @@
 
 <body>
 
-<!-- ================= HEADER ================= -->
-<header class="site-header">
-  <div class="container nav">
-    <a class="brand" href="/" aria-label="Enddrave Home">
-      <img src="assets/images/logo.png" alt="Enddrave Tech logo" />
-    </a>
-    <nav aria-label="Primary navigation">
-      <a href="index.html">Home</a>
-      <a href="services.html">Services</a>
-      <a href="dashboard.html" aria-current="page">Dashboard</a>
-      <a href="about.html">About</a>
-    </nav>
-  </div>
-</header>
-
-<!-- ================= MAIN ================= -->
 <main class="dashboard" role="main">
 
-  <!-- ===== Page Header ===== -->
-  <header class="page-header">
+  <!-- ================= PAGE HEADER ================= -->
+  <section class="page-header">
     <h1 class="page-title">
       Cold Storage Monitoring &amp; Energy Analytics
     </h1>
     <p class="page-pill">Live Demo · BMS + Environment</p>
-  </header>
+  </section>
 
-  <!-- ================= SYSTEM OVERVIEW ================= -->
+  <!-- ================= MAIN GRID ================= -->
   <section class="main-grid">
 
     <!-- ========== LEFT COLUMN ========== -->
@@ -93,8 +76,11 @@
             </div>
             <div>
               <div class="door-label">Cold storage D1</div>
-              <div class="door-state door-closed" aria-live="polite"
-                   data-metric="door_d1">Closed</div>
+              <div class="door-state door-closed"
+                   data-metric="door_d1"
+                   aria-live="polite">
+                Closed
+              </div>
             </div>
           </div>
 
@@ -104,8 +90,11 @@
             </div>
             <div>
               <div class="door-label">Cold storage D2</div>
-              <div class="door-state door-closed" aria-live="polite"
-                   data-metric="door_d2">Closed</div>
+              <div class="door-state door-closed"
+                   data-metric="door_d2"
+                   aria-live="polite">
+                Closed
+              </div>
             </div>
           </div>
 
@@ -124,34 +113,27 @@
         <div class="env-grid">
           <div class="env-mini">
             <h3 class="env-mini-title">Telemetry · THD 1</h3>
-            <canvas class="telemetry-chart" data-tag="THD1"
-                    role="img"
-                    aria-label="Telemetry chart for sensor THD1"></canvas>
+            <canvas class="telemetry-chart" data-tag="THD1"></canvas>
           </div>
-
           <div class="env-mini">
             <h3 class="env-mini-title">Telemetry · THD 2</h3>
             <canvas class="telemetry-chart" data-tag="THD2"></canvas>
           </div>
-
           <div class="env-mini">
             <h3 class="env-mini-title">Telemetry · THD 3</h3>
             <canvas class="telemetry-chart" data-tag="THD3"></canvas>
           </div>
-
           <div class="env-mini">
             <h3 class="env-mini-title">Telemetry · THD 4</h3>
             <canvas class="telemetry-chart" data-tag="THD4"></canvas>
           </div>
-
           <div class="env-mini">
             <h3 class="env-mini-title">Telemetry · THD 5</h3>
             <canvas class="telemetry-chart" data-tag="THD5"></canvas>
           </div>
-
           <div class="env-mini">
             <h3 class="env-mini-title">Telemetry · Anomaly Score</h3>
-            <canvas class="telemetry-chart" data-tag="ANOMALY"></canvas>
+            <canvas class="telemetry-chart" data-tag="THD_ANOMALY"></canvas>
           </div>
         </div>
 
@@ -160,7 +142,7 @@
           <div>
             <h3 class="card-sub">Latest Record</h3>
             <table>
-              <caption>Latest temperature and humidity readings</caption>
+              <caption>Latest temperature &amp; humidity readings</caption>
               <thead>
                 <tr>
                   <th>Tag</th>
@@ -170,7 +152,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr><td>TH1</td><td data-metric="th1_temp">18.2</td><td>74.3</td><td>11:56:48</td></tr>
+                <tr><td>TH1</td><td>18.2</td><td>74.3</td><td>11:56:48</td></tr>
                 <tr><td>TH2</td><td>18.2</td><td>74.3</td><td>11:56:44</td></tr>
                 <tr><td>TH3</td><td>18.2</td><td>74.5</td><td>11:56:37</td></tr>
                 <tr><td>TH4</td><td>18.2</td><td>74.4</td><td>11:56:20</td></tr>
@@ -196,7 +178,7 @@
 
   </section>
 
-  <!-- ================= POWER & SAFETY ================= -->
+  <!-- ================= BATTERY & SAFETY ================= -->
   <section class="battery-row">
 
     <article class="card">
@@ -207,20 +189,18 @@
 
         <div>
           <div class="card-sub">Pack Voltage</div>
-          <div class="value"><span data-metric="pack_voltage">48.6</span> <span class="unit">V</span></div>
+          <div class="value">48.6 <span class="unit">V</span></div>
         </div>
 
         <div>
           <div class="card-sub">Pack Current</div>
-          <div class="value" style="color:var(--orange);">
-            <span data-metric="pack_current">+12.4</span> <span class="unit">A</span>
-          </div>
+          <div class="value warn">+12.4 <span class="unit">A</span></div>
           <div class="card-sub">Charging</div>
         </div>
 
         <div>
           <div class="card-sub">State of Charge</div>
-          <div class="soc-value" data-metric="soc">72%</div>
+          <div class="soc-value">72%</div>
         </div>
 
         <div>
@@ -252,7 +232,7 @@
     <h2 class="section-title">Thermal &amp; Safety Envelope</h2>
 
     <p class="card-sub">
-      Avg temp <strong>22.4 ℃</strong> · Max <strong>26.1 ℃</strong> · Min <strong>19.8 ℃</strong>
+      Avg <strong>22.4 ℃</strong> · Max <strong>26.1 ℃</strong> · Min <strong>19.8 ℃</strong>
     </p>
 
     <div class="pill-row">
@@ -265,25 +245,8 @@
 
 </main>
 
-<!-- ================= FOOTER ================= -->
-<footer class="site-footer">
-  <div class="container footer-grid">
-    <div>
-      <strong>Enddrave Tech Innovation Pvt. Ltd.</strong><br />
-      Industrial IoT &amp; Firmware Engineering
-    </div>
-    <div>
-      <a href="privacy.html">Privacy</a> ·
-      <a href="terms.html">Terms &amp; NDA</a>
-    </div>
-  </div>
-</footer>
-
-<!-- ================= UTILITY BUTTONS ================= -->
-<button class="back-btn" type="button" onclick="history.back()" aria-label="Go back">
-  ← Back
-</button>
-
+<!-- ================= UTILITIES ================= -->
+<button class="back-btn" type="button" onclick="history.back()">← Back</button>
 <button id="scrollTopBtn" aria-label="Scroll to top">▲</button>
 
 <script>
