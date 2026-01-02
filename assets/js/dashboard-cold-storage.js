@@ -43,7 +43,6 @@ stateEl.style.color = "#16a34a";
 
 // -------- CLEAN MINI TELEMETRY CHARTS - FIXED LEGEND POSITIONING --------
 class MiniTelemetryChart {
-  console.log('mini tele');
 constructor(canvas) {
 this.canvas = canvas;
 this.ctx = canvas.getContext('2d');
