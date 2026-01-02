@@ -1,4 +1,4 @@
-<style>
+
 :root{
 --bg:#f5f5ef;
 --card:#ffffff;
@@ -376,7 +376,6 @@ font-size:24px;
 font-size:20px;
 }
 }
-</style>
 /* ===== DOOR STATE CALIBRATION ===== */
 .door-state.ok{color:#2563eb;font-weight:500;}
 .door-state.alert{color:#dc2626;font-weight:600;}
