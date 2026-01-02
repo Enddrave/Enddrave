@@ -1,55 +1,57 @@
 /* =====================================================
-   🔧 DEBUG FLAG (TURN OFF IN PRODUCTION)
+   🔧 DEBUG FLAG
 ===================================================== */
 const DEBUG = false;
 const log = (...args) => DEBUG && console.log(...args);
 
+/* =====================================================
+   🚀 DOM READY
+===================================================== */
 document.addEventListener("DOMContentLoaded", () => {
 
   /* =====================================================
-     🚪 DOOR ICON DYNAMIC IMAGES
+     🚪 DOOR CONFIG
   ===================================================== */
   const IMG_OPEN = "assets/images/door-open.png";
   const IMG_CLOSED = "assets/images/door-closed.png";
 
-  const doorStates = { D1: "open", D2: "closed" };
+  // Initial state (can be overridden by SignalR)
+  const DOOR_STATE = {
+    D1: false,
+    D2: true
+  };
 
-  document.querySelectorAll(".door-item").forEach(item => {
-    const id = item.dataset.door;
-    const state = doorStates[id] || "closed";
-
-    const imgEl = item.querySelector(".door-img");
-    const stateEl = item.querySelector(".door-state");
-    if (!imgEl || !stateEl) return;
-
-    if (state === "open") {
-       console.log('open');
-      imgEl.src = IMG_OPEN;
-      stateEl.textContent = "Open";
-      stateEl.style.color = "#ea580c";
-    } else {
-         console.log('close');
-      imgEl.src = IMG_CLOSED;
-      stateEl.textContent = "Closed";
-      stateEl.style.color = "#16a34a";
-    }
-  });
-
-  function updateDoor(doorId, isOpen) {
+  function renderDoor(doorId, isOpen) {
     const item = document.querySelector(`.door-item[data-door="${doorId}"]`);
     if (!item) return;
 
-    const imgEl = item.querySelector(".door-img");
+    const img = item.querySelector(".door-img img");
     const stateEl = item.querySelector(".door-state");
-    if (!imgEl || !stateEl) return;
+    if (!img || !stateEl) return;
 
-    imgEl.src = isOpen ? IMG_OPEN : IMG_CLOSED;
-    stateEl.textContent = isOpen ? "Open" : "Closed";
-    stateEl.style.color = isOpen ? "#ea580c" : "#16a34a";
+    if (isOpen) {
+      img.src = IMG_OPEN;
+      stateEl.textContent = "Open";
+      stateEl.className = "door-state alert";
+    } else {
+      img.src = IMG_CLOSED;
+      stateEl.textContent = "Closed";
+      stateEl.className = "door-state ok";
+    }
   }
 
+  function updateDoor(doorId, isOpen) {
+    DOOR_STATE[doorId] = isOpen;
+    renderDoor(doorId, isOpen);
+  }
+
+  // Initial render
+  Object.entries(DOOR_STATE).forEach(([id, state]) => {
+    renderDoor(id, state);
+  });
+
   /* =====================================================
-     📈 MINI TELEMETRY CHARTS (FIXED)
+     📈 MINI TELEMETRY CHARTS
   ===================================================== */
   class MiniTelemetryChart {
     constructor(canvas) {
@@ -68,9 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     resize() {
       const dpr = window.devicePixelRatio || 1;
-
-      const width =
-        this.canvas.parentElement?.clientWidth || 240; // 🔑 fallback
+      const width = this.canvas.parentElement?.clientWidth || 240;
       const height = 120;
 
       this.canvas.width = width * dpr;
@@ -119,12 +119,11 @@ document.addEventListener("DOMContentLoaded", () => {
       const xCount = Math.max(this.data.labels.length, 2);
 
       const x = i => padding.left + (innerW * i) / (xCount - 1);
-      const y = (v, max) =>
-        padding.top + innerH - (v / max) * innerH;
+      const y = (v, max) => padding.top + innerH - (v / max) * innerH;
 
+      // Grid
       ctx.strokeStyle = "rgba(229,229,222,0.5)";
       ctx.setLineDash([2, 2]);
-
       for (let i = 0; i <= 4; i++) {
         const gx = padding.left + (innerW * i) / 4;
         const gy = padding.top + (innerH * i) / 4;
@@ -143,14 +142,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const drawSeries = (arr, color, max) => {
         if (!arr.length) return;
-
         ctx.strokeStyle = color;
         ctx.lineWidth = 2.5;
         ctx.beginPath();
-
-        arr.forEach((v, i) => {
-          i === 0 ? ctx.moveTo(x(i), y(v, max)) : ctx.lineTo(x(i), y(v, max));
-        });
+        arr.forEach((v, i) =>
+          i === 0 ? ctx.moveTo(x(i), y(v, max)) : ctx.lineTo(x(i), y(v, max))
+        );
         ctx.stroke();
 
         ctx.fillStyle = color;
@@ -179,7 +176,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /* =====================================================
-     🔄 DEMO DATA (REMOVE WHEN SIGNALR ACTIVE)
+     🔄 DEMO DATA (REMOVE WHEN SIGNALR IS LIVE)
   ===================================================== */
   setInterval(() => {
     telemetryCharts.forEach(chart => {
@@ -192,34 +189,11 @@ document.addEventListener("DOMContentLoaded", () => {
         );
       }
     });
+
+    // Demo door toggle
+    updateDoor("D1", Math.random() > 0.5);
+    updateDoor("D2", Math.random() > 0.5);
+
   }, 3000);
 
-  /* =====================================================
-     🚪 CALIBRATED DOOR LOGIC
-  ===================================================== */
-  const DOOR_MAP = {
-    D1: { open: false },
-    D2: { open: true }
-  };
-
-  function renderDoor(doorId) {
-    const item = document.querySelector(`[data-door="${doorId}"]`);
-    if (!item) return;
-
-    const img = item.querySelector(".door-img");
-    const text = item.querySelector(".door-state");
-    if (!img || !text) return;
-
-    if (DOOR_MAP[doorId].open) {
-      img.src = IMG_OPEN;
-      text.textContent = "Open · Alarm";
-      text.className = "door-state alert";
-    } else {
-      img.src = IMG_CLOSED;
-      text.textContent = "Closed · Normal";
-      text.className = "door-state ok";
-    }
-  }
-
-  Object.keys(DOOR_MAP).forEach(renderDoor);
 });
