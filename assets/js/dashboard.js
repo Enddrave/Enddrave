@@ -219,17 +219,31 @@ function logEvent(data) {
 // =====================================================
 // 💡 Command Buttons (UI-only)
 // =====================================================
-document.getElementById("ledOn").addEventListener("click", () => {
-  logCommand("LED turned ON");
-});
+function initializeCommandButtons() {
+  const ledOnBtn = document.getElementById("ledOn");
+  const ledOffBtn = document.getElementById("ledOff");
+  const simulateOtaBtn = document.getElementById("simulateOta");
 
-document.getElementById("ledOff").addEventListener("click", () => {
-  logCommand("LED turned OFF");
-});
+  if (ledOnBtn) {
+    ledOnBtn.addEventListener("click", () => {
+      logCommand("LED turned ON");
+    });
+  }
 
-document.getElementById("simulateOta").addEventListener("click", () => {
-  logCommand("Simulated OTA update started...");
-});
+  if (ledOffBtn) {
+    ledOffBtn.addEventListener("click", () => {
+      logCommand("LED turned OFF");
+    });
+  }
+
+  if (simulateOtaBtn) {
+    simulateOtaBtn.addEventListener("click", () => {
+      logCommand("Simulated OTA update started...");
+    });
+  }
+  
+  console.log("✅ Command buttons initialized");
+}
 
 function logCommand(msg) {
   const timestamp = new Date().toLocaleTimeString();
@@ -254,6 +268,7 @@ function logCommand(msg) {
 document.addEventListener('DOMContentLoaded', function() {
   console.log("📱 Dashboard initializing...");
   initializeChart();
+  initializeCommandButtons();
   markDeviceOffline();
   startSignalR();
   resetDeviceTimer();
@@ -266,6 +281,7 @@ if (document.readyState === 'loading') {
   // DOM already loaded
   console.log("📱 Dashboard initializing (DOM already ready)...");
   initializeChart();
+  initializeCommandButtons();
   markDeviceOffline();
   startSignalR();
   resetDeviceTimer();
