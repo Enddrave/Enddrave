@@ -23,10 +23,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!imgEl || !stateEl) return;
 
     if (state === "open") {
+       console.log('open');
       imgEl.src = IMG_OPEN;
       stateEl.textContent = "Open";
       stateEl.style.color = "#ea580c";
     } else {
+         console.log('close');
       imgEl.src = IMG_CLOSED;
       stateEl.textContent = "Closed";
       stateEl.style.color = "#16a34a";
