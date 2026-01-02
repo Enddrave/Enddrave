@@ -23,78 +23,62 @@
 
 <body>
 
-<main class="dashboard" role="main">
+<main class="dashboard">
 
-  <!-- ================= PAGE HEADER ================= -->
+  <!-- PAGE HEADER -->
   <section class="page-header">
     <h1 class="page-title">
-      Cold Storage Monitoring &amp; Energy Analytics
+      COLD STORAGE MONITORING &amp; ENERGY ANALYTICS – INDUSTRIAL IOT 4.0
     </h1>
-    <p class="page-pill">Live Demo · BMS + Environment</p>
+    <div class="page-pill">Live Demo · BMS + Environment</div>
   </section>
 
-  <!-- ================= MAIN GRID ================= -->
+  <!-- MAIN GRID -->
   <section class="main-grid">
 
-    <!-- ========== LEFT COLUMN ========== -->
+    <!-- LEFT COLUMN -->
     <section class="left-column">
 
       <!-- Gateway -->
       <article class="card">
-        <h2 class="card-title">Gateway &amp; Connectivity</h2>
-
+        <div class="card-title">Gateway &amp; Connectivity</div>
         <ul class="status-list">
           <li><span class="status-label">Device ID:</span> CS-GW-01</li>
           <li><span class="status-label">Location:</span> Cold Room – Gurugram DC</li>
           <li><span class="status-label">Chemistry:</span> LFP 16s – 48 V ESS</li>
           <li><span class="status-label">Firmware:</span> v1.0.3</li>
-          <li>
-            <span class="status-label">Last update:</span>
-            <time data-metric="last_update">10:12:37</time>
-          </li>
-          <li>
-            <span class="status-label">RSSI:</span>
-            <span data-metric="rssi">-72</span> dBm
-          </li>
+          <li><span class="status-label">Last update:</span> --</li>
+          <li><span class="status-label">RSSI:</span> -72 dBm</li>
         </ul>
-
-        <div class="badge" aria-live="polite">
+        <div class="badge">
           <span class="badge-dot"></span>
-          <span data-metric="gateway_status">Online – MQTT over LTE</span>
+          Online – MQTT over LTE
         </div>
       </article>
 
       <!-- Doors -->
       <article class="card">
-        <h2 class="card-title">Doors Status</h2>
+        <div class="card-title">Doors Status</div>
 
         <div class="door-list">
 
-          <div class="door-item" data-door="D1">
+          <div class="door-item">
             <div class="door-image">
-              <img src="door-closed.png" alt="Cold storage door D1" />
+              <strong>D1</strong>
             </div>
             <div>
               <div class="door-label">Cold storage D1</div>
-              <div class="door-state door-closed"
-                   data-metric="door_d1"
-                   aria-live="polite">
-                Closed
-              </div>
+              <div class="door-state alert">Open</div>
             </div>
           </div>
 
-          <div class="door-item" data-door="D2">
+          <div class="door-item">
             <div class="door-image">
-              <img src="door-closed.png" alt="Cold storage door D2" />
+              <strong>D2</strong>
             </div>
             <div>
               <div class="door-label">Cold storage D2</div>
-              <div class="door-state door-closed"
-                   data-metric="door_d2"
-                   aria-live="polite">
-                Closed
-              </div>
+              <div class="door-state ok">Closed</div>
             </div>
           </div>
 
@@ -103,53 +87,30 @@
 
     </section>
 
-    <!-- ========== RIGHT COLUMN ========== -->
+    <!-- RIGHT COLUMN -->
     <section class="right-column">
 
       <!-- Environment -->
       <article class="card">
-        <h2 class="card-title">Environment THD Profile</h2>
+        <div class="card-title">Environment THD Profile</div>
 
         <div class="env-grid">
-          <div class="env-mini">
-            <h3 class="env-mini-title">Telemetry · THD 1</h3>
-            <canvas class="telemetry-chart" data-tag="THD1"></canvas>
-          </div>
-          <div class="env-mini">
-            <h3 class="env-mini-title">Telemetry · THD 2</h3>
-            <canvas class="telemetry-chart" data-tag="THD2"></canvas>
-          </div>
-          <div class="env-mini">
-            <h3 class="env-mini-title">Telemetry · THD 3</h3>
-            <canvas class="telemetry-chart" data-tag="THD3"></canvas>
-          </div>
-          <div class="env-mini">
-            <h3 class="env-mini-title">Telemetry · THD 4</h3>
-            <canvas class="telemetry-chart" data-tag="THD4"></canvas>
-          </div>
-          <div class="env-mini">
-            <h3 class="env-mini-title">Telemetry · THD 5</h3>
-            <canvas class="telemetry-chart" data-tag="THD5"></canvas>
-          </div>
-          <div class="env-mini">
-            <h3 class="env-mini-title">Telemetry · Anomaly Score</h3>
-            <canvas class="telemetry-chart" data-tag="THD_ANOMALY"></canvas>
-          </div>
+          <div class="env-mini"><div class="env-mini-title">Telemetry · THD 1</div><canvas class="telemetry-chart"></canvas></div>
+          <div class="env-mini"><div class="env-mini-title">Telemetry · THD 2</div><canvas class="telemetry-chart"></canvas></div>
+          <div class="env-mini"><div class="env-mini-title">Telemetry · THD 3</div><canvas class="telemetry-chart"></canvas></div>
+          <div class="env-mini"><div class="env-mini-title">Telemetry · THD 4</div><canvas class="telemetry-chart"></canvas></div>
+          <div class="env-mini"><div class="env-mini-title">Telemetry · THD 5</div><canvas class="telemetry-chart"></canvas></div>
+          <div class="env-mini"><div class="env-mini-title">Telemetry · Anomaly Score</div><canvas class="telemetry-chart"></canvas></div>
         </div>
 
         <div class="env-bottom">
 
+          <!-- Latest -->
           <div>
-            <h3 class="card-sub">Latest Record</h3>
+            <div class="card-sub">Latest Record</div>
             <table>
-              <caption>Latest temperature &amp; humidity readings</caption>
               <thead>
-                <tr>
-                  <th>Tag</th>
-                  <th>Temp (°C)</th>
-                  <th>Hum (%)</th>
-                  <th>Time</th>
-                </tr>
+                <tr><th>Tag</th><th>Temp (°C)</th><th>Hum (%)</th><th>Time</th></tr>
               </thead>
               <tbody>
                 <tr><td>TH1</td><td>18.2</td><td>74.3</td><td>11:56:48</td></tr>
@@ -161,13 +122,14 @@
             </table>
           </div>
 
+          <!-- Logs -->
           <div>
-            <h3 class="card-sub">Event Log</h3>
-            <div class="log-box" role="log" aria-live="polite">
-              <div class="log-row">11:56:48 – TH1 → 18.2°C, 74.3%</div>
-              <div class="log-row">11:56:44 – TH2 → 18.2°C, 74.3%</div>
-              <div class="log-row">11:56:37 – TH3 → 18.2°C, 74.5%</div>
-              <div class="log-row">11:56:20 – TH4 → 18.2°C, 74.4%</div>
+            <div class="card-sub">Event Log</div>
+            <div class="log-box">
+              <div class="log-row">11:56:48 – Sensor 0 → Temp 18.2°C, Hum 74.3%</div>
+              <div class="log-row">11:56:44 – Sensor 0 → Temp 18.2°C, Hum 74.3%</div>
+              <div class="log-row">11:56:37 – Sensor 0 → Temp 18.2°C, Hum 74.5%</div>
+              <div class="log-row">11:56:20 – Sensor 0 → Temp 18.2°C, Hum 74.4%</div>
             </div>
           </div>
 
@@ -178,18 +140,19 @@
 
   </section>
 
-  <!-- ================= BATTERY & SAFETY ================= -->
+  <!-- BATTERY -->
   <section class="battery-row">
 
     <article class="card">
-      <h2 class="section-title">Battery Information</h2>
-      <p class="section-sub">Pack status and capacity</p>
+      <div class="section-title">Battery Information</div>
+      <div class="section-sub">Pack status and capacity</div>
 
       <div class="grid-small">
 
         <div>
           <div class="card-sub">Pack Voltage</div>
           <div class="value">48.6 <span class="unit">V</span></div>
+          <div class="bar"><div class="fill" style="width:72%;background:var(--blue)"></div></div>
         </div>
 
         <div>
@@ -200,64 +163,64 @@
 
         <div>
           <div class="card-sub">State of Charge</div>
-          <div class="soc-value">72%</div>
+          <div class="soc-wrap">
+            <svg viewBox="0 0 100 50" width="200">
+              <path d="M10 50 A40 40 0 0 1 90 50" fill="none" stroke="#e5e7eb" stroke-width="8"/>
+              <path d="M10 50 A40 40 0 0 1 90 50" fill="none" stroke="#0f766e" stroke-width="8" stroke-dasharray="126" stroke-dashoffset="35"/>
+            </svg>
+            <div class="soc-value">72%</div>
+          </div>
         </div>
 
         <div>
           <div class="card-sub">Battery Capacity</div>
           <div class="value">34.5 <span class="unit">Ah</span></div>
+          <div class="bar"><div class="fill" style="width:72%;background:var(--green)"></div></div>
         </div>
 
       </div>
     </article>
 
+    <!-- Errors -->
     <article class="card">
-      <h2 class="section-title">Errors &amp; Faults</h2>
+      <div class="section-title">Errors, Faults &amp; Meta</div>
       <table class="error-table">
-        <caption>System fault status</caption>
-        <thead>
-          <tr><th>Code</th><th>Description</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>F001</td><td class="bad">Cell under-voltage (cleared)</td></tr>
-          <tr><td>—</td><td class="ok">No active faults</td></tr>
-        </tbody>
+        <tr><td>F001</td><td class="bad">Cell under-voltage (latched, cleared)</td></tr>
+        <tr><td>—</td><td class="ok">No active faults</td></tr>
       </table>
     </article>
 
   </section>
 
-  <!-- ================= THERMAL ================= -->
+  <!-- THERMAL -->
   <section class="card">
-    <h2 class="section-title">Thermal &amp; Safety Envelope</h2>
+    <div class="section-title">Thermal &amp; Safety Envelope</div>
 
-    <p class="card-sub">
-      Avg <strong>22.4 ℃</strong> · Max <strong>26.1 ℃</strong> · Min <strong>19.8 ℃</strong>
-    </p>
+    <div class="grid-small">
+      <div>
+        <div class="card-sub">Pack Temperatures</div>
+        <div class="value">22.4 <span class="unit">°C avg</span></div>
+        <div class="card-sub">Max 26.1 °C · Min 19.8 °C</div>
+        <div class="card-sub" style="margin-top:6px;">Contactors: all ON</div>
+      </div>
 
-    <div class="pill-row">
-      <span class="pill">OV/UV clear</span>
-      <span class="pill">OT/UT clear</span>
-      <span class="pill">OC/SC clear</span>
-      <span class="pill">Isolation OK</span>
+      <div>
+        <div class="card-sub">Thermal System</div>
+        <div class="card-sub">Fan 45% · Pump ON · Heater OFF</div>
+        <div class="bar"><div class="fill" style="width:45%;background:var(--blue)"></div></div>
+      </div>
+    </div>
+
+    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+      <span class="pill"><span class="pill-dot"></span> OV/UV clear</span>
+      <span class="pill"><span class="pill-dot"></span> OT/UT clear</span>
+      <span class="pill"><span class="pill-dot"></span> OC/SC clear</span>
+      <span class="pill"><span class="pill-dot"></span> Isolation OK</span>
     </div>
   </section>
 
 </main>
 
-<!-- ================= UTILITIES ================= -->
-<button class="back-btn" type="button" onclick="history.back()">← Back</button>
-<button id="scrollTopBtn" aria-label="Scroll to top">▲</button>
-
-<script>
-  const scrollBtn = document.getElementById("scrollTopBtn");
-  window.addEventListener("scroll", () => {
-    scrollBtn.style.display = window.scrollY > 300 ? "block" : "none";
-  });
-  scrollBtn.addEventListener("click", () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  });
-</script>
-
 </body>
 </html>
+
