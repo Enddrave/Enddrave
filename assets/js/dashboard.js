@@ -1,39 +1,55 @@
 // =====================================================
 // 📊 Chart.js Setup
 // =====================================================
-const ctx = document.getElementById("telemetryChart").getContext("2d");
+let telemetryChart = null;
 
-const telemetryChart = new Chart(ctx, {
-  type: "line",
-  data: {
-    labels: [],
-    datasets: [
-      {
-        label: "Temperature (°C)",
-        data: [],
-        borderWidth: 2,
-        borderColor: "#ff5733",
-        fill: false,
-        tension: 0.3,
-      },
-      {
-        label: "Humidity (%)",
-        data: [],
-        borderWidth: 2,
-        borderColor: "#007bff",
-        fill: false,
-        tension: 0.3,
-      },
-    ],
-  },
-  options: {
-    responsive: true,
-    scales: {
-      x: { title: { display: true, text: "Time" } },
-      y: { title: { display: true, text: "Value" }, min: 0, max: 100 },
+function initializeChart() {
+  const canvas = document.getElementById("telemetryChart");
+  if (!canvas) {
+    console.error("❌ Canvas element 'telemetryChart' not found");
+    return;
+  }
+  
+  const ctx = canvas.getContext("2d");
+  if (!ctx) {
+    console.error("❌ Failed to get 2d context from canvas");
+    return;
+  }
+
+  telemetryChart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: [],
+      datasets: [
+        {
+          label: "Temperature (°C)",
+          data: [],
+          borderWidth: 2,
+          borderColor: "#ff5733",
+          fill: false,
+          tension: 0.3,
+        },
+        {
+          label: "Humidity (%)",
+          data: [],
+          borderWidth: 2,
+          borderColor: "#007bff",
+          fill: false,
+          tension: 0.3,
+        },
+      ],
     },
-  },
-});
+    options: {
+      responsive: true,
+      scales: {
+        x: { title: { display: true, text: "Time" } },
+        y: { title: { display: true, text: "Value" }, min: 0, max: 100 },
+      },
+    },
+  });
+  
+  console.log("✅ Telemetry chart initialized");
+}
 
 // =====================================================
 // 🔧 Helper: Pick Primary Sensor (ID 0 default)
@@ -151,6 +167,11 @@ function updateTelemetryUI(data) {
 // 📈 Update Telemetry Chart
 // =====================================================
 function updateChart(data) {
+  if (!telemetryChart) {
+    console.warn("⚠ Chart not initialized yet, skipping update");
+    return;
+  }
+  
   const sensor = getPrimarySensor(data);
   if (!sensor) return;
 
@@ -230,6 +251,22 @@ function logCommand(msg) {
 // =====================================================
 // 🚀 Init
 // =====================================================
-markDeviceOffline();
-startSignalR();
-resetDeviceTimer();
+document.addEventListener('DOMContentLoaded', function() {
+  console.log("📱 Dashboard initializing...");
+  initializeChart();
+  markDeviceOffline();
+  startSignalR();
+  resetDeviceTimer();
+});
+
+// Fallback initialization if DOMContentLoaded already fired
+if (document.readyState === 'loading') {
+  // Do nothing, DOMContentLoaded will handle it
+} else {
+  // DOM already loaded
+  console.log("📱 Dashboard initializing (DOM already ready)...");
+  initializeChart();
+  markDeviceOffline();
+  startSignalR();
+  resetDeviceTimer();
+}
