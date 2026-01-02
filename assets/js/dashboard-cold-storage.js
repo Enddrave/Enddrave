@@ -13,6 +13,7 @@ const imgEl = item.querySelector(".door-img");
 const stateEl = item.querySelector(".door-state");
 
 if(state === "open"){
+  console.log('open------');
 imgEl.src = IMG_OPEN;
 stateEl.textContent = "Open";
 stateEl.style.color = "#ea580c";
@@ -24,6 +25,7 @@ stateEl.style.color = "#16a34a";
 });
 
 function updateDoor(doorId, isOpen){
+  console.log('updayteDoor');
 const item = document.querySelector(`.door-item[data-door="${doorId}"]`);
 if(!item) return;
 const imgEl = item.querySelector(".door-img");
@@ -41,6 +43,7 @@ stateEl.style.color = "#16a34a";
 
 // -------- CLEAN MINI TELEMETRY CHARTS - FIXED LEGEND POSITIONING --------
 class MiniTelemetryChart {
+  console.log('mini tele');
 constructor(canvas) {
 this.canvas = canvas;
 this.ctx = canvas.getContext('2d');
@@ -61,7 +64,8 @@ this.draw();
 }
 
 pushPoint(temp, hum) {
-const elapsed = Date.now() - this.startTime;
+  console.log('push point');
+  const elapsed = Date.now() - this.startTime;
 const minutes = Math.floor(elapsed / 60000);
 const seconds = Math.floor((elapsed % 60000) / 1000);
 const label = `${minutes}:${seconds.toString().padStart(2, '0')}`;
@@ -285,6 +289,8 @@ const DOOR_MAP = {
 };
 
 function renderDoor(doorId){
+  console.log('render door');
+                            
   const item = document.querySelector(`[data-door="${doorId}"]`);
   if(!item) return;
 
