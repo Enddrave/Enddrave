@@ -1,299 +1,300 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Cold Storage Monitoring &amp; Energy Analytics – Industrial IoT 4.0</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Enddrave Tech — Cold storage monitoring, BMS telemetry, and energy analytics over Industrial IoT 4.0." />
-<link rel="stylesheet" href="assets/css/style-cold-storage.css" />
-<link rel="icon" href="favicon.ico" sizes="any">
+  <meta charset="UTF-8" />
+  <title>Cold Storage Monitoring & Energy Analytics – Industrial IoT 4.0</title>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description"
+        content="Enddrave Tech – Industrial IoT cold storage monitoring, BMS telemetry, and energy analytics." />
+  <meta name="theme-color" content="#0f766e" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
+  <link rel="icon" href="favicon.ico" sizes="any" />
+  <link rel="preload" href="assets/css/style-cold-storage.css" as="style" />
+  <link rel="stylesheet" href="assets/css/style-cold-storage.css" />
 
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap"
+    rel="stylesheet" />
 </head>
+
 <body>
 
-<!-- ===== SITE HEADER FROM MAIN SITE ===== -->
+<!-- ================= HEADER ================= -->
 <header class="site-header">
-<div class="container nav">
-<a class="brand" href="/"><img src="assets/images/logo.png" alt="Enddrave Tech logo" /></a>
-<nav>
-<a href="index.html">Home</a>
-<a href="services.html">Services</a>
-<a href="dashboard.html">Dashboard</a>
-<a href="about.html">About</a>
-<!-- <a href="contact.html">Contact</a> -->
-</nav>
-</div>
+  <div class="container nav">
+    <a class="brand" href="/" aria-label="Enddrave Home">
+      <img src="assets/images/logo.png" alt="Enddrave Tech logo" />
+    </a>
+    <nav aria-label="Primary navigation">
+      <a href="index.html">Home</a>
+      <a href="services.html">Services</a>
+      <a href="dashboard.html" aria-current="page">Dashboard</a>
+      <a href="about.html">About</a>
+    </nav>
+  </div>
 </header>
 
-<main>
-<!-- ===== DASHBOARD CONTENT ===== -->
-<div class="page-header">
-<div class="page-title">Cold Storage Monitoring &amp; Energy Analytics – Industrial IoT 4.0</div>
-<div class="page-pill">Live Demo · BMS + Environment</div>
-</div>
+<!-- ================= MAIN ================= -->
+<main class="dashboard" role="main">
 
-<div class="dashboard">
+  <!-- ===== Page Header ===== -->
+  <header class="page-header">
+    <h1 class="page-title">
+      Cold Storage Monitoring &amp; Energy Analytics
+    </h1>
+    <p class="page-pill">Live Demo · BMS + Environment</p>
+  </header>
 
-<!-- ===== MAIN GRID (no top summary strip) ===== -->
-<div class="main-grid">
+  <!-- ================= SYSTEM OVERVIEW ================= -->
+  <section class="main-grid">
 
-<!-- LEFT COLUMN -->
-<div class="left-column">
+    <!-- ========== LEFT COLUMN ========== -->
+    <section class="left-column">
 
-<!-- Gateway & Connectivity -->
-<div class="card">
-<div class="card-title">Gateway &amp; Connectivity</div>
-<ul class="status-list">
-<li><span class="status-label">Device ID:</span> CS‑GW‑01</li>
-<li><span class="status-label">Location:</span> Cold Room – Gurugram DC</li>
-<li><span class="status-label">Chemistry:</span> LFP 16s – 48 V ESS</li>
-<li><span class="status-label">Firmware:</span> v1.0.3</li>
-<li><span class="status-label">Last update:</span> 10:12:37</li>
-<li><span class="status-label">RSSI:</span> -72 dBm</li>
-</ul>
-<div class="badge">
-<div class="badge-dot"></div>
-<span>Online – MQTT over LTE</span>
-</div>
-</div>
+      <!-- Gateway -->
+      <article class="card">
+        <h2 class="card-title">Gateway &amp; Connectivity</h2>
 
-<!-- Doors Status -->
-<div class="card">
-<div class="card-title">Doors Status</div>
-<div class="door-list">
+        <ul class="status-list">
+          <li><span class="status-label">Device ID:</span> CS-GW-01</li>
+          <li><span class="status-label">Location:</span> Cold Room – Gurugram DC</li>
+          <li><span class="status-label">Chemistry:</span> LFP 16s – 48 V ESS</li>
+          <li><span class="status-label">Firmware:</span> v1.0.3</li>
+          <li>
+            <span class="status-label">Last update:</span>
+            <time data-metric="last_update">10:12:37</time>
+          </li>
+          <li>
+            <span class="status-label">RSSI:</span>
+            <span data-metric="rssi">-72</span> dBm
+          </li>
+        </ul>
 
-<div class="door-item" data-door="D1">
-<div class="door-image">
-<img src="door-closed.png" alt="Door D1" class="door-img">
-</div>
-<div>
-<div class="door-label">Cold storage D1</div>
-<div class="door-state">Closed</div>
-</div>
-</div>
+        <div class="badge" aria-live="polite">
+          <span class="badge-dot"></span>
+          <span data-metric="gateway_status">Online – MQTT over LTE</span>
+        </div>
+      </article>
 
-<div class="door-item" data-door="D2">
-<div class="door-image">
-<img src="door-closed.png" alt="Door D2" class="door-img">
-</div>
-<div>
-<div class="door-label">Cold storage D2</div>
-<div class="door-state">Closed</div>
-</div>
-</div>
+      <!-- Doors -->
+      <article class="card">
+        <h2 class="card-title">Doors Status</h2>
 
-</div>
-</div>
+        <div class="door-list">
 
-</div>
+          <div class="door-item" data-door="D1">
+            <div class="door-image">
+              <img src="door-closed.png" alt="Cold storage door D1" />
+            </div>
+            <div>
+              <div class="door-label">Cold storage D1</div>
+              <div class="door-state door-closed" aria-live="polite"
+                   data-metric="door_d1">Closed</div>
+            </div>
+          </div>
 
-<!-- RIGHT COLUMN -->
-<div class="right-column">
+          <div class="door-item" data-door="D2">
+            <div class="door-image">
+              <img src="door-closed.png" alt="Cold storage door D2" />
+            </div>
+            <div>
+              <div class="door-label">Cold storage D2</div>
+              <div class="door-state door-closed" aria-live="polite"
+                   data-metric="door_d2">Closed</div>
+            </div>
+          </div>
 
-<!-- Environment THD Profile -->
-<div class="card">
-<div class="card-title">Environment THD Profile</div>
+        </div>
+      </article>
 
-<div class="env-grid">
-<div class="env-mini">
-<div class="env-mini-title">Telemetry · THD 1</div>
-<canvas class="telemetry-chart" data-tag="THD1"></canvas>
-</div>
-<div class="env-mini">
-<div class="env-mini-title">Telemetry · THD 2</div>
-<canvas class="telemetry-chart" data-tag="THD2"></canvas>
-</div>
-<div class="env-mini">
-<div class="env-mini-title">Telemetry · THD 3</div>
-<canvas class="telemetry-chart" data-tag="THD3"></canvas>
-</div>
-<div class="env-mini">
-<div class="env-mini-title">Telemetry · THD 4</div>
-<canvas class="telemetry-chart" data-tag="THD4"></canvas>
-</div>
-<div class="env-mini">
-<div class="env-mini-title">Telemetry · THD 5</div>
-<canvas class="telemetry-chart" data-tag="THD5"></canvas>
-</div>
+    </section>
 
-<!-- anomaly score chart tile -->
-<div class="env-mini">
-<div class="env-mini-title">Telemetry · Anomaly Score</div>
-<canvas class="telemetry-chart" data-tag="THD_ANOMALY"></canvas>
-</div>
-</div>
+    <!-- ========== RIGHT COLUMN ========== -->
+    <section class="right-column">
 
-<div class="env-bottom">
-<div>
-<div class="card-sub" style="margin-bottom:6px;">Latest Record</div>
-<table>
-<thead>
-<tr>
-<th>Tag</th>
-<th>Temp (°C)</th>
-<th>Hum (%)</th>
-<th>Time Stamp</th>
-</tr>
-</thead>
-<tbody>
-<tr><td>TH1</td><td>18.2</td><td>74.3</td><td>11:56:48</td></tr>
-<tr><td>TH2</td><td>18.2</td><td>74.3</td><td>11:56:44</td></tr>
-<tr><td>TH3</td><td>18.2</td><td>74.5</td><td>11:56:37</td></tr>
-<tr><td>TH4</td><td>18.2</td><td>74.4</td><td>11:56:20</td></tr>
-<tr><td>TH5</td><td>18.2</td><td>74.5</td><td>11:56:13</td></tr>
-</tbody>
-</table>
-</div>
+      <!-- Environment -->
+      <article class="card">
+        <h2 class="card-title">Environment THD Profile</h2>
 
-<div>
-<div class="card-sub" style="margin-bottom:6px;">Event Log</div>
-<div class="log-box">
-<div class="log-row">11:56:48 – Sensor 0 → Temp 18.2°C, Hum 74.3%</div>
-<div class="log-row">11:56:44 – Sensor 0 → Temp 18.2°C, Hum 74.3%</div>
-<div class="log-row">11:56:37 – Sensor 0 → Temp 18.2°C, Hum 74.5%</div>
-<div class="log-row">11:56:20 – Sensor 0 → Temp 18.2°C, Hum 74.4%</div>
-</div>
-</div>
-</div>
-</div>
+        <div class="env-grid">
+          <div class="env-mini">
+            <h3 class="env-mini-title">Telemetry · THD 1</h3>
+            <canvas class="telemetry-chart" data-tag="THD1"
+                    role="img"
+                    aria-label="Telemetry chart for sensor THD1"></canvas>
+          </div>
 
-<!-- Battery + Errors -->
-<div class="battery-row">
+          <div class="env-mini">
+            <h3 class="env-mini-title">Telemetry · THD 2</h3>
+            <canvas class="telemetry-chart" data-tag="THD2"></canvas>
+          </div>
 
-<div class="card">
-<div class="section-title">Battery Information</div>
-<div class="section-sub">Pack status and capacity</div>
+          <div class="env-mini">
+            <h3 class="env-mini-title">Telemetry · THD 3</h3>
+            <canvas class="telemetry-chart" data-tag="THD3"></canvas>
+          </div>
 
-<div class="grid-small">
+          <div class="env-mini">
+            <h3 class="env-mini-title">Telemetry · THD 4</h3>
+            <canvas class="telemetry-chart" data-tag="THD4"></canvas>
+          </div>
 
-<div>
-<div class="card-sub">Pack Voltage</div>
-<div class="value">48.6 <span class="unit">V</span></div>
-<div class="bar">
-<div class="fill" style="width:70%;background:var(--blue);"></div>
-</div>
-</div>
+          <div class="env-mini">
+            <h3 class="env-mini-title">Telemetry · THD 5</h3>
+            <canvas class="telemetry-chart" data-tag="THD5"></canvas>
+          </div>
 
-<div>
-<div class="card-sub">Pack Current</div>
-<div class="value" style="color:var(--orange);">
-+12.4 <span class="unit">A</span>
-</div>
-<div class="card-sub" style="margin-top:4px;">Charging</div>
-</div>
+          <div class="env-mini">
+            <h3 class="env-mini-title">Telemetry · Anomaly Score</h3>
+            <canvas class="telemetry-chart" data-tag="ANOMALY"></canvas>
+          </div>
+        </div>
 
-<div>
-<div class="card-sub">State of Charge</div>
-<div class="soc-wrap">
-<svg viewBox="0 0 100 50" width="200">
-<path d="M10 50 A40 40 0 0 1 90 50"
-fill="none" stroke="#e5e7eb" stroke-width="8"/>
-<path d="M10 50 A40 40 0 0 1 90 50"
-fill="none" stroke="#0f766e"
-stroke-width="8"
-stroke-linecap="round"
-stroke-dasharray="126"
-stroke-dashoffset="35"/>
-</svg>
-<div class="soc-value">72%</div>
-</div>
-</div>
+        <div class="env-bottom">
 
-<div>
-<div class="card-sub">Battery Capacity</div>
-<div class="value">34.5 <span class="unit">Ah</span></div>
-<div class="bar">
-<div class="fill" style="width:70%;background:var(--green);"></div>
-</div>
-</div>
+          <div>
+            <h3 class="card-sub">Latest Record</h3>
+            <table>
+              <caption>Latest temperature and humidity readings</caption>
+              <thead>
+                <tr>
+                  <th>Tag</th>
+                  <th>Temp (°C)</th>
+                  <th>Hum (%)</th>
+                  <th>Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>TH1</td><td data-metric="th1_temp">18.2</td><td>74.3</td><td>11:56:48</td></tr>
+                <tr><td>TH2</td><td>18.2</td><td>74.3</td><td>11:56:44</td></tr>
+                <tr><td>TH3</td><td>18.2</td><td>74.5</td><td>11:56:37</td></tr>
+                <tr><td>TH4</td><td>18.2</td><td>74.4</td><td>11:56:20</td></tr>
+                <tr><td>TH5</td><td>18.2</td><td>74.5</td><td>11:56:13</td></tr>
+              </tbody>
+            </table>
+          </div>
 
-</div>
-</div>
+          <div>
+            <h3 class="card-sub">Event Log</h3>
+            <div class="log-box" role="log" aria-live="polite">
+              <div class="log-row">11:56:48 – TH1 → 18.2°C, 74.3%</div>
+              <div class="log-row">11:56:44 – TH2 → 18.2°C, 74.3%</div>
+              <div class="log-row">11:56:37 – TH3 → 18.2°C, 74.5%</div>
+              <div class="log-row">11:56:20 – TH4 → 18.2°C, 74.4%</div>
+            </div>
+          </div>
 
-<div class="card">
-<div class="section-title">Errors, Faults &amp; Meta</div>
-<table class="error-table">
-<thead>
-<tr>
-<th>Code</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>F001</td>
-<td class="bad">Cell under-voltage (latched, cleared)</td>
-</tr>
-<tr>
-<td>—</td>
-<td class="ok">No active faults</td>
-</tr>
-</tbody>
-</table>
-</div>
+        </div>
+      </article>
 
-</div>
+    </section>
 
-<!-- THERMAL & SAFETY ENVELOPE -->
-<div class="card">
-<div class="section-title">Thermal &amp; Safety Envelope</div>
+  </section>
 
-<div style="display:grid;grid-template-columns:1.2fr 1fr;gap:16px;margin-top:4px;">
-<div>
-<div class="card-sub">Pack Temperatures</div>
-<div class="value">22.4 <span class="unit">℃ avg</span></div>
-<div class="card-sub" style="margin-top:4px;">
-Max 26.1 ℃ (Module 3) · Min 19.8 ℃
-</div>
-<div class="card-sub" style="margin-top:10px;">Contactors</div>
-<div class="card-sub">
-Pre‑charge · Main + / – · Charger: all ON
-</div>
-</div>
+  <!-- ================= POWER & SAFETY ================= -->
+  <section class="battery-row">
 
-<div>
-<div class="card-sub">Thermal System</div>
-<div class="card-sub">
-Fan: 45 % · Pump: ON · Heater: OFF
-</div>
-<div class="bar" style="margin-top:8px;">
-<div class="fill" style="width:45%;background:var(--blue);"></div>
-</div>
-</div>
-</div>
+    <article class="card">
+      <h2 class="section-title">Battery Information</h2>
+      <p class="section-sub">Pack status and capacity</p>
 
-<div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;">
-<div class="pill"><span class="pill-dot"></span> OV/UV clear</div>
-<div class="pill"><span class="pill-dot"></span> OT/UT clear</div>
-<div class="pill"><span class="pill-dot"></span> OC/SC clear</div>
-<div class="pill"><span class="pill-dot"></span> Isolation OK</div>
-</div>
-</div>
+      <div class="grid-small">
 
-</div>
+        <div>
+          <div class="card-sub">Pack Voltage</div>
+          <div class="value"><span data-metric="pack_voltage">48.6</span> <span class="unit">V</span></div>
+        </div>
 
-</div>
-</div>
+        <div>
+          <div class="card-sub">Pack Current</div>
+          <div class="value" style="color:var(--orange);">
+            <span data-metric="pack_current">+12.4</span> <span class="unit">A</span>
+          </div>
+          <div class="card-sub">Charging</div>
+        </div>
+
+        <div>
+          <div class="card-sub">State of Charge</div>
+          <div class="soc-value" data-metric="soc">72%</div>
+        </div>
+
+        <div>
+          <div class="card-sub">Battery Capacity</div>
+          <div class="value">34.5 <span class="unit">Ah</span></div>
+        </div>
+
+      </div>
+    </article>
+
+    <article class="card">
+      <h2 class="section-title">Errors &amp; Faults</h2>
+      <table class="error-table">
+        <caption>System fault status</caption>
+        <thead>
+          <tr><th>Code</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>F001</td><td class="bad">Cell under-voltage (cleared)</td></tr>
+          <tr><td>—</td><td class="ok">No active faults</td></tr>
+        </tbody>
+      </table>
+    </article>
+
+  </section>
+
+  <!-- ================= THERMAL ================= -->
+  <section class="card">
+    <h2 class="section-title">Thermal &amp; Safety Envelope</h2>
+
+    <p class="card-sub">
+      Avg temp <strong>22.4 ℃</strong> · Max <strong>26.1 ℃</strong> · Min <strong>19.8 ℃</strong>
+    </p>
+
+    <div class="pill-row">
+      <span class="pill">OV/UV clear</span>
+      <span class="pill">OT/UT clear</span>
+      <span class="pill">OC/SC clear</span>
+      <span class="pill">Isolation OK</span>
+    </div>
+  </section>
+
 </main>
 
-<!-- ===== SITE FOOTER FROM MAIN SITE ===== -->
+<!-- ================= FOOTER ================= -->
 <footer class="site-footer">
-<div class="container footer-grid">
-<div><strong>Enddrave Tech Innovation Private Limited</strong><br>Global IoT &amp; Firmware Engineering</div>
-<div><a href="privacy.html">Privacy</a> · <a href="terms.html">Terms &amp; NDA</a></div>
-<!-- <div><a href="mailto:admin@enddrave.com">admin@enddrave.com</a></div> -->
-</div>
+  <div class="container footer-grid">
+    <div>
+      <strong>Enddrave Tech Innovation Pvt. Ltd.</strong><br />
+      Industrial IoT &amp; Firmware Engineering
+    </div>
+    <div>
+      <a href="privacy.html">Privacy</a> ·
+      <a href="terms.html">Terms &amp; NDA</a>
+    </div>
+  </div>
 </footer>
 
-<button class="back-btn" onclick="history.back()">← Back</button>
+<!-- ================= UTILITY BUTTONS ================= -->
+<button class="back-btn" type="button" onclick="history.back()" aria-label="Go back">
+  ← Back
+</button>
+
 <button id="scrollTopBtn" aria-label="Scroll to top">▲</button>
 
-
+<script>
+  const scrollBtn = document.getElementById("scrollTopBtn");
+  window.addEventListener("scroll", () => {
+    scrollBtn.style.display = window.scrollY > 300 ? "block" : "none";
+  });
+  scrollBtn.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+</script>
 
 </body>
 </html>
