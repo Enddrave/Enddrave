@@ -2,12 +2,23 @@
 // 📊 Chart.js Setup
 // =====================================================
 let telemetryChart = null;
+let chartInitRetries = 0;
+const MAX_CHART_INIT_RETRIES = 5;
 
 function initializeChart() {
   const canvas = document.getElementById("telemetryChart");
   if (!canvas) {
-    console.error("❌ Canvas element 'telemetryChart' not found");
-    return;
+    chartInitRetries++;
+    console.warn(`⚠ Canvas element 'telemetryChart' not found (attempt ${chartInitRetries}/${MAX_CHART_INIT_RETRIES})`);
+    
+    if (chartInitRetries < MAX_CHART_INIT_RETRIES) {
+      // Retry after a short delay
+      setTimeout(initializeChart, 100);
+      return;
+    } else {
+      console.error("❌ Canvas element 'telemetryChart' not found after maximum retries");
+      return;
+    }
   }
   
   const ctx = canvas.getContext("2d");
@@ -48,7 +59,7 @@ function initializeChart() {
     },
   });
   
-  console.log("✅ Telemetry chart initialized");
+  console.log("✅ Telemetry chart initialized successfully");
 }
 
 // =====================================================
@@ -265,24 +276,60 @@ function logCommand(msg) {
 // =====================================================
 // 🚀 Init
 // =====================================================
-document.addEventListener('DOMContentLoaded', function() {
+function initializeDashboard() {
   console.log("📱 Dashboard initializing...");
-  initializeChart();
-  initializeCommandButtons();
-  markDeviceOffline();
-  startSignalR();
-  resetDeviceTimer();
-});
-
-// Fallback initialization if DOMContentLoaded already fired
-if (document.readyState === 'loading') {
-  // Do nothing, DOMContentLoaded will handle it
-} else {
-  // DOM already loaded
-  console.log("📱 Dashboard initializing (DOM already ready)...");
+  console.log("🔍 Checking DOM elements...");
+  
+  // Debug: Check if key elements exist
+  const requiredElements = [
+    'telemetryChart',
+    'deviceId', 
+    'location', 
+    'firmware', 
+    'stateDot',
+    'ledOn', 
+    'ledOff', 
+    'simulateOta',
+    'commandBox',
+    'eventLog'
+  ];
+  
+  const missingElements = [];
+  requiredElements.forEach(id => {
+    const element = document.getElementById(id);
+    if (!element) {
+      missingElements.push(id);
+    }
+  });
+  
+  if (missingElements.length > 0) {
+    console.warn(`⚠ Missing elements: ${missingElements.join(', ')}`);
+  } else {
+    console.log("✅ All required elements found");
+  }
+  
   initializeChart();
   initializeCommandButtons();
   markDeviceOffline();
   startSignalR();
   resetDeviceTimer();
 }
+
+document.addEventListener('DOMContentLoaded', initializeDashboard);
+
+// Fallback initialization if DOMContentLoaded already fired
+if (document.readyState === 'loading') {
+  // Do nothing, DOMContentLoaded will handle it
+} else {
+  // DOM already loaded
+  console.log("📱 DOM already ready, initializing immediately...");
+  initializeDashboard();
+}
+
+// Additional fallback - try initialization after a delay if it hasn't worked
+setTimeout(() => {
+  if (!telemetryChart) {
+    console.log("📱 Backup initialization attempt...");
+    initializeDashboard();
+  }
+}, 500);
