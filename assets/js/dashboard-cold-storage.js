@@ -1,7 +1,7 @@
 /* =====================================================
    🔧 DEBUG FLAG
 ===================================================== */
-const DEBUG = false;
+const DEBUG = true;
 const log = (...args) => DEBUG && console.log(...args);
 
 /* =====================================================
@@ -15,10 +15,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const IMG_OPEN = "assets/images/door-open.png";
   const IMG_CLOSED = "assets/images/door-closed.png";
 
-  // Initial state (can be overridden by SignalR)
+  // Default state (overridden by SignalR)
   const DOOR_STATE = {
     D1: false,
-    D2: true
+    D2: false
   };
 
   function renderDoor(doorId, isOpen) {
@@ -43,9 +43,9 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateDoor(doorId, isOpen) {
     DOOR_STATE[doorId] = isOpen;
     renderDoor(doorId, isOpen);
+    log(`🚪 ${doorId} → ${isOpen ? "OPEN" : "CLOSED"}`);
   }
 
-  // Initial render
   Object.entries(DOOR_STATE).forEach(([id, state]) => {
     renderDoor(id, state);
   });
@@ -121,7 +121,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const x = i => padding.left + (innerW * i) / (xCount - 1);
       const y = (v, max) => padding.top + innerH - (v / max) * innerH;
 
-      // Grid
       ctx.strokeStyle = "rgba(229,229,222,0.5)";
       ctx.setLineDash([2, 2]);
       for (let i = 0; i <= 4; i++) {
@@ -176,24 +175,49 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /* =====================================================
-     🔄 DEMO DATA (REMOVE WHEN SIGNALR IS LIVE)
+     🌐 SIGNALR INTEGRATION
   ===================================================== */
-  setInterval(() => {
-    telemetryCharts.forEach(chart => {
-      if (chart.isAnomaly) {
-        chart.pushPoint(20 + Math.random() * 20, 0);
-      } else {
-        chart.pushPoint(
-          16 + Math.random() * 4,
-          70 + Math.random() * 10
-        );
-      }
-    });
+  async function startSignalR() {
+    try {
+      const resp = await fetch(
+        "https://fun-enddrave-vscode.azurewebsites.net/api/negotiate"
+      );
+      if (!resp.ok) throw new Error("/negotiate failed");
 
-    // Demo door toggle
-    updateDoor("D1", Math.random() > 0.5);
-    updateDoor("D2", Math.random() > 0.5);
+      const { url, accessToken } = await resp.json();
 
-  }, 3000);
+      const connection = new signalR.HubConnectionBuilder()
+        .withUrl(url, { accessTokenFactory: () => accessToken })
+        .withAutomaticReconnect()
+        .configureLogging(signalR.LogLevel.Information)
+        .build();
+
+      // 📩 TELEMETRY HANDLER
+      connection.on("telemetry", payload => {
+        log("📡 Telemetry:", payload);
+
+        // DHT22
+        payload.dht22?.forEach((s, i) => {
+          const chart = telemetryCharts[i];
+          if (chart) {
+            chart.pushPoint(s.temperature, s.humidity);
+          }
+        });
+
+        // Doors
+        payload.doors?.forEach(d => {
+          const doorId = `D${d.id + 1}`;
+          updateDoor(doorId, d.state === 1);
+        });
+      });
+
+      await connection.start();
+      console.log("🟢 SignalR Connected");
+    } catch (err) {
+      console.error("❌ SignalR Error:", err);
+    }
+  }
+
+  startSignalR(); // 🚀 START EVERYTHING
 
 });
