@@ -86,12 +86,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =====================================================
-     📈 MINI TELEMETRY CHARTS (FINAL POLISH)
+     📈 MINI TELEMETRY CHARTS (TEAL + ORANGE THEME)
   ===================================================== */
   class MiniTelemetryChart {
     constructor(canvas) {
 
-      // ✅ Lock container height (prevents overflow)
       canvas.parentElement.style.height = "185px";
       canvas.style.maxHeight = "100%";
 
@@ -103,7 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
             {
               label: "Temperature (°C)",
               data: [],
-              borderColor: "#f97316",
+              borderColor: "#f97316",       // 🟧 ORANGE
               backgroundColor: "#f97316",
               borderWidth: 3,
               tension: 0.25,
@@ -113,8 +112,8 @@ document.addEventListener("DOMContentLoaded", () => {
             {
               label: "Humidity (%)",
               data: [],
-              borderColor: "#2563eb",
-              backgroundColor: "#2563eb",
+              borderColor: "#0f766e",       // 🟢 TEAL-GREEN
+              backgroundColor: "#0f766e",
               borderWidth: 3,
               tension: 0.25,
               pointRadius: 3,
@@ -127,11 +126,10 @@ document.addEventListener("DOMContentLoaded", () => {
           maintainAspectRatio: false,
           animation: false,
 
-          /* 🔴 KEY FIXES */
           layout: {
             padding: {
-              top: 14,    // ⬆ legend moved ~2mm up
-              bottom: 14  // ⬇ keeps graph inside card
+              top: 14,
+              bottom: 14
             }
           },
 
@@ -140,11 +138,10 @@ document.addEventListener("DOMContentLoaded", () => {
               display: true,
               position: "top",
               align: "start",
-              fullSize: true,
               labels: {
                 boxWidth: 10,
                 boxHeight: 10,
-                padding: 10, // ⬆ tighter legend spacing
+                padding: 10,
                 font: {
                   size: 12,
                   weight: "500"
