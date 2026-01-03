@@ -86,7 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =====================================================
-     📈 MINI TELEMETRY CHARTS (LEGEND POSITION PERFECTED)
+     📈 MINI TELEMETRY CHARTS (LEGEND SLIGHTLY MORE UP)
   ===================================================== */
   class MiniTelemetryChart {
     constructor(canvas) {
@@ -125,11 +125,11 @@ document.addEventListener("DOMContentLoaded", () => {
           maintainAspectRatio: false,
           animation: false,
 
-          /* 🔑 MAIN FIX */
+          /* 🔑 MICRO ADJUSTMENT */
           layout: {
             padding: {
-              top: 6,     // ⬆ legend moves upward (closer to title)
-              bottom: 16  // ⬇ graph pushed down for breathing space
+              top: 2,      // ⬆ legend moved up ~2–3mm
+              bottom: 16
             }
           },
 
@@ -141,7 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
               labels: {
                 boxWidth: 12,
                 boxHeight: 12,
-                padding: 14,   // balances legend-to-graph gap
+                padding: 10,   // ⬆ tighter legend block
                 font: {
                   size: 12,
                   weight: "500"
