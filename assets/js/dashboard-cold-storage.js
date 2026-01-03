@@ -85,119 +85,105 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
- /* =====================================================
-   📈 MINI TELEMETRY CHARTS (EXACT MATCH FIX)
-===================================================== */
-class MiniTelemetryChart {
-  constructor(canvas) {
-    // lock card height so chart never stretches
-    canvas.parentElement.style.height = "190px";
+  /* =====================================================
+     📈 MINI TELEMETRY CHARTS (LEGEND ALIGNMENT FIXED)
+  ===================================================== */
+  class MiniTelemetryChart {
+    constructor(canvas) {
+      canvas.parentElement.style.height = "190px";
 
-    this.chart = new Chart(canvas.getContext("2d"), {
-      type: "line",
-      data: {
-        labels: [],
-        datasets: [
-          {
-            label: "Temperature (°C)",
-            data: [],
-            borderColor: "#f97316",
-            borderWidth: 4,
-            pointRadius: 4,
-            pointHoverRadius: 5,
-            tension: 0.15,
-            fill: false
-          },
-          {
-            label: "Humidity (%)",
-            data: [],
-            borderColor: "#2563eb",
-            borderWidth: 4,
-            pointRadius: 4,
-            pointHoverRadius: 5,
-            tension: 0.15,
-            fill: false
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        animation: false,
-
-        layout: {
-          padding: {
-            top: 6
-          }
-        },
-
-        plugins: {
-          legend: {
-            display: true,
-            position: "top",
-            align: "center",
-            labels: {
-              boxWidth: 38,
-              boxHeight: 12,
-              padding: 16,
-              font: {
-                size: 13,
-                weight: "500"
-              }
-            }
-          }
-        },
-
-        scales: {
-          x: {
-            ticks: {
-              maxTicksLimit: 12,
-              minRotation: 45,
-              maxRotation: 45,
-              font: {
-                size: 11
-              }
+      this.chart = new Chart(canvas.getContext("2d"), {
+        type: "line",
+        data: {
+          labels: [],
+          datasets: [
+            {
+              label: "Temperature (°C)",
+              data: [],
+              borderColor: "#f97316",
+              borderWidth: 3,
+              tension: 0.25,
+              pointRadius: 3,
+              pointHoverRadius: 4,
+              fill: false
             },
-            grid: {
-              drawBorder: false
+            {
+              label: "Humidity (%)",
+              data: [],
+              borderColor: "#2563eb",
+              borderWidth: 3,
+              tension: 0.25,
+              pointRadius: 3,
+              pointHoverRadius: 4,
+              fill: false
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: false,
+
+          layout: {
+            padding: {
+              top: 8   // 🔑 keeps plot aligned under legend
             }
           },
-          y: {
-            min: 0,
-            max: 100,
-            ticks: {
-              stepSize: 30,
-              font: {
-                size: 11
+
+          plugins: {
+            legend: {
+              display: true,
+              position: "top",
+              align: "center",
+              labels: {
+                usePointStyle: false,
+                boxWidth: 32,
+                boxHeight: 10,
+                padding: 12,
+                font: {
+                  size: 12,
+                  weight: "500"
+                }
+              }
+            }
+          },
+
+          scales: {
+            x: {
+              ticks: {
+                maxTicksLimit: 6,
+                font: { size: 11 }
               }
             },
-            grid: {
-              color: "rgba(0,0,0,0.08)",
-              drawBorder: false
+            y: {
+              min: 0,
+              max: 100,
+              ticks: {
+                stepSize: 10,
+                font: { size: 11 }
+              }
             }
           }
         }
-      }
-    });
-  }
-
-  pushPoint(temp, hum) {
-    const t = new Date().toLocaleTimeString();
-
-    const data = this.chart.data;
-    data.labels.push(t);
-    data.datasets[0].data.push(temp);
-    data.datasets[1].data.push(hum);
-
-    if (data.labels.length > 12) {
-      data.labels.shift();
-      data.datasets.forEach(ds => ds.data.shift());
+      });
     }
 
-    this.chart.update("none");
-  }
-}
+    pushPoint(temp, hum) {
+      const t = new Date().toLocaleTimeString();
+      const data = this.chart.data;
 
+      data.labels.push(t);
+      data.datasets[0].data.push(temp);
+      data.datasets[1].data.push(hum);
+
+      if (data.labels.length > 12) {
+        data.labels.shift();
+        data.datasets.forEach(ds => ds.data.shift());
+      }
+
+      this.chart.update("none");
+    }
+  }
 
   /* =====================================================
      📊 INIT CHARTS
