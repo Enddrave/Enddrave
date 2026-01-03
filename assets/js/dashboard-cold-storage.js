@@ -45,7 +45,6 @@ document.addEventListener("DOMContentLoaded", () => {
     renderDoor(doorId, isOpen);
   }
 
-  // Initial render
   Object.entries(DOOR_STATE).forEach(([id, state]) => {
     renderDoor(id, state);
   });
@@ -121,24 +120,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const x = i => padding.left + (innerW * i) / (xCount - 1);
       const y = (v, max) => padding.top + innerH - (v / max) * innerH;
 
-      ctx.strokeStyle = "rgba(229,229,222,0.5)";
-      ctx.setLineDash([2, 2]);
-      for (let i = 0; i <= 4; i++) {
-        const gx = padding.left + (innerW * i) / 4;
-        const gy = padding.top + (innerH * i) / 4;
-
-        ctx.beginPath();
-        ctx.moveTo(gx, padding.top);
-        ctx.lineTo(gx, padding.top + innerH);
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.moveTo(padding.left, gy);
-        ctx.lineTo(padding.left + innerW, gy);
-        ctx.stroke();
-      }
-      ctx.setLineDash([]);
-
       const drawSeries = (arr, color, max) => {
         if (!arr.length) return;
         ctx.strokeStyle = color;
@@ -148,13 +129,6 @@ document.addEventListener("DOMContentLoaded", () => {
           i === 0 ? ctx.moveTo(x(i), y(v, max)) : ctx.lineTo(x(i), y(v, max))
         );
         ctx.stroke();
-
-        ctx.fillStyle = color;
-        arr.forEach((v, i) => {
-          ctx.beginPath();
-          ctx.arc(x(i), y(v, max), 4, 0, Math.PI * 2);
-          ctx.fill();
-        });
       };
 
       if (this.isAnomaly) {
@@ -175,7 +149,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /* =====================================================
-     🌐 SIGNALR CONNECTION (ADDED)
+     🌐 SIGNALR CONNECTION
   ===================================================== */
   async function startSignalR() {
     try {
@@ -192,18 +166,14 @@ document.addEventListener("DOMContentLoaded", () => {
         .configureLogging(signalR.LogLevel.Information)
         .build();
 
-      // Handlers inline to avoid external dependency
       connection.on("telemetry", payload => {
-        log("📡 Telemetry:", payload);
-
         payload?.dht22?.forEach((s, i) => {
           const chart = telemetryCharts[i];
           if (chart) chart.pushPoint(s.temperature, s.humidity);
         });
 
         payload?.doors?.forEach(d => {
-          const doorId = `D${d.id + 1}`;
-          updateDoor(doorId, d.state === 1);
+          updateDoor(`D${d.id + 1}`, d.state === 1);
         });
       });
 
@@ -214,25 +184,34 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  startSignalR(); // 🚀 CALL NEGOTIATE
+  startSignalR();
 
   /* =====================================================
-     🔄 DEMO DATA (REMOVE WHEN SIGNALR IS LIVE)
+     🔄 DEMO DATA (NOW MATCHES REAL JSON BEHAVIOUR)
   ===================================================== */
+  const demoTelemetry = {
+    dht22: [
+      { id: 0, temperature: 18.0, humidity: 77.4 },
+      { id: 1, temperature: 18.1, humidity: 77.6 },
+      { id: 2, temperature: 17.7, humidity: 79.8 },
+      { id: 3, temperature: 17.7, humidity: 78.9 },
+      { id: 4, temperature: 17.6, humidity: 77.9 }
+    ],
+    doors: [
+      { id: 0, state: 1 },
+      { id: 1, state: 0 }
+    ]
+  };
+
   setInterval(() => {
-    telemetryCharts.forEach(chart => {
-      if (chart.isAnomaly) {
-        chart.pushPoint(20 + Math.random() * 20, 0);
-      } else {
-        chart.pushPoint(
-          16 + Math.random() * 4,
-          70 + Math.random() * 10
-        );
-      }
+    demoTelemetry.dht22.forEach((s, i) => {
+      const chart = telemetryCharts[i];
+      if (chart) chart.pushPoint(s.temperature, s.humidity);
     });
 
-    updateDoor("D1", Math.random() > 0.5);
-    updateDoor("D2", Math.random() > 0.5);
+    demoTelemetry.doors.forEach(d => {
+      updateDoor(`D${d.id + 1}`, d.state === 1);
+    });
   }, 3000);
 
 });
