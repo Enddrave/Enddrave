@@ -85,105 +85,131 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  /* =====================================================
-     📈 MINI TELEMETRY CHARTS (LEGEND ALIGNMENT FIXED)
-  ===================================================== */
-  class MiniTelemetryChart {
-    constructor(canvas) {
-      canvas.parentElement.style.height = "190px";
+  * =====================================================
+   📈 MINI TELEMETRY CHARTS (SCREEN-SIZE INDEPENDENT)
+===================================================== */
+class MiniTelemetryChart {
+  constructor(canvas) {
 
-      this.chart = new Chart(canvas.getContext("2d"), {
-        type: "line",
-        data: {
-          labels: [],
-          datasets: [
-            {
-              label: "Temperature (°C)",
-              data: [],
-              borderColor: "#f97316",
-              borderWidth: 3,
-              tension: 0.25,
-              pointRadius: 3,
-              pointHoverRadius: 4,
-              fill: false
-            },
-            {
-              label: "Humidity (%)",
-              data: [],
-              borderColor: "#2563eb",
-              borderWidth: 3,
-              tension: 0.25,
-              pointRadius: 3,
-              pointHoverRadius: 4,
-              fill: false
-            }
-          ]
+    // 🔒 Hard lock container height
+    canvas.parentElement.style.height = "190px";
+    canvas.style.maxHeight = "190px";
+
+    this.chart = new Chart(canvas.getContext("2d"), {
+      type: "line",
+      data: {
+        labels: [],
+        datasets: [
+          {
+            label: "Temperature (°C)",
+            data: [],
+            borderColor: "#f97316",
+            borderWidth: 4,
+            pointRadius: 4,
+            pointHoverRadius: 5,
+            tension: 0.15,
+            fill: false
+          },
+          {
+            label: "Humidity (%)",
+            data: [],
+            borderColor: "#2563eb",
+            borderWidth: 4,
+            pointRadius: 4,
+            pointHoverRadius: 5,
+            tension: 0.15,
+            fill: false
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+
+        // 🔒 Critical: keeps same proportions everywhere
+        maintainAspectRatio: true,
+        aspectRatio: 2.2,
+
+        devicePixelRatio: 1, // prevents DPI distortion
+        animation: false,
+
+        layout: {
+          padding: {
+            top: 12,
+            bottom: 6,
+            left: 6,
+            right: 6
+          }
         },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          animation: false,
 
-          layout: {
-            padding: {
-              top: 8   // 🔑 keeps plot aligned under legend
-            }
-          },
-
-          plugins: {
-            legend: {
-              display: true,
-              position: "top",
-              align: "center",
-              labels: {
-                usePointStyle: false,
-                boxWidth: 32,
-                boxHeight: 10,
-                padding: 12,
-                font: {
-                  size: 12,
-                  weight: "500"
-                }
-              }
-            }
-          },
-
-          scales: {
-            x: {
-              ticks: {
-                maxTicksLimit: 6,
-                font: { size: 11 }
-              }
-            },
-            y: {
-              min: 0,
-              max: 100,
-              ticks: {
-                stepSize: 10,
-                font: { size: 11 }
+        plugins: {
+          legend: {
+            display: true,
+            position: "top",
+            align: "center",
+            fullSize: true,
+            labels: {
+              boxWidth: 38,
+              boxHeight: 12,
+              padding: 18,
+              font: {
+                size: 13,
+                weight: "600"
               }
             }
           }
+        },
+
+        scales: {
+          x: {
+            ticks: {
+              autoSkip: false,
+              maxTicksLimit: 6,
+              minRotation: 45,
+              maxRotation: 45,
+              font: {
+                size: 11
+              }
+            },
+            grid: {
+              drawBorder: false,
+              color: "rgba(0,0,0,0.08)"
+            }
+          },
+          y: {
+            min: 0,
+            max: 100,
+            ticks: {
+              stepSize: 30,
+              font: {
+                size: 11
+              }
+            },
+            grid: {
+              drawBorder: false,
+              color: "rgba(0,0,0,0.08)"
+            }
+          }
         }
-      });
-    }
-
-    pushPoint(temp, hum) {
-      const t = new Date().toLocaleTimeString();
-      const data = this.chart.data;
-
-      data.labels.push(t);
-      data.datasets[0].data.push(temp);
-      data.datasets[1].data.push(hum);
-
-      if (data.labels.length > 12) {
-        data.labels.shift();
-        data.datasets.forEach(ds => ds.data.shift());
       }
-
-      this.chart.update("none");
-    }
+    });
   }
+
+  pushPoint(temp, hum) {
+    const t = new Date().toLocaleTimeString();
+
+    const data = this.chart.data;
+    data.labels.push(t);
+    data.datasets[0].data.push(temp);
+    data.datasets[1].data.push(hum);
+
+    if (data.labels.length > 12) {
+      data.labels.shift();
+      data.datasets.forEach(ds => ds.data.shift());
+    }
+
+    this.chart.update("none");
+  }
+}
 
   /* =====================================================
      📊 INIT CHARTS
