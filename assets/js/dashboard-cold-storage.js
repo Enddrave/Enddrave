@@ -86,7 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =====================================================
-     📈 MINI TELEMETRY CHARTS (LIVE – TEMP + HUM)
+     📈 MINI TELEMETRY CHARTS (FIXED SCALE 0–100)
   ===================================================== */
   class MiniTelemetryChart {
     constructor(canvas) {
@@ -99,34 +99,45 @@ document.addEventListener("DOMContentLoaded", () => {
               label: "Temperature (°C)",
               data: [],
               borderColor: "#f97316",
-              backgroundColor: "rgba(249,115,22,0.15)",
+              backgroundColor: "transparent",
               borderWidth: 2,
-              tension: 0.35,
-              pointRadius: 3
+              tension: 0.3,
+              pointRadius: 2
             },
             {
               label: "Humidity (%)",
               data: [],
               borderColor: "#2563eb",
-              backgroundColor: "rgba(37,99,235,0.15)",
+              backgroundColor: "transparent",
               borderWidth: 2,
-              tension: 0.35,
-              pointRadius: 3
+              tension: 0.3,
+              pointRadius: 2
             }
           ]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          animation: false,
           plugins: {
-            legend: { display: true }
+            legend: {
+              display: true,
+              position: "top"
+            }
           },
           scales: {
-            x: { title: { display: true, text: "Time" } },
+            x: {
+              title: { display: true, text: "Time" },
+              ticks: { maxTicksLimit: 6 }
+            },
             y: {
+              min: 0,
+              max: 100,
+              beginAtZero: true,
               title: { display: true, text: "Value" },
-              suggestedMin: 0,
-              suggestedMax: 100
+              grid: {
+                drawBorder: false
+              }
             }
           }
         }
@@ -134,10 +145,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     pushPoint(temp, hum) {
-      const time = new Date().toLocaleTimeString();
+      const t = new Date().toLocaleTimeString();
       const data = this.chart.data;
 
-      data.labels.push(time);
+      data.labels.push(t);
       data.datasets[0].data.push(temp);
       data.datasets[1].data.push(hum);
 
@@ -146,12 +157,12 @@ document.addEventListener("DOMContentLoaded", () => {
         data.datasets.forEach(ds => ds.data.shift());
       }
 
-      this.chart.update();
+      this.chart.update("none");
     }
   }
 
   /* =====================================================
-     📊 INIT CHARTS (1 canvas = 1 sensor)
+     📊 INIT CHARTS
   ===================================================== */
   const telemetryCharts = [];
   document.querySelectorAll(".telemetry-chart").forEach(canvas => {
@@ -159,7 +170,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /* =====================================================
-     🌐 SIGNALR CONNECTION (LIVE DATA)
+     🌐 SIGNALR CONNECTION (LIVE)
   ===================================================== */
   async function startSignalR() {
     try {
@@ -175,13 +186,11 @@ document.addEventListener("DOMContentLoaded", () => {
         .withAutomaticReconnect()
         .build();
 
-      // 🔴 BACKEND METHOD NAME
       conn.on("newtelemetry", payload => {
         log("LIVE JSON:", payload);
 
         updateGatewayInfo(payload);
 
-        // 🔥 FULL LIVE GRAPH DATA
         payload?.dht22?.forEach(sensor => {
           const chart = telemetryCharts[sensor.id];
           if (chart) {
@@ -195,7 +204,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       await conn.start();
-      console.log("🟢 SignalR CONNECTED (LIVE)");
+      console.log("🟢 SignalR CONNECTED");
     } catch (e) {
       console.error("SignalR error:", e);
     }
