@@ -86,7 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =====================================================
-     📈 MINI TELEMETRY CHARTS (UNCHANGED)
+     📈 MINI TELEMETRY CHARTS (LEGEND ALIGNMENT FIXED)
   ===================================================== */
   class MiniTelemetryChart {
     constructor(canvas) {
@@ -102,16 +102,20 @@ document.addEventListener("DOMContentLoaded", () => {
               data: [],
               borderColor: "#f97316",
               borderWidth: 3,
-              tension: 0.2,
-              pointRadius: 3
+              tension: 0.25,
+              pointRadius: 3,
+              pointHoverRadius: 4,
+              fill: false
             },
             {
               label: "Humidity (%)",
               data: [],
               borderColor: "#2563eb",
               borderWidth: 3,
-              tension: 0.2,
-              pointRadius: 3
+              tension: 0.25,
+              pointRadius: 3,
+              pointHoverRadius: 4,
+              fill: false
             }
           ]
         },
@@ -119,11 +123,45 @@ document.addEventListener("DOMContentLoaded", () => {
           responsive: true,
           maintainAspectRatio: false,
           animation: false,
+
+          layout: {
+            padding: {
+              top: 8   // 🔑 keeps plot aligned under legend
+            }
+          },
+
+          plugins: {
+            legend: {
+              display: true,
+              position: "top",
+              align: "center",
+              labels: {
+                usePointStyle: false,
+                boxWidth: 32,
+                boxHeight: 10,
+                padding: 12,
+                font: {
+                  size: 12,
+                  weight: "500"
+                }
+              }
+            }
+          },
+
           scales: {
+            x: {
+              ticks: {
+                maxTicksLimit: 6,
+                font: { size: 11 }
+              }
+            },
             y: {
               min: 0,
               max: 100,
-              ticks: { stepSize: 10 }
+              ticks: {
+                stepSize: 10,
+                font: { size: 11 }
+              }
             }
           }
         }
@@ -147,6 +185,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  /* =====================================================
+     📊 INIT CHARTS
+  ===================================================== */
   const telemetryCharts = [];
   document.querySelectorAll(".telemetry-chart").forEach(canvas => {
     telemetryCharts.push(new MiniTelemetryChart(canvas));
@@ -177,27 +218,6 @@ document.addEventListener("DOMContentLoaded", () => {
       logBox.removeChild(logBox.lastChild);
     }
   }
-
-  /* =====================================================
-     📐 FINAL ALIGNMENT (SLIGHTLY LOWER – RED LINE MATCH)
-  ===================================================== */
-  function alignLatestAndEventLogTop() {
-    const table = document.querySelector(".env-bottom table");
-    const thead = table?.querySelector("thead");
-    const logBox = document.querySelector(".log-box");
-
-    if (!thead || !logBox) return;
-
-    const headerHeight = thead.offsetHeight;
-
-    // 🔴 fine-tune offset (red-line alignment)
-    const EXTRA_OFFSET = 10; // px (adjusted)
-
-    logBox.style.paddingTop = (headerHeight + EXTRA_OFFSET) + "px";
-  }
-
-  setTimeout(alignLatestAndEventLogTop, 0);
-  window.addEventListener("resize", alignLatestAndEventLogTop);
 
   /* =====================================================
      🌐 SIGNALR CONNECTION (UNCHANGED)
