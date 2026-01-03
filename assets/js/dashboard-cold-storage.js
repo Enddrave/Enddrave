@@ -86,7 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =====================================================
-     📈 MINI TELEMETRY CHARTS (VISIBILITY ENHANCED)
+     📈 MINI TELEMETRY CHARTS (FONT VISIBILITY FIXED)
   ===================================================== */
   class MiniTelemetryChart {
     constructor(canvas) {
@@ -105,9 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
               borderColor: "#f97316",
               borderWidth: 3,
               pointRadius: 3,
-              pointHoverRadius: 4,
-              tension: 0.2,
-              fill: false
+              tension: 0.2
             },
             {
               label: "Humidity (%)",
@@ -115,37 +113,49 @@ document.addEventListener("DOMContentLoaded", () => {
               borderColor: "#2563eb",
               borderWidth: 3,
               pointRadius: 3,
-              pointHoverRadius: 4,
-              tension: 0.2,
-              fill: false
+              tension: 0.2
             }
           ]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          devicePixelRatio: 1,   // 🔴 KEY FIX (prevents blur)
           animation: false,
-          layout: {
-            padding: { top: 6, left: 6, right: 6, bottom: 6 }
-          },
           plugins: {
             legend: {
+              display: true,
               position: "top",
               labels: {
-                boxWidth: 18,
-                boxHeight: 8,
-                font: { size: 11 }
+                font: {
+                  size: 13,
+                  weight: "600"
+                },
+                color: "#111827",
+                boxWidth: 18
               }
             }
           },
           scales: {
             x: {
-              grid: {
-                color: "rgba(0,0,0,0.05)"
-              },
               ticks: {
-                maxTicksLimit: 6,
-                font: { size: 10 }
+                font: {
+                  size: 12,
+                  weight: "500"
+                },
+                color: "#374151",
+                maxTicksLimit: 6
+              },
+              grid: {
+                color: "rgba(0,0,0,0.08)"
+              },
+              title: {
+                display: true,
+                text: "Time",
+                font: {
+                  size: 12,
+                  weight: "600"
+                }
               }
             },
             y: {
@@ -153,10 +163,22 @@ document.addEventListener("DOMContentLoaded", () => {
               max: 100,
               ticks: {
                 stepSize: 10,
-                font: { size: 10 }
+                font: {
+                  size: 12,
+                  weight: "500"
+                },
+                color: "#374151"
+              },
+              title: {
+                display: true,
+                text: "Value",
+                font: {
+                  size: 12,
+                  weight: "600"
+                }
               },
               grid: {
-                color: "rgba(0,0,0,0.08)"
+                color: "rgba(0,0,0,0.1)"
               }
             }
           }
