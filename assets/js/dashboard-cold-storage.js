@@ -179,23 +179,23 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =====================================================
-     📐 ALIGN EVENT LOG WITH LATEST RECORD (NEW FIX)
+     📐 PERFECT TOP ALIGNMENT FIX (NEW)
   ===================================================== */
-  function alignLatestAndEventLog() {
-    const latestCard = document.querySelector(".env-bottom > div:first-child");
+  function alignLatestAndEventLogTop() {
+    const table = document.querySelector(".env-bottom table");
+    const thead = table?.querySelector("thead");
     const logBox = document.querySelector(".log-box");
 
-    if (!latestCard || !logBox) return;
+    if (!thead || !logBox) return;
 
-    const h = latestCard.offsetHeight;
-    logBox.style.minHeight = h + "px";
-    logBox.style.maxHeight = h + "px";
-    logBox.style.overflowY = "auto";
+    const headerHeight = thead.offsetHeight;
+
+    // Match Event Log content start with table body
+    logBox.style.paddingTop = headerHeight + "px";
   }
 
-  // Run once after layout paint
-  setTimeout(alignLatestAndEventLog, 0);
-  window.addEventListener("resize", alignLatestAndEventLog);
+  setTimeout(alignLatestAndEventLogTop, 0);
+  window.addEventListener("resize", alignLatestAndEventLogTop);
 
   /* =====================================================
      🌐 SIGNALR CONNECTION (UNCHANGED)
