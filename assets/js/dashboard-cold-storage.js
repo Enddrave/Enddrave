@@ -1,7 +1,7 @@
 /* =====================================================
    🔧 DEBUG FLAG
 ===================================================== */
-const DEBUG = false;
+const DEBUG = true;
 const log = (...args) => DEBUG && console.log(...args);
 
 /* =====================================================
@@ -9,17 +9,15 @@ const log = (...args) => DEBUG && console.log(...args);
 ===================================================== */
 document.addEventListener("DOMContentLoaded", () => {
 
+  let signalRActive = false; // ⛔ stop demo once live data arrives
+
   /* =====================================================
      🚪 DOOR CONFIG
   ===================================================== */
   const IMG_OPEN = "assets/images/door-open.png";
   const IMG_CLOSED = "assets/images/door-closed.png";
 
-  // Initial state (can be overridden by SignalR)
-  const DOOR_STATE = {
-    D1: false,
-    D2: true
-  };
+  const DOOR_STATE = { D1: false, D2: true };
 
   function renderDoor(doorId, isOpen) {
     const item = document.querySelector(`.door-item[data-door="${doorId}"]`);
@@ -27,7 +25,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const img = item.querySelector(".door-img img");
     const stateEl = item.querySelector(".door-state");
-    if (!img || !stateEl) return;
 
     if (isOpen) {
       img.src = IMG_OPEN;
@@ -45,46 +42,49 @@ document.addEventListener("DOMContentLoaded", () => {
     renderDoor(doorId, isOpen);
   }
 
-  Object.entries(DOOR_STATE).forEach(([id, state]) => {
-    renderDoor(id, state);
-  });
+  Object.entries(DOOR_STATE).forEach(([id, s]) => renderDoor(id, s));
 
   /* =====================================================
-     🛰️ GATEWAY & CONNECTIVITY (NEW – DYNAMIC)
+     🛰️ GATEWAY & CONNECTIVITY (HTML-AWARE FIX)
   ===================================================== */
   function updateGatewayInfo(payload) {
     if (!payload) return;
 
-    const set = (id, value) => {
-      const el = document.getElementById(id);
-      if (el && value !== undefined && value !== null) {
-        el.textContent = value;
+    const gatewayCard = document.querySelector(
+      '.card .card-title:textEquals("Gateway & Connectivity")'
+    ) || document.querySelector(".left-column .card");
+
+    if (!gatewayCard) return;
+
+    const rows = gatewayCard.querySelectorAll(".status-list li");
+
+    rows.forEach(li => {
+      const label = li.querySelector(".status-label")?.textContent || "";
+
+      if (label.includes("Device ID"))
+        li.lastChild.textContent = " " + payload.deviceId;
+
+      if (label.includes("Location"))
+        li.lastChild.textContent = " " + payload.location;
+
+      if (label.includes("Firmware"))
+        li.lastChild.textContent = " " + payload.firmwareVersion;
+
+      if (label.includes("Last update") && payload.ts) {
+        const t = new Date(payload.ts * 1000).toLocaleString();
+        li.lastChild.textContent = " " + t;
       }
-    };
 
-    set("gw-deviceId", payload.deviceId);
-    set("gw-location", payload.location);
-    set("gw-firmware", payload.firmwareVersion);
+      if (label.includes("RSSI") && payload.rssi !== undefined)
+        li.lastChild.textContent = " " + payload.rssi + " dBm";
+    });
 
-    if (payload.ts) {
-      const t = new Date(payload.ts * 1000);
-      set("gw-lastUpdate", t.toLocaleString());
-    }
-
-    if (payload.rssi !== undefined) {
-      set("gw-rssi", `${payload.rssi} dBm`);
-    }
-
-    const statusEl = document.getElementById("gw-status");
-    if (statusEl) {
-      const online = payload.status === "online";
-      statusEl.textContent = online
-        ? "● Online – MQTT over LTE"
-        : "● Offline";
-
-      statusEl.className = online
-        ? "status-pill online"
-        : "status-pill offline";
+    const badge = gatewayCard.querySelector(".badge");
+    if (badge) {
+      badge.innerHTML = `
+        <span class="badge-dot"></span>
+        ${payload.status === "online" ? "Online – MQTT over LTE" : "Offline"}
+      `;
     }
   }
 
@@ -93,170 +93,106 @@ document.addEventListener("DOMContentLoaded", () => {
   ===================================================== */
   class MiniTelemetryChart {
     constructor(canvas) {
-      this.canvas = canvas;
       this.ctx = canvas.getContext("2d");
-      if (!this.ctx) return;
-
-      this.maxPoints = 12;
-      this.data = { labels: [], temp: [], hum: [] };
-      this.isAnomaly = canvas.dataset.tag === "THD_ANOMALY";
-      this.startTime = Date.now();
-
-      this.resize();
-      window.addEventListener("resize", () => this.resize());
+      this.labels = [];
+      this.temp = [];
+      this.hum = [];
+      this.max = 12;
     }
 
-    resize() {
-      const dpr = window.devicePixelRatio || 1;
-      const width = this.canvas.parentElement?.clientWidth || 240;
-      const height = 120;
+    pushPoint(t, h) {
+      const now = new Date();
+      const label = now.toLocaleTimeString();
 
-      this.canvas.width = width * dpr;
-      this.canvas.height = height * dpr;
-      this.canvas.style.width = width + "px";
-      this.canvas.style.height = height + "px";
+      this.labels.push(label);
+      this.temp.push(t);
+      this.hum.push(h);
 
-      this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      this.draw();
-    }
-
-    pushPoint(temp, hum) {
-      const elapsed = Date.now() - this.startTime;
-      const m = Math.floor(elapsed / 60000);
-      const s = Math.floor((elapsed % 60000) / 1000);
-      const label = `${m}:${s.toString().padStart(2, "0")}`;
-
-      this.data.labels.push(label);
-      this.data.temp.push(temp);
-      this.data.hum.push(hum);
-
-      if (this.data.labels.length > this.maxPoints) {
-        ["labels", "temp", "hum"].forEach(k => this.data[k].shift());
+      if (this.labels.length > this.max) {
+        this.labels.shift();
+        this.temp.shift();
+        this.hum.shift();
       }
+
       this.draw();
     }
 
     draw() {
       const ctx = this.ctx;
-      if (!ctx) return;
+      ctx.clearRect(0, 0, 300, 120);
 
-      const w = this.canvas.width / (window.devicePixelRatio || 1);
-      const h = 120;
+      ctx.strokeStyle = "#ea580c";
+      ctx.beginPath();
+      this.temp.forEach((v, i) =>
+        i === 0 ? ctx.moveTo(i * 20, 120 - v) : ctx.lineTo(i * 20, 120 - v)
+      );
+      ctx.stroke();
 
-      ctx.clearRect(0, 0, w, h);
-      ctx.fillStyle = "#fbfbf7";
-      ctx.fillRect(0, 0, w, h);
-
-      const padding = { top: 15, right: 50, bottom: 25, left: 35 };
-      const innerW = w - padding.left - padding.right;
-      const innerH = h - padding.top - padding.bottom;
-
-      const tempMax = 30;
-      const humMax = 100;
-      const anomalyMax = 100;
-      const xCount = Math.max(this.data.labels.length, 2);
-
-      const x = i => padding.left + (innerW * i) / (xCount - 1);
-      const y = (v, max) => padding.top + innerH - (v / max) * innerH;
-
-      const drawSeries = (arr, color, max) => {
-        if (!arr.length) return;
-        ctx.strokeStyle = color;
-        ctx.lineWidth = 2.5;
-        ctx.beginPath();
-        arr.forEach((v, i) =>
-          i === 0 ? ctx.moveTo(x(i), y(v, max)) : ctx.lineTo(x(i), y(v, max))
-        );
-        ctx.stroke();
-      };
-
-      if (this.isAnomaly) {
-        drawSeries(this.data.temp, "#ea580c", anomalyMax);
-      } else {
-        drawSeries(this.data.temp, "#ea580c", tempMax);
-        drawSeries(this.data.hum, "#0f766e", humMax);
-      }
+      ctx.strokeStyle = "#0f766e";
+      ctx.beginPath();
+      this.hum.forEach((v, i) =>
+        i === 0 ? ctx.moveTo(i * 20, 120 - v) : ctx.lineTo(i * 20, 120 - v)
+      );
+      ctx.stroke();
     }
   }
 
-  /* =====================================================
-     📊 INIT CHARTS
-  ===================================================== */
   const telemetryCharts = [];
-  document.querySelectorAll(".telemetry-chart").forEach(canvas => {
-    telemetryCharts.push(new MiniTelemetryChart(canvas));
+  document.querySelectorAll(".telemetry-chart").forEach(c => {
+    telemetryCharts.push(new MiniTelemetryChart(c));
   });
 
   /* =====================================================
-     🌐 SIGNALR CONNECTION
+     🌐 SIGNALR CONNECTION (LIVE DATA)
   ===================================================== */
   async function startSignalR() {
     try {
       const resp = await fetch(
         "https://fun-enddrave-vscode.azurewebsites.net/api/negotiate"
       );
-      if (!resp.ok) return console.error("❌ /negotiate failed");
-
       const { url, accessToken } = await resp.json();
 
-      const connection = new signalR.HubConnectionBuilder()
+      const conn = new signalR.HubConnectionBuilder()
         .withUrl(url, { accessTokenFactory: () => accessToken })
         .withAutomaticReconnect()
-        .configureLogging(signalR.LogLevel.Information)
         .build();
 
-      connection.on("telemetry", payload => {
+      conn.on("telemetry", payload => {
+        signalRActive = true;
+        log("LIVE PAYLOAD:", payload);
 
-        // 🛰️ Gateway update (NEW)
         updateGatewayInfo(payload);
 
-        // 📈 Sensors (unchanged)
-        payload?.dht22?.forEach((s, i) => {
-          const chart = telemetryCharts[i];
-          if (chart) chart.pushPoint(s.temperature, s.humidity);
+        payload.dht22?.forEach((s, i) => {
+          telemetryCharts[i]?.pushPoint(s.temperature, s.humidity);
         });
 
-        // 🚪 Doors (unchanged)
-        payload?.doors?.forEach(d => {
+        payload.doors?.forEach(d => {
           updateDoor(`D${d.id + 1}`, d.state === 1);
         });
       });
 
-      await connection.start();
-      console.log("🟢 SignalR Connected");
-    } catch (err) {
-      console.error("❌ SignalR Error:", err);
+      await conn.start();
+      console.log("🟢 SignalR LIVE");
+    } catch (e) {
+      console.error("SignalR error", e);
     }
   }
 
   startSignalR();
 
   /* =====================================================
-     🔄 DEMO DATA (NOW MATCHES REAL JSON BEHAVIOUR)
+     🔄 DEMO (AUTO-DISABLED WHEN LIVE)
   ===================================================== */
-  const demoTelemetry = {
-    dht22: [
-      { id: 0, temperature: 18.0, humidity: 77.4 },
-      { id: 1, temperature: 18.1, humidity: 77.6 },
-      { id: 2, temperature: 17.7, humidity: 79.8 },
-      { id: 3, temperature: 17.7, humidity: 78.9 },
-      { id: 4, temperature: 17.6, humidity: 77.9 }
-    ],
-    doors: [
-      { id: 0, state: 1 },
-      { id: 1, state: 0 }
-    ]
-  };
-
   setInterval(() => {
-    demoTelemetry.dht22.forEach((s, i) => {
-      const chart = telemetryCharts[i];
-      if (chart) chart.pushPoint(s.temperature, s.humidity);
-    });
+    if (signalRActive) return;
 
-    demoTelemetry.doors.forEach(d => {
-      updateDoor(`D${d.id + 1}`, d.state === 1);
-    });
+    telemetryCharts.forEach(c =>
+      c.pushPoint(18 + Math.random(), 75 + Math.random())
+    );
+
+    updateDoor("D1", Math.random() > 0.5);
+    updateDoor("D2", Math.random() > 0.5);
   }, 3000);
 
 });
