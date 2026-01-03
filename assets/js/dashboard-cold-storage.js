@@ -86,25 +86,30 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =====================================================
-     📊 LATEST RECORD TABLE (NEW – LIVE UPDATE)
+     🧾 EVENT LOG (FULL JSON – NEW)
   ===================================================== */
-  function updateLatestRecordTable(dht22) {
-    if (!Array.isArray(dht22)) return;
+  function updateEventLogFullJSON(payload) {
+    const logBox = document.querySelector(".log-box");
+    if (!logBox || !payload) return;
 
-    const rows = document.querySelectorAll(
-      ".env-bottom table tbody tr"
-    );
+    const time = new Date().toLocaleTimeString();
 
-    dht22.forEach(sensor => {
-      const row = rows[sensor.id];
-      if (!row) return;
+    const entry = document.createElement("pre");
+    entry.className = "log-row";
+    entry.style.whiteSpace = "pre-wrap";
+    entry.style.fontFamily = "monospace";
+    entry.style.fontSize = "12px";
 
-      const now = new Date().toLocaleTimeString();
+    entry.textContent =
+      `${time} — FULL TELEMETRY\n` +
+      JSON.stringify(payload, null, 2);
 
-      row.cells[1].textContent = sensor.temperature.toFixed(1);
-      row.cells[2].textContent = sensor.humidity.toFixed(1);
-      row.cells[3].textContent = now;
-    });
+    logBox.prepend(entry);
+
+    // Keep last 10 logs only
+    while (logBox.children.length > 10) {
+      logBox.removeChild(logBox.lastChild);
+    }
   }
 
   /* =====================================================
@@ -124,43 +129,28 @@ document.addEventListener("DOMContentLoaded", () => {
               data: [],
               borderColor: "#f97316",
               borderWidth: 3,
-              pointRadius: 3,
-              tension: 0.2
+              tension: 0.2,
+              pointRadius: 3
             },
             {
               label: "Humidity (%)",
               data: [],
               borderColor: "#2563eb",
               borderWidth: 3,
-              pointRadius: 3,
-              tension: 0.2
+              tension: 0.2,
+              pointRadius: 3
             }
           ]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          devicePixelRatio: 1,
           animation: false,
-          plugins: {
-            legend: {
-              display: true,
-              position: "top",
-              labels: {
-                font: { size: 13, weight: "600" }
-              }
-            }
-          },
           scales: {
-            x: {
-              ticks: { maxTicksLimit: 6 },
-              title: { display: true, text: "Time" }
-            },
             y: {
               min: 0,
               max: 100,
-              ticks: { stepSize: 10 },
-              title: { display: true, text: "Value" }
+              ticks: { stepSize: 10 }
             }
           }
         }
@@ -213,8 +203,8 @@ document.addEventListener("DOMContentLoaded", () => {
         log("LIVE JSON:", payload);
 
         updateGatewayInfo(payload);
+        updateEventLogFullJSON(payload);
 
-        // 📈 Charts
         payload?.dht22?.forEach(sensor => {
           const chart = telemetryCharts[sensor.id];
           if (chart) {
@@ -222,10 +212,6 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         });
 
-        // 📊 Table (NEW)
-        updateLatestRecordTable(payload?.dht22);
-
-        // 🚪 Doors
         payload?.doors?.forEach(d => {
           renderDoor(`D${d.id + 1}`, d.state === 1);
         });
