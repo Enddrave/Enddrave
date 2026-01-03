@@ -86,13 +86,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =====================================================
-     📈 MINI TELEMETRY CHARTS (VISUALLY FIXED)
+     📈 MINI TELEMETRY CHARTS (VISIBILITY ENHANCED)
   ===================================================== */
   class MiniTelemetryChart {
     constructor(canvas) {
 
-      // 🔴 CRITICAL FIX: lock chart height
-      canvas.parentElement.style.height = "180px";
+      // Lock visual height
+      canvas.parentElement.style.height = "190px";
 
       this.chart = new Chart(canvas.getContext("2d"), {
         type: "line",
@@ -103,21 +103,21 @@ document.addEventListener("DOMContentLoaded", () => {
               label: "Temperature (°C)",
               data: [],
               borderColor: "#f97316",
-              borderWidth: 2,
-              tension: 0.25,
-              pointRadius: 2,
-              fill: false,
-              spanGaps: false
+              borderWidth: 3,
+              pointRadius: 3,
+              pointHoverRadius: 4,
+              tension: 0.2,
+              fill: false
             },
             {
               label: "Humidity (%)",
               data: [],
               borderColor: "#2563eb",
-              borderWidth: 2,
-              tension: 0.25,
-              pointRadius: 2,
-              fill: false,
-              spanGaps: false
+              borderWidth: 3,
+              pointRadius: 3,
+              pointHoverRadius: 4,
+              tension: 0.2,
+              fill: false
             }
           ]
         },
@@ -125,26 +125,38 @@ document.addEventListener("DOMContentLoaded", () => {
           responsive: true,
           maintainAspectRatio: false,
           animation: false,
-          normalized: true,
+          layout: {
+            padding: { top: 6, left: 6, right: 6, bottom: 6 }
+          },
           plugins: {
             legend: {
-              display: true,
-              position: "top"
+              position: "top",
+              labels: {
+                boxWidth: 18,
+                boxHeight: 8,
+                font: { size: 11 }
+              }
             }
           },
           scales: {
             x: {
-              title: { display: true, text: "Time" },
-              ticks: { maxTicksLimit: 6 }
+              grid: {
+                color: "rgba(0,0,0,0.05)"
+              },
+              ticks: {
+                maxTicksLimit: 6,
+                font: { size: 10 }
+              }
             },
             y: {
               min: 0,
               max: 100,
-              beginAtZero: true,
-              title: { display: true, text: "Value" },
-              ticks: { stepSize: 10 },
+              ticks: {
+                stepSize: 10,
+                font: { size: 10 }
+              },
               grid: {
-                drawBorder: false
+                color: "rgba(0,0,0,0.08)"
               }
             }
           }
