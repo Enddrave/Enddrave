@@ -86,134 +86,106 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =====================================================
-   📈 MINI TELEMETRY CHARTS (FIXED CANVAS + TIME FIX)
-===================================================== */
-class MiniTelemetryChart {
-  constructor(canvas) {
+     📈 MINI TELEMETRY CHARTS (LEGEND FIXED – CIRCLES + HORIZONTAL)
+  ===================================================== */
+  class MiniTelemetryChart {
+    constructor(canvas) {
+      canvas.parentElement.style.height = "190px";
 
-    /* ---------- FIXED RENDER SIZE ---------- */
-    const FIXED_WIDTH = 600;
-    const FIXED_HEIGHT = 260;
-
-    const wrapper = canvas.parentElement;
-    wrapper.style.height = "190px";
-    wrapper.style.display = "flex";
-    wrapper.style.justifyContent = "center";
-    wrapper.style.alignItems = "center";
-    wrapper.style.overflow = "hidden";
-
-    canvas.width = FIXED_WIDTH;
-    canvas.height = FIXED_HEIGHT;
-    canvas.style.width = FIXED_WIDTH + "px";
-    canvas.style.height = FIXED_HEIGHT + "px";
-
-    const applyScale = () => {
-      const scale = wrapper.clientWidth / FIXED_WIDTH;
-      canvas.style.transform = `scale(${scale})`;
-      canvas.style.transformOrigin = "top center";
-    };
-
-    applyScale();
-    window.addEventListener("resize", applyScale);
-
-    /* ---------- CHART ---------- */
-    this.chart = new Chart(canvas.getContext("2d"), {
-      type: "line",
-      data: {
-        labels: [],
-        datasets: [
-          {
-            label: "Temperature (°C)",
-            data: [],
-            borderColor: "#f97316",
-            borderWidth: 4,
-            pointRadius: 4,
-            tension: 0.15,
-            fill: false
-          },
-          {
-            label: "Humidity (%)",
-            data: [],
-            borderColor: "#2563eb",
-            borderWidth: 4,
-            pointRadius: 4,
-            tension: 0.15,
-            fill: false
-          }
-        ]
-      },
-      options: {
-        responsive: false,
-        animation: false,
-        devicePixelRatio: 1,
-
-        layout: {
-          padding: { top: 18, bottom: 12, left: 12, right: 12 }
+      this.chart = new Chart(canvas.getContext("2d"), {
+        type: "line",
+        data: {
+          labels: [],
+          datasets: [
+            {
+              label: "Temperature (°C)",
+              data: [],
+              borderColor: "#f97316",
+              backgroundColor: "#f97316",
+              borderWidth: 3,
+              tension: 0.25,
+              pointRadius: 3,
+              pointHoverRadius: 4,
+              fill: false
+            },
+            {
+              label: "Humidity (%)",
+              data: [],
+              borderColor: "#2563eb",
+              backgroundColor: "#2563eb",
+              borderWidth: 3,
+              tension: 0.25,
+              pointRadius: 3,
+              pointHoverRadius: 4,
+              fill: false
+            }
+          ]
         },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: false,
 
-        plugins: {
-          legend: {
-            display: true,
-            position: "top",
-            labels: {
-              boxWidth: 36,
-              boxHeight: 12,
-              padding: 18,
-              font: {
-                size: 14,
-                weight: "600"
+          layout: {
+            padding: { top: 6 }
+          },
+
+          plugins: {
+            legend: {
+              display: true,
+              position: "top",
+              align: "start",          // 🔒 prevents vertical stacking
+              maxHeight: 32,           // 🔒 forces single row
+              labels: {
+                usePointStyle: true,   // ✅ circle markers
+                pointStyle: "circle",
+                boxWidth: 8,
+                boxHeight: 8,
+                padding: 16,
+                font: {
+                  size: 12,
+                  weight: "500"
+                }
+              }
+            }
+          },
+
+          scales: {
+            x: {
+              ticks: {
+                maxTicksLimit: 6,
+                font: { size: 11 }
+              }
+            },
+            y: {
+              min: 0,
+              max: 100,
+              ticks: {
+                stepSize: 10,
+                font: { size: 11 }
               }
             }
           }
-        },
-
-        scales: {
-          x: {
-            ticks: {
-              autoSkip: false,          // 🔴 FIX
-              maxRotation: 45,
-              minRotation: 45,
-              font: { size: 12 },
-              callback: (val, index) => {
-                return this.chart.data.labels[index];
-              }
-            },
-            grid: { drawBorder: false }
-          },
-          y: {
-            min: 0,
-            max: 100,
-            ticks: {
-              stepSize: 30,
-              font: { size: 12 }
-            },
-            grid: { drawBorder: false }
-          }
         }
-      }
-    });
-  }
-
-  pushPoint(temp, hum) {
-    const time = new Date().toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit"
-    });
-
-    const d = this.chart.data;
-    d.labels.push(time);
-    d.datasets[0].data.push(temp);
-    d.datasets[1].data.push(hum);
-
-    if (d.labels.length > 12) {
-      d.labels.shift();
-      d.datasets.forEach(ds => ds.data.shift());
+      });
     }
 
-    this.chart.update("none");
+    pushPoint(temp, hum) {
+      const t = new Date().toLocaleTimeString();
+      const data = this.chart.data;
+
+      data.labels.push(t);
+      data.datasets[0].data.push(temp);
+      data.datasets[1].data.push(hum);
+
+      if (data.labels.length > 12) {
+        data.labels.shift();
+        data.datasets.forEach(ds => ds.data.shift());
+      }
+
+      this.chart.update("none");
+    }
   }
-}
 
   /* =====================================================
      📊 INIT CHARTS
@@ -231,8 +203,8 @@ class MiniTelemetryChart {
     if (!logBox) return;
 
     const time = new Date().toLocaleTimeString();
-
     const entry = document.createElement("pre");
+
     entry.className = "log-row";
     entry.style.whiteSpace = "pre-wrap";
     entry.style.fontFamily = "monospace";
