@@ -86,10 +86,14 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =====================================================
-     📈 MINI TELEMETRY CHARTS (FIXED SCALE 0–100)
+     📈 MINI TELEMETRY CHARTS (VISUALLY FIXED)
   ===================================================== */
   class MiniTelemetryChart {
     constructor(canvas) {
+
+      // 🔴 CRITICAL FIX: lock chart height
+      canvas.parentElement.style.height = "180px";
+
       this.chart = new Chart(canvas.getContext("2d"), {
         type: "line",
         data: {
@@ -99,19 +103,21 @@ document.addEventListener("DOMContentLoaded", () => {
               label: "Temperature (°C)",
               data: [],
               borderColor: "#f97316",
-              backgroundColor: "transparent",
               borderWidth: 2,
-              tension: 0.3,
-              pointRadius: 2
+              tension: 0.25,
+              pointRadius: 2,
+              fill: false,
+              spanGaps: false
             },
             {
               label: "Humidity (%)",
               data: [],
               borderColor: "#2563eb",
-              backgroundColor: "transparent",
               borderWidth: 2,
-              tension: 0.3,
-              pointRadius: 2
+              tension: 0.25,
+              pointRadius: 2,
+              fill: false,
+              spanGaps: false
             }
           ]
         },
@@ -119,6 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
           responsive: true,
           maintainAspectRatio: false,
           animation: false,
+          normalized: true,
           plugins: {
             legend: {
               display: true,
@@ -135,6 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
               max: 100,
               beginAtZero: true,
               title: { display: true, text: "Value" },
+              ticks: { stepSize: 10 },
               grid: {
                 drawBorder: false
               }
