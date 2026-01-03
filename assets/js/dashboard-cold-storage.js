@@ -85,38 +85,80 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  /* =====================================================
-     📈 MINI TELEMETRY CHARTS (REAL DATA ONLY)
-  ===================================================== */
-  class MiniTelemetryChart {
-    constructor(canvas) {
-      this.ctx = canvas.getContext("2d");
-      this.data = [];
-      this.max = 12;
-    }
-
-    pushPoint(value) {
-      this.data.push(value);
-      if (this.data.length > this.max) this.data.shift();
-      this.draw();
-    }
-
-    draw() {
-      const ctx = this.ctx;
-      ctx.clearRect(0, 0, 300, 120);
-      ctx.strokeStyle = "#0f766e";
-      ctx.beginPath();
-      this.data.forEach((v, i) =>
-        i === 0 ? ctx.moveTo(i * 20, 120 - v) : ctx.lineTo(i * 20, 120 - v)
-      );
-      ctx.stroke();
-    }
+ /* =====================================================
+   📈 MINI TELEMETRY CHARTS (Chart.js – FINAL)
+===================================================== */
+class MiniTelemetryChart {
+  constructor(canvas) {
+    this.chart = new Chart(canvas.getContext("2d"), {
+      type: "line",
+      data: {
+        labels: [],
+        datasets: [
+          {
+            label: "Temperature (°C)",
+            data: [],
+            borderColor: "#f97316",
+            backgroundColor: "rgba(249,115,22,0.15)",
+            borderWidth: 2,
+            tension: 0.35,
+            pointRadius: 3
+          },
+          {
+            label: "Humidity (%)",
+            data: [],
+            borderColor: "#2563eb",
+            backgroundColor: "rgba(37,99,235,0.15)",
+            borderWidth: 2,
+            tension: 0.35,
+            pointRadius: 3
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            position: "top",
+            labels: {
+              boxWidth: 40
+            }
+          }
+        },
+        scales: {
+          x: {
+            title: { display: true, text: "Time" },
+            ticks: { maxTicksLimit: 6 }
+          },
+          y: {
+            title: { display: true, text: "Value" },
+            suggestedMin: 0,
+            suggestedMax: 100
+          }
+        }
+      }
+    });
   }
 
-  const telemetryCharts = [];
-  document.querySelectorAll(".telemetry-chart").forEach(c => {
-    telemetryCharts.push(new MiniTelemetryChart(c));
-  });
+  pushPoint(temp, hum) {
+    const t = new Date().toLocaleTimeString();
+
+    const data = this.chart.data;
+    data.labels.push(t);
+    data.datasets[0].data.push(temp);
+    data.datasets[1].data.push(hum);
+
+    if (data.labels.length > 12) {
+      data.labels.shift();
+      data.datasets.forEach(ds => ds.data.shift());
+    }
+
+    this.chart.update();
+  }
+}
+
 
   /* =====================================================
      🌐 SIGNALR CONNECTION (FINAL & CORRECT)
