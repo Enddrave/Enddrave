@@ -1,7 +1,7 @@
 /* =====================================================
    🔧 DEBUG FLAG
 ===================================================== */
-const DEBUG = true;
+const DEBUG = false;
 const log = (...args) => DEBUG && console.log(...args);
 
 /* =====================================================
@@ -15,10 +15,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const IMG_OPEN = "assets/images/door-open.png";
   const IMG_CLOSED = "assets/images/door-closed.png";
 
-  // Default state (overridden by SignalR)
+  // Initial state (can be overridden by SignalR)
   const DOOR_STATE = {
     D1: false,
-    D2: false
+    D2: true
   };
 
   function renderDoor(doorId, isOpen) {
@@ -43,9 +43,9 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateDoor(doorId, isOpen) {
     DOOR_STATE[doorId] = isOpen;
     renderDoor(doorId, isOpen);
-    log(`🚪 ${doorId} → ${isOpen ? "OPEN" : "CLOSED"}`);
   }
 
+  // Initial render
   Object.entries(DOOR_STATE).forEach(([id, state]) => {
     renderDoor(id, state);
   });
@@ -175,14 +175,14 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /* =====================================================
-     🌐 SIGNALR INTEGRATION
+     🌐 SIGNALR CONNECTION (ADDED)
   ===================================================== */
   async function startSignalR() {
     try {
       const resp = await fetch(
         "https://fun-enddrave-vscode.azurewebsites.net/api/negotiate"
       );
-      if (!resp.ok) throw new Error("/negotiate failed");
+      if (!resp.ok) return console.error("❌ /negotiate failed");
 
       const { url, accessToken } = await resp.json();
 
@@ -192,20 +192,16 @@ document.addEventListener("DOMContentLoaded", () => {
         .configureLogging(signalR.LogLevel.Information)
         .build();
 
-      // 📩 TELEMETRY HANDLER
+      // Handlers inline to avoid external dependency
       connection.on("telemetry", payload => {
         log("📡 Telemetry:", payload);
 
-        // DHT22
-        payload.dht22?.forEach((s, i) => {
+        payload?.dht22?.forEach((s, i) => {
           const chart = telemetryCharts[i];
-          if (chart) {
-            chart.pushPoint(s.temperature, s.humidity);
-          }
+          if (chart) chart.pushPoint(s.temperature, s.humidity);
         });
 
-        // Doors
-        payload.doors?.forEach(d => {
+        payload?.doors?.forEach(d => {
           const doorId = `D${d.id + 1}`;
           updateDoor(doorId, d.state === 1);
         });
@@ -218,6 +214,25 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  startSignalR(); // 🚀 START EVERYTHING
+  startSignalR(); // 🚀 CALL NEGOTIATE
+
+  /* =====================================================
+     🔄 DEMO DATA (REMOVE WHEN SIGNALR IS LIVE)
+  ===================================================== */
+  setInterval(() => {
+    telemetryCharts.forEach(chart => {
+      if (chart.isAnomaly) {
+        chart.pushPoint(20 + Math.random() * 20, 0);
+      } else {
+        chart.pushPoint(
+          16 + Math.random() * 4,
+          70 + Math.random() * 10
+        );
+      }
+    });
+
+    updateDoor("D1", Math.random() > 0.5);
+    updateDoor("D2", Math.random() > 0.5);
+  }, 3000);
 
 });
