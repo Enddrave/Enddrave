@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =====================================================
-     🛰️ GATEWAY & CONNECTIVITY (SAFE + HTML-AWARE)
+     🛰️ GATEWAY & CONNECTIVITY (SAFE)
   ===================================================== */
   function updateGatewayInfo(payload) {
     try {
@@ -85,83 +85,81 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
- /* =====================================================
-   📈 MINI TELEMETRY CHARTS (Chart.js – FINAL)
-===================================================== */
-class MiniTelemetryChart {
-  constructor(canvas) {
-    this.chart = new Chart(canvas.getContext("2d"), {
-      type: "line",
-      data: {
-        labels: [],
-        datasets: [
-          {
-            label: "Temperature (°C)",
-            data: [],
-            borderColor: "#f97316",
-            backgroundColor: "rgba(249,115,22,0.15)",
-            borderWidth: 2,
-            tension: 0.35,
-            pointRadius: 3
+  /* =====================================================
+     📈 MINI TELEMETRY CHARTS (LIVE – TEMP + HUM)
+  ===================================================== */
+  class MiniTelemetryChart {
+    constructor(canvas) {
+      this.chart = new Chart(canvas.getContext("2d"), {
+        type: "line",
+        data: {
+          labels: [],
+          datasets: [
+            {
+              label: "Temperature (°C)",
+              data: [],
+              borderColor: "#f97316",
+              backgroundColor: "rgba(249,115,22,0.15)",
+              borderWidth: 2,
+              tension: 0.35,
+              pointRadius: 3
+            },
+            {
+              label: "Humidity (%)",
+              data: [],
+              borderColor: "#2563eb",
+              backgroundColor: "rgba(37,99,235,0.15)",
+              borderWidth: 2,
+              tension: 0.35,
+              pointRadius: 3
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: true }
           },
-          {
-            label: "Humidity (%)",
-            data: [],
-            borderColor: "#2563eb",
-            backgroundColor: "rgba(37,99,235,0.15)",
-            borderWidth: 2,
-            tension: 0.35,
-            pointRadius: 3
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: true,
-            position: "top",
-            labels: {
-              boxWidth: 40
+          scales: {
+            x: { title: { display: true, text: "Time" } },
+            y: {
+              title: { display: true, text: "Value" },
+              suggestedMin: 0,
+              suggestedMax: 100
             }
           }
-        },
-        scales: {
-          x: {
-            title: { display: true, text: "Time" },
-            ticks: { maxTicksLimit: 6 }
-          },
-          y: {
-            title: { display: true, text: "Value" },
-            suggestedMin: 0,
-            suggestedMax: 100
-          }
         }
-      }
-    });
-  }
-
-  pushPoint(temp, hum) {
-    const t = new Date().toLocaleTimeString();
-
-    const data = this.chart.data;
-    data.labels.push(t);
-    data.datasets[0].data.push(temp);
-    data.datasets[1].data.push(hum);
-
-    if (data.labels.length > 12) {
-      data.labels.shift();
-      data.datasets.forEach(ds => ds.data.shift());
+      });
     }
 
-    this.chart.update();
-  }
-}
+    pushPoint(temp, hum) {
+      const time = new Date().toLocaleTimeString();
+      const data = this.chart.data;
 
+      data.labels.push(time);
+      data.datasets[0].data.push(temp);
+      data.datasets[1].data.push(hum);
+
+      if (data.labels.length > 12) {
+        data.labels.shift();
+        data.datasets.forEach(ds => ds.data.shift());
+      }
+
+      this.chart.update();
+    }
+  }
 
   /* =====================================================
-     🌐 SIGNALR CONNECTION (FINAL & CORRECT)
+     📊 INIT CHARTS (1 canvas = 1 sensor)
+  ===================================================== */
+  const telemetryCharts = [];
+  document.querySelectorAll(".telemetry-chart").forEach(canvas => {
+    telemetryCharts.push(new MiniTelemetryChart(canvas));
+  });
+
+  /* =====================================================
+     🌐 SIGNALR CONNECTION (LIVE DATA)
   ===================================================== */
   async function startSignalR() {
     try {
@@ -177,14 +175,18 @@ class MiniTelemetryChart {
         .withAutomaticReconnect()
         .build();
 
-      // 🔴 IMPORTANT: backend method name
+      // 🔴 BACKEND METHOD NAME
       conn.on("newtelemetry", payload => {
         log("LIVE JSON:", payload);
 
         updateGatewayInfo(payload);
 
-        payload?.dht22?.forEach((s, i) => {
-          telemetryCharts[i]?.pushPoint(s.temperature);
+        // 🔥 FULL LIVE GRAPH DATA
+        payload?.dht22?.forEach(sensor => {
+          const chart = telemetryCharts[sensor.id];
+          if (chart) {
+            chart.pushPoint(sensor.temperature, sensor.humidity);
+          }
         });
 
         payload?.doors?.forEach(d => {
@@ -193,7 +195,7 @@ class MiniTelemetryChart {
       });
 
       await conn.start();
-      console.log("🟢 SignalR CONNECTED (newtelemetry)");
+      console.log("🟢 SignalR CONNECTED (LIVE)");
     } catch (e) {
       console.error("SignalR error:", e);
     }
