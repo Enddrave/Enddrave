@@ -86,11 +86,14 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =====================================================
-     📈 MINI TELEMETRY CHARTS (LEGEND OFFSET FIXED)
+     📈 MINI TELEMETRY CHARTS (FINAL POLISH)
   ===================================================== */
   class MiniTelemetryChart {
     constructor(canvas) {
-      canvas.parentElement.style.height = "190px";
+
+      // ✅ Lock container height (prevents overflow)
+      canvas.parentElement.style.height = "185px";
+      canvas.style.maxHeight = "100%";
 
       this.chart = new Chart(canvas.getContext("2d"), {
         type: "line",
@@ -124,10 +127,11 @@ document.addEventListener("DOMContentLoaded", () => {
           maintainAspectRatio: false,
           animation: false,
 
-          // 🔴 KEY FIX: push plot DOWN so legend never overlaps
+          /* 🔴 KEY FIXES */
           layout: {
             padding: {
-              top: 22   // ⬆️ increased from earlier value
+              top: 14,    // ⬆ legend moved ~2mm up
+              bottom: 14  // ⬇ keeps graph inside card
             }
           },
 
@@ -136,12 +140,11 @@ document.addEventListener("DOMContentLoaded", () => {
               display: true,
               position: "top",
               align: "start",
-              fullSize: true, // 🔑 forces legend to reserve its own space
+              fullSize: true,
               labels: {
-                usePointStyle: false,
                 boxWidth: 10,
                 boxHeight: 10,
-                padding: 16,   // ⬆️ extra breathing room
+                padding: 10, // ⬆ tighter legend spacing
                 font: {
                   size: 12,
                   weight: "500"
