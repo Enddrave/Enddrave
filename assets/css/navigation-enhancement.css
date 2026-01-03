@@ -1,0 +1,35 @@
+/* Active navigation enhancement - Component System Extension */
+nav a.active {
+  color: #2b7a6d !important;
+  font-weight: 600;
+  position: relative;
+}
+
+nav a.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #2b7a6d;
+  border-radius: 1px;
+}
+
+/* Mobile responsive navigation active state */
+@media (max-width: 768px) {
+  nav a.active {
+    background: rgba(43, 122, 109, 0.1);
+    border-radius: 4px;
+    padding: 4px 8px;
+  }
+  
+  nav a.active::after {
+    display: none;
+  }
+}
+
+/* Smooth transition for all navigation links */
+nav a {
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
