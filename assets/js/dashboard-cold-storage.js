@@ -86,7 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =====================================================
-     📈 MINI TELEMETRY CHARTS (LEGEND FIXED – CIRCLES + HORIZONTAL)
+     📈 MINI TELEMETRY CHARTS (SMALL SQUARE LEGEND – FIXED)
   ===================================================== */
   class MiniTelemetryChart {
     constructor(canvas) {
@@ -105,7 +105,6 @@ document.addEventListener("DOMContentLoaded", () => {
               borderWidth: 3,
               tension: 0.25,
               pointRadius: 3,
-              pointHoverRadius: 4,
               fill: false
             },
             {
@@ -116,7 +115,6 @@ document.addEventListener("DOMContentLoaded", () => {
               borderWidth: 3,
               tension: 0.25,
               pointRadius: 3,
-              pointHoverRadius: 4,
               fill: false
             }
           ]
@@ -134,14 +132,13 @@ document.addEventListener("DOMContentLoaded", () => {
             legend: {
               display: true,
               position: "top",
-              align: "start",          // 🔒 prevents vertical stacking
-              maxHeight: 32,           // 🔒 forces single row
+              align: "start",     // 🔒 keeps one row
+              maxHeight: 28,      // 🔒 prevents wrapping
               labels: {
-                usePointStyle: true,   // ✅ circle markers
-                pointStyle: "circle",
-                boxWidth: 8,
-                boxHeight: 8,
-                padding: 16,
+                usePointStyle: false, // ✅ square
+                boxWidth: 10,         // 🔹 small square
+                boxHeight: 10,
+                padding: 14,
                 font: {
                   size: 12,
                   weight: "500"
