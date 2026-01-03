@@ -45,48 +45,62 @@ document.addEventListener("DOMContentLoaded", () => {
   Object.entries(DOOR_STATE).forEach(([id, s]) => renderDoor(id, s));
 
   /* =====================================================
-     🛰️ GATEWAY & CONNECTIVITY (HTML-AWARE FIX)
-  ===================================================== */
-  function updateGatewayInfo(payload) {
-    if (!payload) return;
+   🛰️ GATEWAY & CONNECTIVITY (FIXED – SAFE DOM UPDATE)
+===================================================== */
+function updateGatewayInfo(payload) {
+  if (!payload) return;
 
-    const gatewayCard = document.querySelector(
-      '.card .card-title:textEquals("Gateway & Connectivity")'
-    ) || document.querySelector(".left-column .card");
+  const gatewayCard = document.querySelector(".left-column .card");
+  if (!gatewayCard) return;
 
-    if (!gatewayCard) return;
+  const rows = gatewayCard.querySelectorAll(".status-list li");
 
-    const rows = gatewayCard.querySelectorAll(".status-list li");
+  rows.forEach(li => {
+    const labelEl = li.querySelector(".status-label");
+    if (!labelEl) return;
 
-    rows.forEach(li => {
-      const label = li.querySelector(".status-label")?.textContent || "";
+    const label = labelEl.textContent.trim();
 
-      if (label.includes("Device ID"))
-        li.lastChild.textContent = " " + payload.deviceId;
-
-      if (label.includes("Location"))
-        li.lastChild.textContent = " " + payload.location;
-
-      if (label.includes("Firmware"))
-        li.lastChild.textContent = " " + payload.firmwareVersion;
-
-      if (label.includes("Last update") && payload.ts) {
-        const t = new Date(payload.ts * 1000).toLocaleString();
-        li.lastChild.textContent = " " + t;
-      }
-
-      if (label.includes("RSSI") && payload.rssi !== undefined)
-        li.lastChild.textContent = " " + payload.rssi + " dBm";
-    });
-
-    const badge = gatewayCard.querySelector(".badge");
-    if (badge) {
-      badge.innerHTML = `
-        <span class="badge-dot"></span>
-        ${payload.status === "online" ? "Online – MQTT over LTE" : "Offline"}
-      `;
+    // Ensure value node exists
+    let valueNode = labelEl.nextSibling;
+    if (!valueNode || valueNode.nodeType !== Node.TEXT_NODE) {
+      valueNode = document.createTextNode("");
+      li.appendChild(valueNode);
     }
+
+    if (label.startsWith("Device ID")) {
+      valueNode.textContent = " " + payload.deviceId;
+    }
+
+    if (label.startsWith("Location")) {
+      valueNode.textContent = " " + payload.location;
+    }
+
+    if (label.startsWith("Firmware")) {
+      valueNode.textContent = " " + payload.firmwareVersion;
+    }
+
+    if (label.startsWith("Last update") && payload.ts) {
+      valueNode.textContent =
+        " " + new Date(payload.ts * 1000).toLocaleString();
+    }
+
+    if (label.startsWith("RSSI") && payload.rssi !== undefined) {
+      valueNode.textContent = " " + payload.rssi + " dBm";
+    }
+  });
+
+  // Badge update (safe)
+  const badge = gatewayCard.querySelector(".badge");
+  if (badge) {
+    badge.innerHTML = `
+      <span class="badge-dot"></span>
+      ${payload.status === "online"
+        ? "Online – MQTT over LTE"
+        : "Offline"}
+    `;
   }
+}
 
   /* =====================================================
      📈 MINI TELEMETRY CHARTS
