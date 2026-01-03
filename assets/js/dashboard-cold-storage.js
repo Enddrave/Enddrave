@@ -153,7 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /* =====================================================
-     🧾 EVENT LOG (FULL JSON – UNCHANGED)
+     🧾 EVENT LOG (UNCHANGED)
   ===================================================== */
   function updateEventLogFullJSON(payload) {
     const logBox = document.querySelector(".log-box");
@@ -179,7 +179,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =====================================================
-     📐 PERFECT TOP ALIGNMENT FIX (NEW)
+     📐 FINAL ALIGNMENT (SLIGHTLY LOWER – RED LINE MATCH)
   ===================================================== */
   function alignLatestAndEventLogTop() {
     const table = document.querySelector(".env-bottom table");
@@ -190,8 +190,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const headerHeight = thead.offsetHeight;
 
-    // Match Event Log content start with table body
-    logBox.style.paddingTop = headerHeight + "px";
+    // 🔴 fine-tune offset (red-line alignment)
+    const EXTRA_OFFSET = 10; // px (adjusted)
+
+    logBox.style.paddingTop = (headerHeight + EXTRA_OFFSET) + "px";
   }
 
   setTimeout(alignLatestAndEventLogTop, 0);
