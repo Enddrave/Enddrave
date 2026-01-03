@@ -86,7 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =====================================================
-     📈 MINI TELEMETRY CHARTS (SMALL SQUARE LEGEND – FIXED)
+     📈 MINI TELEMETRY CHARTS (LEGEND OFFSET FIXED)
   ===================================================== */
   class MiniTelemetryChart {
     constructor(canvas) {
@@ -124,21 +124,24 @@ document.addEventListener("DOMContentLoaded", () => {
           maintainAspectRatio: false,
           animation: false,
 
+          // 🔴 KEY FIX: push plot DOWN so legend never overlaps
           layout: {
-            padding: { top: 6 }
+            padding: {
+              top: 22   // ⬆️ increased from earlier value
+            }
           },
 
           plugins: {
             legend: {
               display: true,
               position: "top",
-              align: "start",     // 🔒 keeps one row
-              maxHeight: 28,      // 🔒 prevents wrapping
+              align: "start",
+              fullSize: true, // 🔑 forces legend to reserve its own space
               labels: {
-                usePointStyle: false, // ✅ square
-                boxWidth: 10,         // 🔹 small square
+                usePointStyle: false,
+                boxWidth: 10,
                 boxHeight: 10,
-                padding: 14,
+                padding: 16,   // ⬆️ extra breathing room
                 font: {
                   size: 12,
                   weight: "500"
