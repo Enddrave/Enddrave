@@ -233,6 +233,7 @@ font-weight:500;
 }
 
 .log-box{
+padding-top: 0px !important;
 max-height:214px;
 overflow-y:auto;
 border-radius:12px;
