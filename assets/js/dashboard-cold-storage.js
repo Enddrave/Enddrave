@@ -50,6 +50,45 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /* =====================================================
+     🛰️ GATEWAY & CONNECTIVITY (NEW – DYNAMIC)
+  ===================================================== */
+  function updateGatewayInfo(payload) {
+    if (!payload) return;
+
+    const set = (id, value) => {
+      const el = document.getElementById(id);
+      if (el && value !== undefined && value !== null) {
+        el.textContent = value;
+      }
+    };
+
+    set("gw-deviceId", payload.deviceId);
+    set("gw-location", payload.location);
+    set("gw-firmware", payload.firmwareVersion);
+
+    if (payload.ts) {
+      const t = new Date(payload.ts * 1000);
+      set("gw-lastUpdate", t.toLocaleString());
+    }
+
+    if (payload.rssi !== undefined) {
+      set("gw-rssi", `${payload.rssi} dBm`);
+    }
+
+    const statusEl = document.getElementById("gw-status");
+    if (statusEl) {
+      const online = payload.status === "online";
+      statusEl.textContent = online
+        ? "● Online – MQTT over LTE"
+        : "● Offline";
+
+      statusEl.className = online
+        ? "status-pill online"
+        : "status-pill offline";
+    }
+  }
+
+  /* =====================================================
      📈 MINI TELEMETRY CHARTS
   ===================================================== */
   class MiniTelemetryChart {
@@ -167,11 +206,17 @@ document.addEventListener("DOMContentLoaded", () => {
         .build();
 
       connection.on("telemetry", payload => {
+
+        // 🛰️ Gateway update (NEW)
+        updateGatewayInfo(payload);
+
+        // 📈 Sensors (unchanged)
         payload?.dht22?.forEach((s, i) => {
           const chart = telemetryCharts[i];
           if (chart) chart.pushPoint(s.temperature, s.humidity);
         });
 
+        // 🚪 Doors (unchanged)
         payload?.doors?.forEach(d => {
           updateDoor(`D${d.id + 1}`, d.state === 1);
         });
