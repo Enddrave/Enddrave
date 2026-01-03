@@ -86,11 +86,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =====================================================
-     📈 MINI TELEMETRY CHARTS (TEAL + ORANGE THEME)
+     📈 MINI TELEMETRY CHARTS (LEGEND POSITION PERFECTED)
   ===================================================== */
   class MiniTelemetryChart {
     constructor(canvas) {
-
       canvas.parentElement.style.height = "185px";
       canvas.style.maxHeight = "100%";
 
@@ -102,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
             {
               label: "Temperature (°C)",
               data: [],
-              borderColor: "#f97316",       // 🟧 ORANGE
+              borderColor: "#f97316",
               backgroundColor: "#f97316",
               borderWidth: 3,
               tension: 0.25,
@@ -112,7 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
             {
               label: "Humidity (%)",
               data: [],
-              borderColor: "#0f766e",       // 🟢 TEAL-GREEN
+              borderColor: "#0f766e",
               backgroundColor: "#0f766e",
               borderWidth: 3,
               tension: 0.25,
@@ -126,10 +125,11 @@ document.addEventListener("DOMContentLoaded", () => {
           maintainAspectRatio: false,
           animation: false,
 
+          /* 🔑 MAIN FIX */
           layout: {
             padding: {
-              top: 14,
-              bottom: 14
+              top: 6,     // ⬆ legend moves upward (closer to title)
+              bottom: 16  // ⬇ graph pushed down for breathing space
             }
           },
 
@@ -139,9 +139,9 @@ document.addEventListener("DOMContentLoaded", () => {
               position: "top",
               align: "start",
               labels: {
-                boxWidth: 10,
-                boxHeight: 10,
-                padding: 10,
+                boxWidth: 12,
+                boxHeight: 12,
+                padding: 14,   // balances legend-to-graph gap
                 font: {
                   size: 12,
                   weight: "500"
