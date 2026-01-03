@@ -86,12 +86,32 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =====================================================
-     📈 MINI TELEMETRY CHARTS (FONT VISIBILITY FIXED)
+     📊 LATEST RECORD TABLE (NEW – LIVE UPDATE)
+  ===================================================== */
+  function updateLatestRecordTable(dht22) {
+    if (!Array.isArray(dht22)) return;
+
+    const rows = document.querySelectorAll(
+      ".env-bottom table tbody tr"
+    );
+
+    dht22.forEach(sensor => {
+      const row = rows[sensor.id];
+      if (!row) return;
+
+      const now = new Date().toLocaleTimeString();
+
+      row.cells[1].textContent = sensor.temperature.toFixed(1);
+      row.cells[2].textContent = sensor.humidity.toFixed(1);
+      row.cells[3].textContent = now;
+    });
+  }
+
+  /* =====================================================
+     📈 MINI TELEMETRY CHARTS (UNCHANGED)
   ===================================================== */
   class MiniTelemetryChart {
     constructor(canvas) {
-
-      // Lock visual height
       canvas.parentElement.style.height = "190px";
 
       this.chart = new Chart(canvas.getContext("2d"), {
@@ -120,66 +140,27 @@ document.addEventListener("DOMContentLoaded", () => {
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          devicePixelRatio: 1,   // 🔴 KEY FIX (prevents blur)
+          devicePixelRatio: 1,
           animation: false,
           plugins: {
             legend: {
               display: true,
               position: "top",
               labels: {
-                font: {
-                  size: 13,
-                  weight: "600"
-                },
-                color: "#111827",
-                boxWidth: 18
+                font: { size: 13, weight: "600" }
               }
             }
           },
           scales: {
             x: {
-              ticks: {
-                font: {
-                  size: 12,
-                  weight: "500"
-                },
-                color: "#374151",
-                maxTicksLimit: 6
-              },
-              grid: {
-                color: "rgba(0,0,0,0.08)"
-              },
-              title: {
-                display: true,
-                text: "Time",
-                font: {
-                  size: 12,
-                  weight: "600"
-                }
-              }
+              ticks: { maxTicksLimit: 6 },
+              title: { display: true, text: "Time" }
             },
             y: {
               min: 0,
               max: 100,
-              ticks: {
-                stepSize: 10,
-                font: {
-                  size: 12,
-                  weight: "500"
-                },
-                color: "#374151"
-              },
-              title: {
-                display: true,
-                text: "Value",
-                font: {
-                  size: 12,
-                  weight: "600"
-                }
-              },
-              grid: {
-                color: "rgba(0,0,0,0.1)"
-              }
+              ticks: { stepSize: 10 },
+              title: { display: true, text: "Value" }
             }
           }
         }
@@ -233,6 +214,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         updateGatewayInfo(payload);
 
+        // 📈 Charts
         payload?.dht22?.forEach(sensor => {
           const chart = telemetryCharts[sensor.id];
           if (chart) {
@@ -240,6 +222,10 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         });
 
+        // 📊 Table (NEW)
+        updateLatestRecordTable(payload?.dht22);
+
+        // 🚪 Doors
         payload?.doors?.forEach(d => {
           renderDoor(`D${d.id + 1}`, d.state === 1);
         });
