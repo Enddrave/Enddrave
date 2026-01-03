@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =====================================================
-     🛰️ GATEWAY & CONNECTIVITY (SAFE)
+     🛰️ GATEWAY & CONNECTIVITY (UNCHANGED)
   ===================================================== */
   function updateGatewayInfo(payload) {
     try {
@@ -82,33 +82,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     } catch (err) {
       console.error("Gateway UI error:", err);
-    }
-  }
-
-  /* =====================================================
-     🧾 EVENT LOG (FULL JSON – NEW)
-  ===================================================== */
-  function updateEventLogFullJSON(payload) {
-    const logBox = document.querySelector(".log-box");
-    if (!logBox || !payload) return;
-
-    const time = new Date().toLocaleTimeString();
-
-    const entry = document.createElement("pre");
-    entry.className = "log-row";
-    entry.style.whiteSpace = "pre-wrap";
-    entry.style.fontFamily = "monospace";
-    entry.style.fontSize = "12px";
-
-    entry.textContent =
-      `${time} — FULL TELEMETRY\n` +
-      JSON.stringify(payload, null, 2);
-
-    logBox.prepend(entry);
-
-    // Keep last 10 logs only
-    while (logBox.children.length > 10) {
-      logBox.removeChild(logBox.lastChild);
     }
   }
 
@@ -174,16 +147,58 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  /* =====================================================
-     📊 INIT CHARTS
-  ===================================================== */
   const telemetryCharts = [];
   document.querySelectorAll(".telemetry-chart").forEach(canvas => {
     telemetryCharts.push(new MiniTelemetryChart(canvas));
   });
 
   /* =====================================================
-     🌐 SIGNALR CONNECTION (LIVE)
+     🧾 EVENT LOG (FULL JSON – UNCHANGED)
+  ===================================================== */
+  function updateEventLogFullJSON(payload) {
+    const logBox = document.querySelector(".log-box");
+    if (!logBox) return;
+
+    const time = new Date().toLocaleTimeString();
+
+    const entry = document.createElement("pre");
+    entry.className = "log-row";
+    entry.style.whiteSpace = "pre-wrap";
+    entry.style.fontFamily = "monospace";
+    entry.style.fontSize = "12px";
+
+    entry.textContent =
+      `${time} — FULL TELEMETRY\n` +
+      JSON.stringify(payload, null, 2);
+
+    logBox.prepend(entry);
+
+    while (logBox.children.length > 10) {
+      logBox.removeChild(logBox.lastChild);
+    }
+  }
+
+  /* =====================================================
+     📐 ALIGN EVENT LOG WITH LATEST RECORD (NEW FIX)
+  ===================================================== */
+  function alignLatestAndEventLog() {
+    const latestCard = document.querySelector(".env-bottom > div:first-child");
+    const logBox = document.querySelector(".log-box");
+
+    if (!latestCard || !logBox) return;
+
+    const h = latestCard.offsetHeight;
+    logBox.style.minHeight = h + "px";
+    logBox.style.maxHeight = h + "px";
+    logBox.style.overflowY = "auto";
+  }
+
+  // Run once after layout paint
+  setTimeout(alignLatestAndEventLog, 0);
+  window.addEventListener("resize", alignLatestAndEventLog);
+
+  /* =====================================================
+     🌐 SIGNALR CONNECTION (UNCHANGED)
   ===================================================== */
   async function startSignalR() {
     try {
