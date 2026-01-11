@@ -25,7 +25,7 @@ a{color:var(--primary);text-decoration:none}
 .nav nav a:hover{background:var(--grey)}
 .hero,.sub-hero{background:#f7f7f7 url('../images/banner-home.jpg') center/cover no-repeat;color:#0f1412}
 .hero .hero-inner{padding:120px 0}
-.sub-hero .container{padding:80px 0}
+.sub-hero .container{padding:30px 0}
 .features,.cards-3,.grid-3{display:grid;gap:20px}
 .features{grid-template-columns:repeat(3,1fr);}
 .cards-3{grid-template-columns:repeat(3,1fr);margin:20px auto}
