@@ -15,35 +15,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const IMG_OPEN = "assets/images/door-open.png";
   const IMG_CLOSED = "assets/images/door-closed.png";
 
-  /* =====================================================
-     🚪 DOOR NA RENDER
-  ===================================================== */
-  function renderDoorNA(doorId) {
-    const item = document.querySelector(`.door-item[data-door="${doorId}"]`);
-    if (!item) return;
-
-    const img = item.querySelector(".door-img img");
-    const stateEl = item.querySelector(".door-state");
-
-    if (img) img.src = IMG_CLOSED;
-    if (stateEl) {
-      stateEl.textContent = "NA";
-      stateEl.className = "door-state na";
-    }
-  }
-
-  /* =====================================================
-     🚪 INITIAL DOOR STATE = NA
-  ===================================================== */
-  ["D1", "D2"].forEach(renderDoorNA);
-
   function renderDoor(doorId, isOpen) {
-    if (isOpen === undefined || isOpen === null) {
-      renderDoorNA(doorId);
-      return;
-    }
-
-    const item = document.querySelector(`.door-item[data-door="${doorId}"]`);
+    const item = document.querySelector(
+      `.door-item[data-door="${doorId}"]`
+    );
     if (!item) return;
 
     const img = item.querySelector(".door-img img");
@@ -52,7 +27,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     img.src = isOpen ? IMG_OPEN : IMG_CLOSED;
     stateEl.textContent = isOpen ? "Open" : "Closed";
-    stateEl.className = isOpen ? "door-state alert" : "door-state ok";
+    stateEl.className = isOpen
+      ? "door-state alert"
+      : "door-state ok";
   }
 
   /* =====================================================
@@ -77,14 +54,17 @@ document.addEventListener("DOMContentLoaded", () => {
           li.appendChild(valueNode);
         }
 
-        if (label.startsWith("Device ID"))
+        if (label.startsWith("Device ID")) {
           valueNode.textContent = " " + (payload.deviceId ?? "NA");
+        }
 
-        if (label.startsWith("Location"))
+        if (label.startsWith("Location")) {
           valueNode.textContent = " " + (payload.location ?? "NA");
+        }
 
-        if (label.startsWith("Firmware"))
+        if (label.startsWith("Firmware")) {
           valueNode.textContent = " " + (payload.firmwareVersion ?? "NA");
+        }
 
         if (label.startsWith("Last update")) {
           valueNode.textContent = payload.ts
@@ -94,7 +74,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (label.startsWith("RSSI")) {
           valueNode.textContent =
-            payload.rssi !== undefined ? " " + payload.rssi + " dBm" : " NA";
+            payload.rssi !== undefined
+              ? " " + payload.rssi + " dBm"
+              : " NA";
         }
       });
 
@@ -113,7 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =====================================================
-     📈 MINI TELEMETRY CHARTS (UNCHANGED)
+     📈 MINI TELEMETRY CHARTS
   ===================================================== */
   class MiniTelemetryChart {
     constructor(canvas) {
@@ -150,7 +132,45 @@ document.addEventListener("DOMContentLoaded", () => {
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          animation: false
+          animation: false,
+          layout: {
+            padding: {
+              top: 2,
+              bottom: 16
+            }
+          },
+          plugins: {
+            legend: {
+              display: true,
+              position: "top",
+              align: "start",
+              labels: {
+                boxWidth: 12,
+                boxHeight: 12,
+                padding: 10,
+                font: {
+                  size: 12,
+                  weight: "500"
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: {
+                maxTicksLimit: 6,
+                font: { size: 11 }
+              }
+            },
+            y: {
+              min: 0,
+              max: 100,
+              ticks: {
+                stepSize: 10,
+                font: { size: 11 }
+              }
+            }
+          }
         }
       });
     }
