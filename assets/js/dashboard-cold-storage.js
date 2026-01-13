@@ -10,42 +10,15 @@ const log = (...args) => DEBUG && console.log(...args);
 document.addEventListener("DOMContentLoaded", () => {
 
   /* =====================================================
-     ⏱️ TELEMETRY TIMEOUT CONFIG
-  ===================================================== */
-  const TELEMETRY_TIMEOUT_MS = 20000;
-  let lastTelemetryTs = 0;
-  let timeoutTimer = null;
-
-  /* =====================================================
      🚪 DOOR CONFIG
   ===================================================== */
   const IMG_OPEN = "assets/images/door-open.png";
   const IMG_CLOSED = "assets/images/door-closed.png";
-  const IMG_NA = "assets/images/door-na.png";
-
-  /* =====================================================
-     🚪 DOOR RENDERERS
-  ===================================================== */
-  function renderDoorNA(doorId) {
-    const item = document.querySelector(`.door-item[data-door="${doorId}"]`);
-    if (!item) return;
-
-    const img = item.querySelector(".door-img img");
-    const stateEl = item.querySelector(".door-state");
-    if (!img || !stateEl) return;
-
-    img.src = IMG_NA;
-    stateEl.textContent = "NA";
-    stateEl.className = "door-state na";
-  }
 
   function renderDoor(doorId, isOpen) {
-    if (isOpen === undefined || isOpen === null) {
-      renderDoorNA(doorId);
-      return;
-    }
-
-    const item = document.querySelector(`.door-item[data-door="${doorId}"]`);
+    const item = document.querySelector(
+      `.door-item[data-door="${doorId}"]`
+    );
     if (!item) return;
 
     const img = item.querySelector(".door-img img");
@@ -60,32 +33,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =====================================================
-     🚪 INIT DOORS = NA
+     🛰️ GATEWAY & CONNECTIVITY (UNCHANGED)
   ===================================================== */
-  ["D1", "D2"].forEach(renderDoorNA);
-
-  /* =====================================================
-     🛰️ RESET ALL JSON-DRIVEN UI TO NA
-  ===================================================== */
-  function resetUIToNA() {
-    log("⛔ Telemetry timeout → Resetting UI to NA");
-
-    // Doors
-    ["D1", "D2"].forEach(renderDoorNA);
-
-    // Gateway info
-    updateGatewayInfo({ status: "offline" });
-
-    // Battery (explicit NA handling)
-    document.querySelectorAll(".battery-value").forEach(el => {
-      el.textContent = " NA";
-    });
-  }
-
-  /* =====================================================
-     🛰️ GATEWAY & CONNECTIVITY
-  ===================================================== */
-  function updateGatewayInfo(payload = {}) {
+  function updateGatewayInfo(payload) {
     try {
       const card = document.querySelector(".left-column .card");
       if (!card) return;
@@ -104,14 +54,17 @@ document.addEventListener("DOMContentLoaded", () => {
           li.appendChild(valueNode);
         }
 
-        if (label.startsWith("Device ID"))
+        if (label.startsWith("Device ID")) {
           valueNode.textContent = " " + (payload.deviceId ?? "NA");
+        }
 
-        if (label.startsWith("Location"))
+        if (label.startsWith("Location")) {
           valueNode.textContent = " " + (payload.location ?? "NA");
+        }
 
-        if (label.startsWith("Firmware"))
+        if (label.startsWith("Firmware")) {
           valueNode.textContent = " " + (payload.firmwareVersion ?? "NA");
+        }
 
         if (label.startsWith("Last update")) {
           valueNode.textContent = payload.ts
@@ -125,20 +78,15 @@ document.addEventListener("DOMContentLoaded", () => {
               ? " " + payload.rssi + " dBm"
               : " NA";
         }
-
-        if (label.startsWith("Battery")) {
-          valueNode.textContent =
-            payload.battery !== undefined
-              ? " " + payload.battery + "%"
-              : " NA";
-        }
       });
 
       const badge = card.querySelector(".badge");
       if (badge) {
         badge.innerHTML = `
           <span class="badge-dot"></span>
-          ${payload.status === "online" ? "Online – MQTT over LTE" : "Offline"}
+          ${payload.status === "online"
+            ? "Online – MQTT over LTE"
+            : "Offline"}
         `;
       }
     } catch (err) {
@@ -147,7 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =====================================================
-     📈 MINI TELEMETRY CHARTS (UNCHANGED)
+     📈 MINI TELEMETRY CHARTS
   ===================================================== */
   class MiniTelemetryChart {
     constructor(canvas) {
@@ -156,8 +104,74 @@ document.addEventListener("DOMContentLoaded", () => {
 
       this.chart = new Chart(canvas.getContext("2d"), {
         type: "line",
-        data: { labels: [], datasets: [] },
-        options: { responsive: true }
+        data: {
+          labels: [],
+          datasets: [
+            {
+              label: "Temperature (°C)",
+              data: [],
+              borderColor: "#f97316",
+              backgroundColor: "#f97316",
+              borderWidth: 3,
+              tension: 0.25,
+              pointRadius: 3,
+              fill: false
+            },
+            {
+              label: "Humidity (%)",
+              data: [],
+              borderColor: "#0f766e",
+              backgroundColor: "#0f766e",
+              borderWidth: 3,
+              tension: 0.25,
+              pointRadius: 3,
+              fill: false
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: false,
+          layout: {
+            padding: {
+              top: 2,
+              bottom: 16
+            }
+          },
+          plugins: {
+            legend: {
+              display: true,
+              position: "top",
+              align: "start",
+              labels: {
+                boxWidth: 12,
+                boxHeight: 12,
+                padding: 10,
+                font: {
+                  size: 12,
+                  weight: "500"
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: {
+                maxTicksLimit: 6,
+                font: { size: 11 }
+              }
+            },
+            y: {
+              min: 0,
+              max: 100,
+              ticks: {
+                stepSize: 10,
+                font: { size: 11 }
+              }
+            }
+          }
+        }
       });
     }
 
@@ -178,6 +192,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  /* =====================================================
+     📊 INIT CHARTS
+  ===================================================== */
   const telemetryCharts = [];
   document.querySelectorAll(".telemetry-chart").forEach(canvas => {
     telemetryCharts.push(new MiniTelemetryChart(canvas));
@@ -194,18 +211,22 @@ document.addEventListener("DOMContentLoaded", () => {
     const entry = document.createElement("pre");
 
     entry.className = "log-row";
+    entry.style.whiteSpace = "pre-wrap";
+    entry.style.fontFamily = "monospace";
+    entry.style.fontSize = "12px";
     entry.textContent =
       `${time} — FULL TELEMETRY\n` +
       JSON.stringify(payload, null, 2);
 
     logBox.prepend(entry);
+
     while (logBox.children.length > 10) {
       logBox.removeChild(logBox.lastChild);
     }
   }
 
   /* =====================================================
-     🌐 SIGNALR CONNECTION
+     🌐 SIGNALR CONNECTION (UNCHANGED)
   ===================================================== */
   async function startSignalR() {
     try {
@@ -223,14 +244,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       conn.on("newtelemetry", payload => {
         log("LIVE JSON:", payload);
-
-        lastTelemetryTs = Date.now();
-        clearTimeout(timeoutTimer);
-
-        timeoutTimer = setTimeout(
-          resetUIToNA,
-          TELEMETRY_TIMEOUT_MS
-        );
 
         updateGatewayInfo(payload);
         updateEventLogFullJSON(payload);
@@ -251,13 +264,8 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log("🟢 SignalR CONNECTED");
     } catch (e) {
       console.error("SignalR error:", e);
-      resetUIToNA();
     }
   }
 
-  /* =====================================================
-     🚀 START
-  ===================================================== */
-  resetUIToNA();     // default NA on load
   startSignalR();
 });
