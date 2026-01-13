@@ -14,19 +14,27 @@ document.addEventListener("DOMContentLoaded", () => {
   ===================================================== */
   const IMG_OPEN = "assets/images/door-open.png";
   const IMG_CLOSED = "assets/images/door-closed.png";
-
-  function renderDoor(doorId, isOpen) {
-    const item = document.querySelector(`.door-item[data-door="${doorId}"]`);
-    if (!item) return;
-
-    const img = item.querySelector(".door-img img");
-    const stateEl = item.querySelector(".door-state");
-    if (!img || !stateEl) return;
-
-    img.src = isOpen ? IMG_OPEN : IMG_CLOSED;
-    stateEl.textContent = isOpen ? "Open" : "Closed";
-    stateEl.className = isOpen ? "door-state alert" : "door-state ok";
+/* =====================================================
+   🚪 INITIAL DOOR STATE = NA
+===================================================== */
+["D1", "D2"].forEach(renderDoorNA);
+function renderDoor(doorId, isOpen) {
+  if (isOpen === undefined || isOpen === null) {
+    renderDoorNA(doorId);
+    return;
   }
+
+  const item = document.querySelector(`.door-item[data-door="${doorId}"]`);
+  if (!item) return;
+
+  const img = item.querySelector(".door-img img");
+  const stateEl = item.querySelector(".door-state");
+  if (!img || !stateEl) return;
+
+  img.src = isOpen ? IMG_OPEN : IMG_CLOSED;
+  stateEl.textContent = isOpen ? "Open" : "Closed";
+  stateEl.className = isOpen ? "door-state alert" : "door-state ok";
+}
 
   /* =====================================================
      🛰️ GATEWAY & CONNECTIVITY (UNCHANGED)
