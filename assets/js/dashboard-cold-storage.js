@@ -54,17 +54,14 @@ document.addEventListener("DOMContentLoaded", () => {
           li.appendChild(valueNode);
         }
 
-        if (label.startsWith("Device ID")) {
+        if (label.startsWith("Device ID"))
           valueNode.textContent = " " + (payload.deviceId ?? "NA");
-        }
 
-        if (label.startsWith("Location")) {
+        if (label.startsWith("Location"))
           valueNode.textContent = " " + (payload.location ?? "NA");
-        }
 
-        if (label.startsWith("Firmware")) {
+        if (label.startsWith("Firmware"))
           valueNode.textContent = " " + (payload.firmwareVersion ?? "NA");
-        }
 
         if (label.startsWith("Last update")) {
           valueNode.textContent = payload.ts
@@ -92,6 +89,39 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (err) {
       console.error("Gateway UI error:", err);
     }
+  }
+
+  /* =====================================================
+     🆕 LATEST RECORD TABLE (NEW)
+  ===================================================== */
+  function updateLatestRecordTable(payload) {
+    if (!payload?.dht22) return;
+
+    payload.dht22.forEach(sensor => {
+      const tag = `TH${sensor.id + 1}`;
+      const row = document.querySelector(
+        `.latest-record-table tr[data-tag="${tag}"]`
+      );
+      if (!row) return;
+
+      const cells = row.querySelectorAll("td");
+      if (cells.length < 4) return;
+
+      cells[1].textContent =
+        sensor.temperature !== undefined
+          ? sensor.temperature.toFixed(1)
+          : "NA";
+
+      cells[2].textContent =
+        sensor.humidity !== undefined
+          ? sensor.humidity.toFixed(1)
+          : "NA";
+
+      const ts = sensor.timestamp ?? payload.ts;
+      cells[3].textContent = ts
+        ? new Date(ts * 1000).toLocaleTimeString()
+        : "NA";
+    });
   }
 
   /* =====================================================
@@ -133,42 +163,12 @@ document.addEventListener("DOMContentLoaded", () => {
           responsive: true,
           maintainAspectRatio: false,
           animation: false,
-          layout: {
-            padding: {
-              top: 2,
-              bottom: 16
-            }
-          },
+          layout: { padding: { top: 2, bottom: 16 } },
           plugins: {
             legend: {
               display: true,
               position: "top",
-              align: "start",
-              labels: {
-                boxWidth: 12,
-                boxHeight: 12,
-                padding: 10,
-                font: {
-                  size: 12,
-                  weight: "500"
-                }
-              }
-            }
-          },
-          scales: {
-            x: {
-              ticks: {
-                maxTicksLimit: 6,
-                font: { size: 11 }
-              }
-            },
-            y: {
-              min: 0,
-              max: 100,
-              ticks: {
-                stepSize: 10,
-                font: { size: 11 }
-              }
+              align: "start"
             }
           }
         }
@@ -211,9 +211,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const entry = document.createElement("pre");
 
     entry.className = "log-row";
-    entry.style.whiteSpace = "pre-wrap";
-    entry.style.fontFamily = "monospace";
-    entry.style.fontSize = "12px";
     entry.textContent =
       `${time} — FULL TELEMETRY\n` +
       JSON.stringify(payload, null, 2);
@@ -246,6 +243,7 @@ document.addEventListener("DOMContentLoaded", () => {
         log("LIVE JSON:", payload);
 
         updateGatewayInfo(payload);
+        updateLatestRecordTable(payload);
         updateEventLogFullJSON(payload);
 
         payload?.dht22?.forEach(sensor => {
