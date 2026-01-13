@@ -10,34 +10,59 @@ const log = (...args) => DEBUG && console.log(...args);
 document.addEventListener("DOMContentLoaded", () => {
 
   /* =====================================================
+     ⏱ OFFLINE CONFIG
+  ===================================================== */
+  const OFFLINE_TIMEOUT = 20000; // 20 seconds
+  let lastTelemetryTs = 0;
+
+  /* =====================================================
      🚪 DOOR CONFIG
   ===================================================== */
   const IMG_OPEN = "assets/images/door-open.png";
   const IMG_CLOSED = "assets/images/door-closed.png";
-/* =====================================================
-   🚪 INITIAL DOOR STATE = NA
-===================================================== */
-["D1", "D2"].forEach(renderDoorNA);
-function renderDoor(doorId, isOpen) {
-  if (isOpen === undefined || isOpen === null) {
-    renderDoorNA(doorId);
-    return;
-  }
-
-  const item = document.querySelector(`.door-item[data-door="${doorId}"]`);
-  if (!item) return;
-
-  const img = item.querySelector(".door-img img");
-  const stateEl = item.querySelector(".door-state");
-  if (!img || !stateEl) return;
-
-  img.src = isOpen ? IMG_OPEN : IMG_CLOSED;
-  stateEl.textContent = isOpen ? "Open" : "Closed";
-  stateEl.className = isOpen ? "door-state alert" : "door-state ok";
-}
 
   /* =====================================================
-     🛰️ GATEWAY & CONNECTIVITY (UNCHANGED)
+     🚪 DOOR NA RENDER
+  ===================================================== */
+  function renderDoorNA(doorId) {
+    const item = document.querySelector(`.door-item[data-door="${doorId}"]`);
+    if (!item) return;
+
+    const img = item.querySelector(".door-img img");
+    const stateEl = item.querySelector(".door-state");
+
+    if (img) img.src = IMG_CLOSED;
+    if (stateEl) {
+      stateEl.textContent = "NA";
+      stateEl.className = "door-state na";
+    }
+  }
+
+  function renderDoor(doorId, isOpen) {
+    if (isOpen === undefined || isOpen === null) {
+      renderDoorNA(doorId);
+      return;
+    }
+
+    const item = document.querySelector(`.door-item[data-door="${doorId}"]`);
+    if (!item) return;
+
+    const img = item.querySelector(".door-img img");
+    const stateEl = item.querySelector(".door-state");
+    if (!img || !stateEl) return;
+
+    img.src = isOpen ? IMG_OPEN : IMG_CLOSED;
+    stateEl.textContent = isOpen ? "Open" : "Closed";
+    stateEl.className = isOpen ? "door-state alert" : "door-state ok";
+  }
+
+  /* =====================================================
+     🚪 INITIAL STATE (PAGE LOAD)
+  ===================================================== */
+  ["D1", "D2"].forEach(renderDoorNA);
+
+  /* =====================================================
+     🛰️ GATEWAY UI
   ===================================================== */
   function updateGatewayInfo(payload) {
     try {
@@ -83,9 +108,7 @@ function renderDoor(doorId, isOpen) {
       if (badge) {
         badge.innerHTML = `
           <span class="badge-dot"></span>
-          ${payload.status === "online"
-            ? "Online – MQTT over LTE"
-            : "Offline"}
+          ${payload.status === "online" ? "Online – MQTT over LTE" : "Offline"}
         `;
       }
     } catch (err) {
@@ -94,7 +117,28 @@ function renderDoor(doorId, isOpen) {
   }
 
   /* =====================================================
-     📈 MINI TELEMETRY CHARTS (LEGEND SLIGHTLY MORE UP)
+     ❌ SET UI OFFLINE + NA
+  ===================================================== */
+  function setUIOffline() {
+    updateGatewayInfo({ status: "offline" });
+    ["D1", "D2"].forEach(renderDoorNA);
+  }
+
+  /* =====================================================
+     ⏱ OFFLINE WATCHDOG
+  ===================================================== */
+  setInterval(() => {
+    if (!lastTelemetryTs) return;
+
+    if (Date.now() - lastTelemetryTs > OFFLINE_TIMEOUT) {
+      log("⚠ No telemetry for 20s → OFFLINE");
+      setUIOffline();
+      lastTelemetryTs = 0;
+    }
+  }, 1000);
+
+  /* =====================================================
+     📈 MINI TELEMETRY CHARTS (UNCHANGED)
   ===================================================== */
   class MiniTelemetryChart {
     constructor(canvas) {
@@ -110,135 +154,53 @@ function renderDoor(doorId, isOpen) {
               label: "Temperature (°C)",
               data: [],
               borderColor: "#f97316",
-              backgroundColor: "#f97316",
               borderWidth: 3,
               tension: 0.25,
-              pointRadius: 3,
-              fill: false
+              pointRadius: 3
             },
             {
               label: "Humidity (%)",
               data: [],
               borderColor: "#0f766e",
-              backgroundColor: "#0f766e",
               borderWidth: 3,
               tension: 0.25,
-              pointRadius: 3,
-              fill: false
+              pointRadius: 3
             }
           ]
         },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          animation: false,
-
-          /* 🔑 MICRO ADJUSTMENT */
-          layout: {
-            padding: {
-              top: 2,      // ⬆ legend moved up ~2–3mm
-              bottom: 16
-            }
-          },
-
-          plugins: {
-            legend: {
-              display: true,
-              position: "top",
-              align: "start",
-              labels: {
-                boxWidth: 12,
-                boxHeight: 12,
-                padding: 10,   // ⬆ tighter legend block
-                font: {
-                  size: 12,
-                  weight: "500"
-                }
-              }
-            }
-          },
-
-          scales: {
-            x: {
-              ticks: {
-                maxTicksLimit: 6,
-                font: { size: 11 }
-              }
-            },
-            y: {
-              min: 0,
-              max: 100,
-              ticks: {
-                stepSize: 10,
-                font: { size: 11 }
-              }
-            }
-          }
-        }
+        options: { responsive: true, animation: false }
       });
     }
 
     pushPoint(temp, hum) {
       const t = new Date().toLocaleTimeString();
-      const data = this.chart.data;
+      const d = this.chart.data;
 
-      data.labels.push(t);
-      data.datasets[0].data.push(temp);
-      data.datasets[1].data.push(hum);
+      d.labels.push(t);
+      d.datasets[0].data.push(temp);
+      d.datasets[1].data.push(hum);
 
-      if (data.labels.length > 12) {
-        data.labels.shift();
-        data.datasets.forEach(ds => ds.data.shift());
+      if (d.labels.length > 12) {
+        d.labels.shift();
+        d.datasets.forEach(ds => ds.data.shift());
       }
-
       this.chart.update("none");
     }
   }
 
-  /* =====================================================
-     📊 INIT CHARTS
-  ===================================================== */
   const telemetryCharts = [];
-  document.querySelectorAll(".telemetry-chart").forEach(canvas => {
-    telemetryCharts.push(new MiniTelemetryChart(canvas));
-  });
+  document.querySelectorAll(".telemetry-chart").forEach(c =>
+    telemetryCharts.push(new MiniTelemetryChart(c))
+  );
 
   /* =====================================================
-     🧾 EVENT LOG (UNCHANGED)
-  ===================================================== */
-  function updateEventLogFullJSON(payload) {
-    const logBox = document.querySelector(".log-box");
-    if (!logBox) return;
-
-    const time = new Date().toLocaleTimeString();
-    const entry = document.createElement("pre");
-
-    entry.className = "log-row";
-    entry.style.whiteSpace = "pre-wrap";
-    entry.style.fontFamily = "monospace";
-    entry.style.fontSize = "12px";
-
-    entry.textContent =
-      `${time} — FULL TELEMETRY\n` +
-      JSON.stringify(payload, null, 2);
-
-    logBox.prepend(entry);
-
-    while (logBox.children.length > 10) {
-      logBox.removeChild(logBox.lastChild);
-    }
-  }
-
-  /* =====================================================
-     🌐 SIGNALR CONNECTION (UNCHANGED)
+     🌐 SIGNALR
   ===================================================== */
   async function startSignalR() {
     try {
       const resp = await fetch(
         "https://fun-enddrave-vscode.azurewebsites.net/api/negotiate"
       );
-      if (!resp.ok) throw new Error("Negotiate failed");
-
       const { url, accessToken } = await resp.json();
 
       const conn = new signalR.HubConnectionBuilder()
@@ -247,16 +209,12 @@ function renderDoor(doorId, isOpen) {
         .build();
 
       conn.on("newtelemetry", payload => {
-        log("LIVE JSON:", payload);
+        lastTelemetryTs = Date.now();
 
         updateGatewayInfo(payload);
-        updateEventLogFullJSON(payload);
 
-        payload?.dht22?.forEach(sensor => {
-          const chart = telemetryCharts[sensor.id];
-          if (chart) {
-            chart.pushPoint(sensor.temperature, sensor.humidity);
-          }
+        payload?.dht22?.forEach(s => {
+          telemetryCharts[s.id]?.pushPoint(s.temperature, s.humidity);
         });
 
         payload?.doors?.forEach(d => {
