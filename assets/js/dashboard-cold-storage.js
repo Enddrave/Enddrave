@@ -260,23 +260,35 @@ document.addEventListener("DOMContentLoaded", () => {
   /* =====================================================
      🧾 EVENT LOG (FULL JSON)
   ===================================================== */
-  function updateEventLogFullJSON(payload) {
-    const logBox = document.querySelector(".log-box");
-    if (!logBox) return;
+function updateEventLogFullJSON(payload) {
+  const logBox = document.querySelector(".log-box");
+  if (!logBox) return;
 
-    const pre = document.createElement("pre");
-    pre.className = "log-row";
-    pre.textContent =
-      `${new Date().toLocaleTimeString()} — FULL TELEMETRY\n` +
-      JSON.stringify(payload, null, 2);
-
-    logBox.prepend(pre);
-
-    while (logBox.children.length > 20) {
-      logBox.removeChild(logBox.lastChild);
-    }
+  /* ❌ CLEAR LOG IF NO DATA OR DEVICE OFFLINE */
+  if (
+    !payload ||
+    payload.status !== "online" ||
+    !payload.dht22 ||
+    payload.dht22.length === 0
+  ) {
+    logBox.innerHTML = "";   // 🧹 keep empty
+    return;
   }
 
+  /* ✅ VALID LIVE DATA → SHOW LOG */
+  const pre = document.createElement("pre");
+  pre.className = "log-row";
+  pre.textContent =
+    `${new Date().toLocaleTimeString()} — FULL TELEMETRY\n` +
+    JSON.stringify(payload, null, 2);
+
+  logBox.prepend(pre);
+
+  /* 🔄 LIMIT TO LAST 20 ENTRIES */
+  while (logBox.children.length > 20) {
+    logBox.removeChild(logBox.lastChild);
+  }
+}
   /* =====================================================
      🌐 SIGNALR CONNECTION
   ===================================================== */
