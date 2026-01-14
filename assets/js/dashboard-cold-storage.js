@@ -10,6 +10,19 @@ const log = (...args) => DEBUG && console.log(...args);
 document.addEventListener("DOMContentLoaded", () => {
 
   /* =====================================================
+     🔴 DEFAULT OFFLINE STATE (PAGE LOAD)
+  ===================================================== */
+  function setGatewayOffline() {
+    const badge = document.querySelector(".badge");
+    if (!badge) return;
+
+    badge.innerHTML = `
+      <span class="badge-dot offline"></span>
+      Offline
+    `;
+  }
+
+  /* =====================================================
      🚪 DOOR CONFIG
   ===================================================== */
   const IMG_OPEN = "assets/images/door-open.png";
@@ -29,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =====================================================
-     🛰️ GATEWAY & CONNECTIVITY (UNCHANGED)
+     🛰️ GATEWAY & CONNECTIVITY
   ===================================================== */
   function updateGatewayInfo(payload) {
     try {
@@ -68,6 +81,16 @@ document.addEventListener("DOMContentLoaded", () => {
               ? " " + payload.rssi + " dBm"
               : " NA";
       });
+
+      /* 🟢 ONLINE STATE (ONLY AFTER DATA ARRIVES) */
+      const badge = card.querySelector(".badge");
+      if (badge) {
+        badge.innerHTML = `
+          <span class="badge-dot"></span>
+          Online – MQTT over LTE
+        `;
+      }
+
     } catch (e) {
       console.error("Gateway UI error:", e);
     }
@@ -141,7 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
     .forEach(c => telemetryCharts.push(new MiniTelemetryChart(c)));
 
   /* =====================================================
-     📋 LATEST RECORD TABLE (WORKING – DO NOT TOUCH)
+     📋 LATEST RECORD TABLE (WORKING)
   ===================================================== */
   function updateLatestRecordTable(payload) {
     if (!payload?.dht22) return;
@@ -167,13 +190,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =====================================================
-     🧾 EVENT LOG (FULL JSON – FINAL)
+     🧾 EVENT LOG (FULL JSON)
   ===================================================== */
   function updateEventLogFullJSON(payload) {
     const logBox = document.querySelector(".log-box");
     if (!logBox) return;
-
-    const time = new Date().toLocaleTimeString();
 
     const pre = document.createElement("pre");
     pre.className = "log-row";
@@ -182,19 +203,18 @@ document.addEventListener("DOMContentLoaded", () => {
     pre.style.fontSize = "12px";
 
     pre.textContent =
-      `${time} — FULL TELEMETRY PAYLOAD\n` +
+      `${new Date().toLocaleTimeString()} — FULL TELEMETRY PAYLOAD\n` +
       JSON.stringify(payload, null, 2);
 
     logBox.prepend(pre);
 
-    // keep last 20 logs only
     while (logBox.children.length > 20) {
       logBox.removeChild(logBox.lastChild);
     }
   }
 
   /* =====================================================
-     🌐 SIGNALR CONNECTION (UNCHANGED)
+     🌐 SIGNALR CONNECTION
   ===================================================== */
   async function startSignalR() {
     const resp = await fetch(
@@ -230,5 +250,9 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("🟢 SignalR CONNECTED");
   }
 
-  startSignalR();
+  /* =====================================================
+     🚀 STARTUP SEQUENCE
+  ===================================================== */
+  setGatewayOffline();   // 🔴 default state
+  startSignalR();        // 🛰️ wait for data
 });
