@@ -50,26 +50,25 @@ document.addEventListener("DOMContentLoaded", () => {
           li.appendChild(valueNode);
         }
 
-        if (label.startsWith("Device ID")) {
+        if (label.startsWith("Device ID"))
           valueNode.textContent = " " + (payload.deviceId ?? "NA");
-        }
-        if (label.startsWith("Location")) {
+
+        if (label.startsWith("Location"))
           valueNode.textContent = " " + (payload.location ?? "NA");
-        }
-        if (label.startsWith("Firmware")) {
+
+        if (label.startsWith("Firmware"))
           valueNode.textContent = " " + (payload.firmwareVersion ?? "NA");
-        }
-        if (label.startsWith("Last update")) {
+
+        if (label.startsWith("Last update"))
           valueNode.textContent = payload.ts
             ? " " + new Date(payload.ts * 1000).toLocaleString()
             : " NA";
-        }
-        if (label.startsWith("RSSI")) {
+
+        if (label.startsWith("RSSI"))
           valueNode.textContent =
             payload.rssi !== undefined
               ? " " + payload.rssi + " dBm"
               : " NA";
-        }
       });
     } catch (err) {
       console.error("Gateway UI error:", err);
@@ -114,7 +113,21 @@ document.addEventListener("DOMContentLoaded", () => {
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          animation: false
+          animation: false,
+          layout: {
+            padding: { top: 2, bottom: 16 }
+          },
+          plugins: {
+            legend: {
+              display: true,
+              position: "top",
+              align: "start"
+            }
+          },
+          scales: {
+            x: { ticks: { maxTicksLimit: 6 } },
+            y: { min: 0, max: 100 }
+          }
         }
       });
     }
@@ -145,18 +158,14 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /* =====================================================
-     📋 LATEST RECORD TABLE (✅ FIXED & DYNAMIC)
+     📋 LATEST RECORD TABLE (✅ FINAL FIX)
   ===================================================== */
   function updateLatestRecordTable(payload) {
     const tbody = document.querySelector("#latestRecordTable tbody");
     if (!tbody || !payload?.dht22) return;
 
-    const time = payload.ts
-      ? new Date(payload.ts * 1000).toLocaleTimeString()
-      : new Date().toLocaleTimeString();
-
     payload.dht22.forEach(sensor => {
-      const rowId = `th-${sensor.id}`;
+      const rowId = `th-row-${sensor.id}`;
       let row = document.getElementById(rowId);
 
       if (!row) {
@@ -181,8 +190,30 @@ document.addEventListener("DOMContentLoaded", () => {
           ? sensor.humidity.toFixed(1)
           : "NA";
 
-      row.querySelector(".time").textContent = time;
+      // 👇 THIS is the real dynamic update
+      row.querySelector(".time").textContent =
+        new Date().toLocaleTimeString();
     });
+  }
+
+  /* =====================================================
+     🧾 EVENT LOG (UNCHANGED)
+  ===================================================== */
+  function updateEventLogFullJSON(payload) {
+    const logBox = document.querySelector(".log-box");
+    if (!logBox) return;
+
+    const entry = document.createElement("pre");
+    entry.className = "log-row";
+    entry.textContent =
+      `${new Date().toLocaleTimeString()} — FULL TELEMETRY\n` +
+      JSON.stringify(payload, null, 2);
+
+    logBox.prepend(entry);
+
+    while (logBox.children.length > 10) {
+      logBox.removeChild(logBox.lastChild);
+    }
   }
 
   /* =====================================================
@@ -203,6 +234,7 @@ document.addEventListener("DOMContentLoaded", () => {
       log("LIVE JSON:", payload);
 
       updateGatewayInfo(payload);
+      updateEventLogFullJSON(payload);
       updateLatestRecordTable(payload);
 
       payload?.dht22?.forEach(sensor => {
