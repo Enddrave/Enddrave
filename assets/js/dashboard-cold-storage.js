@@ -193,7 +193,16 @@ document.addEventListener("DOMContentLoaded", () => {
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          animation: false
+          animation: false,
+           plugins: {
+               legend: {
+                 labels: {
+        boxWidth: 10,   // width of legend marker
+        boxHeight: 10,  // height of legend marker (same = square)
+        padding: 12
+      }
+    }
+  }
         }
       });
     }
