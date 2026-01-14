@@ -52,9 +52,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const cells = row.querySelectorAll("td");
       if (cells.length < 4) return;
 
-      cells[1].textContent = "--";
-      cells[2].textContent = "--";
-      cells[3].textContent = "--";
+      cells[1].textContent = "--"; // Temp
+      cells[2].textContent = "--"; // Hum
+      cells[3].textContent = "--"; // Time
     });
   }
 
@@ -67,8 +67,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const stateEl = item.querySelector(".door-state");
 
       if (img) {
-        img.src = "assets/images/door-closed.png";
-        img.style.opacity = "0.4";
+        img.src = "assets/images/door-closed.png"; // neutral
+        img.style.opacity = "0.4";                 // dim
       }
 
       if (stateEl) {
@@ -95,14 +95,68 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!img || !stateEl) return;
 
     img.src = isOpen ? IMG_OPEN : IMG_CLOSED;
-    img.style.opacity = "1";
+    img.style.opacity = "1"; // restore from offline
 
     stateEl.textContent = isOpen ? "Open" : "Closed";
     stateEl.className = isOpen ? "door-state alert" : "door-state ok";
   }
 
   /* =====================================================
-     📈 MINI TELEMETRY CHARTS
+     🛰️ GATEWAY & CONNECTIVITY (ONLINE UPDATE)
+  ===================================================== */
+  function updateGatewayInfo(payload) {
+    try {
+      const card = document.querySelector(".left-column .card");
+      if (!card) return;
+
+      card.querySelectorAll(".status-list li").forEach(li => {
+        const labelEl = li.querySelector(".status-label");
+        if (!labelEl) return;
+
+        const label = labelEl.textContent.trim();
+        let valueNode = labelEl.nextSibling;
+
+        if (!valueNode || valueNode.nodeType !== Node.TEXT_NODE) {
+          valueNode = document.createTextNode(" --");
+          li.appendChild(valueNode);
+        }
+
+        if (label.startsWith("Device ID"))
+          valueNode.textContent = " " + (payload.deviceId ?? "--");
+
+        if (label.startsWith("Location"))
+          valueNode.textContent = " " + (payload.location ?? "--");
+
+        if (label.startsWith("Firmware"))
+          valueNode.textContent = " " + (payload.firmwareVersion ?? "--");
+
+        if (label.startsWith("Last update"))
+          valueNode.textContent = payload.ts
+            ? " " + new Date(payload.ts * 1000).toLocaleString()
+            : " --";
+
+        if (label.startsWith("RSSI"))
+          valueNode.textContent =
+            payload.rssi !== undefined
+              ? " " + payload.rssi + " dBm"
+              : " --";
+      });
+
+      /* 🟢 ONLINE BADGE */
+      const badge = card.querySelector(".badge");
+      if (badge) {
+        badge.className = "badge online";
+        badge.innerHTML =
+          `<span class="badge-dot"></span> Online – MQTT over LTE`;
+      }
+
+    } catch (err) {
+      console.error("Gateway UI error:", err);
+    }
+  }
+
+  /* =====================================================
+     📈 MINI TELEMETRY CHARTS (UNCHANGED)
   ===================================================== */
   class MiniTelemetryChart {
     constructor(canvas) {
@@ -139,23 +193,16 @@ document.addEventListener("DOMContentLoaded", () => {
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          animation: false,
-          plugins: {
-            legend: {
-              labels: {
-                boxWidth: 10,
-                boxHeight: 10
-              }
-            }
-          }
+          animation: false
         }
       });
     }
 
     pushPoint(temp, hum) {
+      const t = new Date().toLocaleTimeString();
       const d = this.chart.data;
 
-      d.labels.push(new Date().toLocaleTimeString());
+      d.labels.push(t);
       d.datasets[0].data.push(temp);
       d.datasets[1].data.push(hum);
 
@@ -176,7 +223,53 @@ document.addEventListener("DOMContentLoaded", () => {
     .forEach(c => telemetryCharts.push(new MiniTelemetryChart(c)));
 
   /* =====================================================
-     🌐 SIGNALR CONNECTION (FIXED)
+     📋 LATEST RECORD TABLE (ONLINE UPDATE)
+  ===================================================== */
+  function updateLatestRecordTable(payload) {
+    if (!payload?.dht22) return;
+
+    const rows = document.querySelectorAll("table tbody tr");
+
+    payload.dht22.forEach((sensor, index) => {
+      const row = rows[index];
+      if (!row) return;
+
+      const cells = row.querySelectorAll("td");
+      if (cells.length < 4) return;
+
+      cells[1].textContent =
+        sensor.temperature?.toFixed(1) ?? "NA";
+
+      cells[2].textContent =
+        sensor.humidity?.toFixed(1) ?? "NA";
+
+      cells[3].textContent =
+        new Date().toLocaleTimeString();
+    });
+  }
+
+  /* =====================================================
+     🧾 EVENT LOG (FULL JSON)
+  ===================================================== */
+  function updateEventLogFullJSON(payload) {
+    const logBox = document.querySelector(".log-box");
+    if (!logBox) return;
+
+    const pre = document.createElement("pre");
+    pre.className = "log-row";
+    pre.textContent =
+      `${new Date().toLocaleTimeString()} — FULL TELEMETRY\n` +
+      JSON.stringify(payload, null, 2);
+
+    logBox.prepend(pre);
+
+    while (logBox.children.length > 20) {
+      logBox.removeChild(logBox.lastChild);
+    }
+  }
+
+  /* =====================================================
+     🌐 SIGNALR CONNECTION
   ===================================================== */
   async function startSignalR() {
     const resp = await fetch(
@@ -192,13 +285,20 @@ document.addEventListener("DOMContentLoaded", () => {
     conn.on("newtelemetry", payload => {
       log("LIVE JSON:", payload);
 
-      /* ✅ FIXED DYNAMIC DATA MAPPING */
-      payload?.dht22?.forEach((sensor, index) => {
-        const chart = telemetryCharts[index];
+      updateGatewayInfo(payload);
+      updateLatestRecordTable(payload);
+      updateEventLogFullJSON(payload);
+
+      payload?.dht22?.forEach(sensor => {
+        const chart = telemetryCharts[sensor.id];
         if (chart) {
           chart.pushPoint(sensor.temperature, sensor.humidity);
         }
       });
+
+      payload?.doors?.forEach(d =>
+        renderDoor(`D${d.id + 1}`, d.state === 1)
+      );
     });
 
     await conn.start();
@@ -206,11 +306,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =====================================================
-     🚀 STARTUP
+     🚀 STARTUP SEQUENCE
   ===================================================== */
-  setGatewayOffline();
-  resetGatewayFields();
-  resetLatestRecordTable();
-  resetDoorStatus();
-  startSignalR();
+  setGatewayOffline();        // 🔴 badge
+  resetGatewayFields();      // -- gateway fields
+  resetLatestRecordTable();  // -- latest record
+  resetDoorStatus();         // -- doors
+  startSignalR();            // wait for telemetry
 });
