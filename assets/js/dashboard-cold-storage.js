@@ -71,16 +71,6 @@ document.addEventListener("DOMContentLoaded", () => {
               : " NA";
         }
       });
-
-      const badge = card.querySelector(".badge");
-      if (badge) {
-        badge.innerHTML = `
-          <span class="badge-dot"></span>
-          ${payload.status === "online"
-            ? "Online – MQTT over LTE"
-            : "Offline"}
-        `;
-      }
     } catch (err) {
       console.error("Gateway UI error:", err);
     }
@@ -124,11 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          animation: false,
-          plugins: { legend: { display: true } },
-          scales: {
-            y: { min: 0, max: 100 }
-          }
+          animation: false
         }
       });
     }
@@ -151,7 +137,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =====================================================
-     📊 INIT CHARTS (UNCHANGED)
+     📊 INIT CHARTS
   ===================================================== */
   const telemetryCharts = [];
   document.querySelectorAll(".telemetry-chart").forEach(canvas => {
@@ -159,7 +145,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /* =====================================================
-     📋 LATEST RECORD TABLE (DYNAMIC FROM JSON)
+     📋 LATEST RECORD TABLE (✅ FIXED & DYNAMIC)
   ===================================================== */
   function updateLatestRecordTable(payload) {
     const tbody = document.querySelector("#latestRecordTable tbody");
@@ -170,7 +156,7 @@ document.addEventListener("DOMContentLoaded", () => {
       : new Date().toLocaleTimeString();
 
     payload.dht22.forEach(sensor => {
-      const rowId = `th-row-${sensor.id}`;
+      const rowId = `th-${sensor.id}`;
       let row = document.getElementById(rowId);
 
       if (!row) {
@@ -200,68 +186,39 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =====================================================
-     🧾 EVENT LOG (UNCHANGED)
-  ===================================================== */
-  function updateEventLogFullJSON(payload) {
-    const logBox = document.querySelector(".log-box");
-    if (!logBox) return;
-
-    const time = new Date().toLocaleTimeString();
-    const entry = document.createElement("pre");
-
-    entry.className = "log-row";
-    entry.textContent =
-      `${time} — FULL TELEMETRY\n` +
-      JSON.stringify(payload, null, 2);
-
-    logBox.prepend(entry);
-
-    while (logBox.children.length > 10) {
-      logBox.removeChild(logBox.lastChild);
-    }
-  }
-
-  /* =====================================================
      🌐 SIGNALR CONNECTION (UNCHANGED)
   ===================================================== */
   async function startSignalR() {
-    try {
-      const resp = await fetch(
-        "https://fun-enddrave-vscode.azurewebsites.net/api/negotiate"
-      );
-      if (!resp.ok) throw new Error("Negotiate failed");
+    const resp = await fetch(
+      "https://fun-enddrave-vscode.azurewebsites.net/api/negotiate"
+    );
+    const { url, accessToken } = await resp.json();
 
-      const { url, accessToken } = await resp.json();
+    const conn = new signalR.HubConnectionBuilder()
+      .withUrl(url, { accessTokenFactory: () => accessToken })
+      .withAutomaticReconnect()
+      .build();
 
-      const conn = new signalR.HubConnectionBuilder()
-        .withUrl(url, { accessTokenFactory: () => accessToken })
-        .withAutomaticReconnect()
-        .build();
+    conn.on("newtelemetry", payload => {
+      log("LIVE JSON:", payload);
 
-      conn.on("newtelemetry", payload => {
-        log("LIVE JSON:", payload);
+      updateGatewayInfo(payload);
+      updateLatestRecordTable(payload);
 
-        updateGatewayInfo(payload);
-        updateEventLogFullJSON(payload);
-        updateLatestRecordTable(payload);
-
-        payload?.dht22?.forEach(sensor => {
-          const chart = telemetryCharts[sensor.id];
-          if (chart) {
-            chart.pushPoint(sensor.temperature, sensor.humidity);
-          }
-        });
-
-        payload?.doors?.forEach(d => {
-          renderDoor(`D${d.id + 1}`, d.state === 1);
-        });
+      payload?.dht22?.forEach(sensor => {
+        const chart = telemetryCharts[sensor.id];
+        if (chart) {
+          chart.pushPoint(sensor.temperature, sensor.humidity);
+        }
       });
 
-      await conn.start();
-      console.log("🟢 SignalR CONNECTED");
-    } catch (e) {
-      console.error("SignalR error:", e);
-    }
+      payload?.doors?.forEach(d => {
+        renderDoor(`D${d.id + 1}`, d.state === 1);
+      });
+    });
+
+    await conn.start();
+    console.log("🟢 SignalR CONNECTED");
   }
 
   startSignalR();
