@@ -74,8 +74,8 @@ document.addEventListener("DOMContentLoaded", () => {
       if (stateEl) {
         stateEl.textContent = "--";
         stateEl.className = "door-state";
-        stateEl.style.color = "#9ca3af";
-        stateEl.style.fontWeight = "500";
+        stateEl.style.color = "#000000";
+        stateEl.style.fontWeight = "250";
       }
     });
   }
