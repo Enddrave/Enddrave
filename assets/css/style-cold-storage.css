@@ -7,14 +7,10 @@
   --muted: #6b7280;
 
   --blue: #2563eb;
-  --blue-soft: #eef2ff;
-
   --green: #16a34a;
   --orange: #ea580c;
   --amber: #d97706;
-
   --red: #dc2626;
-  --red-soft: #fef2f2;
 }
 
 /* ===== RESET ===== */
@@ -195,33 +191,26 @@ body {
   color: var(--muted);
 }
 
+/* ===== DOOR STATE (SAFE — NO LAYOUT CHANGE) ===== */
 .door-state {
   font-size: 13px;
   margin-top: 2px;
 }
 
-/* =====================================================
-   ✅ DOOR STATE VISUAL ONLY (NO LAYOUT CHANGE)
-===================================================== */
-
-/* CLOSED */
-.door-state.ok {
-  color: #1e40af;
+/* 🔴 OPEN — visual only */
+.door-state.alert {
+  color: #dc2626;
   font-weight: 600;
-  background: var(--blue-soft);
-  border: 1px solid #c7d2fe;
-  border-radius: 999px;
-  padding: 2px 12px;        /* minimal, does NOT affect flow */
+  background-color: rgba(220, 38, 38, 0.08);
+  box-shadow: inset 0 0 0 9999px rgba(220, 38, 38, 0.05);
 }
 
-/* OPEN */
-.door-state.alert {
-  color: #991b1b;
+/* 🔵 CLOSED — visual only */
+.door-state.ok {
+  color: #2563eb;
   font-weight: 600;
-  background: var(--red-soft);
-  border: 1px solid #fecaca;
-  border-radius: 999px;
-  padding: 2px 12px;        /* minimal, same as closed */
+  background-color: rgba(37, 99, 235, 0.08);
+  box-shadow: inset 0 0 0 9999px rgba(37, 99, 235, 0.05);
 }
 
 /* ===== TABLE ===== */
