@@ -16,10 +16,29 @@ document.addEventListener("DOMContentLoaded", () => {
     const badge = document.querySelector(".badge");
     if (!badge) return;
 
-    badge.innerHTML = `
-      <span class="badge-dot offline"></span>
-      Offline
-    `;
+    badge.className = "badge offline";
+    badge.innerHTML = `<span class="badge-dot"></span> Offline`;
+  }
+
+  /* =====================================================
+     🔴 RESET GATEWAY FIELDS (OFFLINE)
+  ===================================================== */
+  function resetGatewayFields() {
+    const card = document.querySelector(".left-column .card");
+    if (!card) return;
+
+    card.querySelectorAll(".status-list li").forEach(li => {
+      const labelEl = li.querySelector(".status-label");
+      if (!labelEl) return;
+
+      let valueNode = labelEl.nextSibling;
+      if (!valueNode || valueNode.nodeType !== Node.TEXT_NODE) {
+        valueNode = document.createTextNode(" --");
+        li.appendChild(valueNode);
+      } else {
+        valueNode.textContent = " --";
+      }
+    });
   }
 
   /* =====================================================
@@ -42,7 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =====================================================
-     🛰️ GATEWAY & CONNECTIVITY
+     🛰️ GATEWAY & CONNECTIVITY (ONLINE UPDATE)
   ===================================================== */
   function updateGatewayInfo(payload) {
     try {
@@ -62,37 +81,36 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (label.startsWith("Device ID"))
-          valueNode.textContent = " " + (payload.deviceId ?? "NA");
+          valueNode.textContent = " " + (payload.deviceId ?? "--");
 
         if (label.startsWith("Location"))
-          valueNode.textContent = " " + (payload.location ?? "NA");
+          valueNode.textContent = " " + (payload.location ?? "--");
 
         if (label.startsWith("Firmware"))
-          valueNode.textContent = " " + (payload.firmwareVersion ?? "NA");
+          valueNode.textContent = " " + (payload.firmwareVersion ?? "--");
 
         if (label.startsWith("Last update"))
           valueNode.textContent = payload.ts
             ? " " + new Date(payload.ts * 1000).toLocaleString()
-            : " NA";
+            : " --";
 
         if (label.startsWith("RSSI"))
           valueNode.textContent =
             payload.rssi !== undefined
               ? " " + payload.rssi + " dBm"
-              : " NA";
+              : " --";
       });
 
-      /* 🟢 ONLINE STATE (ONLY AFTER DATA ARRIVES) */
+      /* 🟢 ONLINE BADGE */
       const badge = card.querySelector(".badge");
       if (badge) {
-        badge.innerHTML = `
-          <span class="badge-dot"></span>
-          Online – MQTT over LTE
-        `;
+        badge.className = "badge online";
+        badge.innerHTML =
+          `<span class="badge-dot"></span> Online – MQTT over LTE`;
       }
 
-    } catch (e) {
-      console.error("Gateway UI error:", e);
+    } catch (err) {
+      console.error("Gateway UI error:", err);
     }
   }
 
@@ -198,12 +216,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const pre = document.createElement("pre");
     pre.className = "log-row";
-    pre.style.whiteSpace = "pre-wrap";
-    pre.style.fontFamily = "monospace";
-    pre.style.fontSize = "12px";
-
     pre.textContent =
-      `${new Date().toLocaleTimeString()} — FULL TELEMETRY PAYLOAD\n` +
+      `${new Date().toLocaleTimeString()} — FULL TELEMETRY\n` +
       JSON.stringify(payload, null, 2);
 
     logBox.prepend(pre);
@@ -253,6 +267,7 @@ document.addEventListener("DOMContentLoaded", () => {
   /* =====================================================
      🚀 STARTUP SEQUENCE
   ===================================================== */
-  setGatewayOffline();   // 🔴 default state
-  startSignalR();        // 🛰️ wait for data
+  setGatewayOffline();    // 🔴 default offline
+  resetGatewayFields();  // -- values
+  startSignalR();        // wait for data
 });
