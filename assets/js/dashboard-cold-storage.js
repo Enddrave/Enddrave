@@ -204,7 +204,7 @@ document.addEventListener("DOMContentLoaded", () => {
             },
             layout: {
              padding: {
-               bottom: 20   // ⬅️ increase as needed
+               bottom: 70   // ⬅️ increase as needed
              }
            }
          }
