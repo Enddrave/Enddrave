@@ -103,7 +103,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* =====================================================
      📈 MINI TELEMETRY CHARTS
-     🔲 ONLY CHANGE: LEGEND SQUARE BOX
   ===================================================== */
   class MiniTelemetryChart {
     constructor(canvas) {
@@ -141,8 +140,6 @@ document.addEventListener("DOMContentLoaded", () => {
           responsive: true,
           maintainAspectRatio: false,
           animation: false,
-
-          /* 🔲 LEGEND FLAG FIX (RECTANGLE → SQUARE) */
           plugins: {
             legend: {
               labels: {
@@ -156,10 +153,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     pushPoint(temp, hum) {
-      const t = new Date().toLocaleTimeString();
       const d = this.chart.data;
 
-      d.labels.push(t);
+      d.labels.push(new Date().toLocaleTimeString());
       d.datasets[0].data.push(temp);
       d.datasets[1].data.push(hum);
 
@@ -180,7 +176,7 @@ document.addEventListener("DOMContentLoaded", () => {
     .forEach(c => telemetryCharts.push(new MiniTelemetryChart(c)));
 
   /* =====================================================
-     🌐 SIGNALR CONNECTION
+     🌐 SIGNALR CONNECTION (FIXED)
   ===================================================== */
   async function startSignalR() {
     const resp = await fetch(
@@ -194,13 +190,19 @@ document.addEventListener("DOMContentLoaded", () => {
       .build();
 
     conn.on("newtelemetry", payload => {
-      payload?.dht22?.forEach(sensor => {
-        const chart = telemetryCharts[sensor.id];
-        if (chart) chart.pushPoint(sensor.temperature, sensor.humidity);
+      log("LIVE JSON:", payload);
+
+      /* ✅ FIXED DYNAMIC DATA MAPPING */
+      payload?.dht22?.forEach((sensor, index) => {
+        const chart = telemetryCharts[index];
+        if (chart) {
+          chart.pushPoint(sensor.temperature, sensor.humidity);
+        }
       });
     });
 
     await conn.start();
+    console.log("🟢 SignalR CONNECTED");
   }
 
   /* =====================================================
