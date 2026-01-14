@@ -201,12 +201,7 @@ document.addEventListener("DOMContentLoaded", () => {
                   boxHeight: 10,  // height of legend marker (same = square)
                   padding: 12
                }
-            },
-            layout: {
-             padding: {
-               bottom: 70   // ⬅️ increase as needed
-             }
-           }
+            }
          }
         }
       });
