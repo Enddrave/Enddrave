@@ -10,7 +10,7 @@ const log = (...args) => DEBUG && console.log(...args);
 document.addEventListener("DOMContentLoaded", () => {
 
   /* =====================================================
-     🔴 DEFAULT OFFLINE BADGE
+     🔴 DEFAULT OFFLINE STATE (BADGE)
   ===================================================== */
   function setGatewayOffline() {
     const badge = document.querySelector(".badge");
@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =====================================================
-     🔴 RESET GATEWAY FIELDS
+     🔴 RESET GATEWAY FIELDS (OFFLINE)
   ===================================================== */
   function resetGatewayFields() {
     const card = document.querySelector(".left-column .card");
@@ -42,36 +42,40 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =====================================================
-     🔴 RESET LATEST RECORD TABLE
+     🔴 RESET LATEST RECORD TABLE (OFFLINE)
   ===================================================== */
   function resetLatestRecordTable() {
-    document.querySelectorAll("table tbody tr").forEach(row => {
+    const rows = document.querySelectorAll("table tbody tr");
+    if (!rows.length) return;
+
+    rows.forEach(row => {
       const cells = row.querySelectorAll("td");
       if (cells.length < 4) return;
 
-      cells[1].textContent = "--";
-      cells[2].textContent = "--";
-      cells[3].textContent = "--";
+      cells[1].textContent = "--"; // Temp
+      cells[2].textContent = "--"; // Hum
+      cells[3].textContent = "--"; // Time
     });
   }
 
   /* =====================================================
-     🔴 RESET DOOR STATUS
+     🔴 RESET DOOR STATUS (OFFLINE)
   ===================================================== */
   function resetDoorStatus() {
     document.querySelectorAll(".door-item").forEach(item => {
       const img = item.querySelector(".door-img img");
-      const state = item.querySelector(".door-state");
+      const stateEl = item.querySelector(".door-state");
 
       if (img) {
-        img.src = "assets/images/door-closed.png";
-        img.style.opacity = "0.45";
+        img.src = "assets/images/door-closed.png"; // neutral
+        img.style.opacity = "0.4";                 // dim
       }
 
-      if (state) {
-        state.textContent = "--";
-        state.className = "door-state";
-        state.style.color = "#9ca3af";
+      if (stateEl) {
+        stateEl.textContent = "--";
+        stateEl.className = "door-state";
+        stateEl.style.color = "#9ca3af";
+        stateEl.style.fontWeight = "500";
       }
     });
   }
@@ -87,61 +91,67 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!item) return;
 
     const img = item.querySelector(".door-img img");
-    const state = item.querySelector(".door-state");
-    if (!img || !state) return;
+    const stateEl = item.querySelector(".door-state");
+    if (!img || !stateEl) return;
 
     img.src = isOpen ? IMG_OPEN : IMG_CLOSED;
-    img.style.opacity = "1";
+    img.style.opacity = "1"; // restore from offline
 
-    state.textContent = isOpen ? "Open" : "Closed";
-    state.className = isOpen ? "door-state alert" : "door-state ok";
+    stateEl.textContent = isOpen ? "Open" : "Closed";
+    stateEl.className = isOpen ? "door-state alert" : "door-state ok";
   }
 
   /* =====================================================
-     🛰️ GATEWAY UPDATE (ONLINE)
+     🛰️ GATEWAY & CONNECTIVITY (ONLINE UPDATE)
   ===================================================== */
   function updateGatewayInfo(payload) {
-    const card = document.querySelector(".left-column .card");
-    if (!card) return;
+    try {
+      const card = document.querySelector(".left-column .card");
+      if (!card) return;
 
-    card.querySelectorAll(".status-list li").forEach(li => {
-      const labelEl = li.querySelector(".status-label");
-      if (!labelEl) return;
+      card.querySelectorAll(".status-list li").forEach(li => {
+        const labelEl = li.querySelector(".status-label");
+        if (!labelEl) return;
 
-      const label = labelEl.textContent.trim();
-      let valueNode = labelEl.nextSibling;
+        const label = labelEl.textContent.trim();
+        let valueNode = labelEl.nextSibling;
 
-      if (!valueNode || valueNode.nodeType !== Node.TEXT_NODE) {
-        valueNode = document.createTextNode(" --");
-        li.appendChild(valueNode);
+        if (!valueNode || valueNode.nodeType !== Node.TEXT_NODE) {
+          valueNode = document.createTextNode(" --");
+          li.appendChild(valueNode);
+        }
+
+        if (label.startsWith("Device ID"))
+          valueNode.textContent = " " + (payload.deviceId ?? "--");
+
+        if (label.startsWith("Location"))
+          valueNode.textContent = " " + (payload.location ?? "--");
+
+        if (label.startsWith("Firmware"))
+          valueNode.textContent = " " + (payload.firmwareVersion ?? "--");
+
+        if (label.startsWith("Last update"))
+          valueNode.textContent = payload.ts
+            ? " " + new Date(payload.ts * 1000).toLocaleString()
+            : " --";
+
+        if (label.startsWith("RSSI"))
+          valueNode.textContent =
+            payload.rssi !== undefined
+              ? " " + payload.rssi + " dBm"
+              : " --";
+      });
+
+      /* 🟢 ONLINE BADGE */
+      const badge = card.querySelector(".badge");
+      if (badge) {
+        badge.className = "badge online";
+        badge.innerHTML =
+          `<span class="badge-dot"></span> Online – MQTT over LTE`;
       }
 
-      if (label.startsWith("Device ID"))
-        valueNode.textContent = " " + (payload.deviceId ?? "--");
-
-      if (label.startsWith("Location"))
-        valueNode.textContent = " " + (payload.location ?? "--");
-
-      if (label.startsWith("Firmware"))
-        valueNode.textContent = " " + (payload.firmwareVersion ?? "--");
-
-      if (label.startsWith("Last update"))
-        valueNode.textContent = payload.ts
-          ? " " + new Date(payload.ts * 1000).toLocaleString()
-          : " --";
-
-      if (label.startsWith("RSSI"))
-        valueNode.textContent =
-          payload.rssi !== undefined
-            ? " " + payload.rssi + " dBm"
-            : " --";
-    });
-
-    const badge = card.querySelector(".badge");
-    if (badge) {
-      badge.className = "badge online";
-      badge.innerHTML =
-        `<span class="badge-dot"></span> Online – MQTT over LTE`;
+    } catch (err) {
+      console.error("Gateway UI error:", err);
     }
   }
 
@@ -150,6 +160,9 @@ document.addEventListener("DOMContentLoaded", () => {
   ===================================================== */
   class MiniTelemetryChart {
     constructor(canvas) {
+      canvas.parentElement.style.height = "185px";
+      canvas.style.maxHeight = "100%";
+
       this.chart = new Chart(canvas.getContext("2d"), {
         type: "line",
         data: {
@@ -159,6 +172,7 @@ document.addEventListener("DOMContentLoaded", () => {
               label: "Temperature (°C)",
               data: [],
               borderColor: "#f97316",
+              backgroundColor: "#f97316",
               borderWidth: 3,
               tension: 0.25,
               pointRadius: 3,
@@ -168,6 +182,7 @@ document.addEventListener("DOMContentLoaded", () => {
               label: "Humidity (%)",
               data: [],
               borderColor: "#0f766e",
+              backgroundColor: "#0f766e",
               borderWidth: 3,
               tension: 0.25,
               pointRadius: 3,
@@ -183,13 +198,13 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    pushPoint(t, h) {
-      const time = new Date().toLocaleTimeString();
+    pushPoint(temp, hum) {
+      const t = new Date().toLocaleTimeString();
       const d = this.chart.data;
 
-      d.labels.push(time);
-      d.datasets[0].data.push(t);
-      d.datasets[1].data.push(h);
+      d.labels.push(t);
+      d.datasets[0].data.push(temp);
+      d.datasets[1].data.push(hum);
 
       if (d.labels.length > 12) {
         d.labels.shift();
@@ -200,28 +215,36 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  /* =====================================================
+     📊 INIT CHARTS
+  ===================================================== */
   const telemetryCharts = [];
   document.querySelectorAll(".telemetry-chart")
     .forEach(c => telemetryCharts.push(new MiniTelemetryChart(c)));
 
   /* =====================================================
-     📋 LATEST RECORD TABLE (ONLINE)
+     📋 LATEST RECORD TABLE (ONLINE UPDATE)
   ===================================================== */
   function updateLatestRecordTable(payload) {
     if (!payload?.dht22) return;
 
     const rows = document.querySelectorAll("table tbody tr");
 
-    payload.dht22.forEach((s, i) => {
-      const row = rows[i];
+    payload.dht22.forEach((sensor, index) => {
+      const row = rows[index];
       if (!row) return;
 
       const cells = row.querySelectorAll("td");
       if (cells.length < 4) return;
 
-      cells[1].textContent = s.temperature?.toFixed(1) ?? "NA";
-      cells[2].textContent = s.humidity?.toFixed(1) ?? "NA";
-      cells[3].textContent = new Date().toLocaleTimeString();
+      cells[1].textContent =
+        sensor.temperature?.toFixed(1) ?? "NA";
+
+      cells[2].textContent =
+        sensor.humidity?.toFixed(1) ?? "NA";
+
+      cells[3].textContent =
+        new Date().toLocaleTimeString();
     });
   }
 
@@ -229,8 +252,8 @@ document.addEventListener("DOMContentLoaded", () => {
      🧾 EVENT LOG (FULL JSON)
   ===================================================== */
   function updateEventLogFullJSON(payload) {
-    const box = document.querySelector(".log-box");
-    if (!box) return;
+    const logBox = document.querySelector(".log-box");
+    if (!logBox) return;
 
     const pre = document.createElement("pre");
     pre.className = "log-row";
@@ -238,20 +261,21 @@ document.addEventListener("DOMContentLoaded", () => {
       `${new Date().toLocaleTimeString()} — FULL TELEMETRY\n` +
       JSON.stringify(payload, null, 2);
 
-    box.prepend(pre);
-    while (box.children.length > 20) {
-      box.removeChild(box.lastChild);
+    logBox.prepend(pre);
+
+    while (logBox.children.length > 20) {
+      logBox.removeChild(logBox.lastChild);
     }
   }
 
   /* =====================================================
-     🌐 SIGNALR
+     🌐 SIGNALR CONNECTION
   ===================================================== */
   async function startSignalR() {
-    const r = await fetch(
+    const resp = await fetch(
       "https://fun-enddrave-vscode.azurewebsites.net/api/negotiate"
     );
-    const { url, accessToken } = await r.json();
+    const { url, accessToken } = await resp.json();
 
     const conn = new signalR.HubConnectionBuilder()
       .withUrl(url, { accessTokenFactory: () => accessToken })
@@ -259,15 +283,17 @@ document.addEventListener("DOMContentLoaded", () => {
       .build();
 
     conn.on("newtelemetry", payload => {
-      log("LIVE:", payload);
+      log("LIVE JSON:", payload);
 
       updateGatewayInfo(payload);
       updateLatestRecordTable(payload);
       updateEventLogFullJSON(payload);
 
-      payload?.dht22?.forEach(s => {
-        const chart = telemetryCharts[s.id];
-        if (chart) chart.pushPoint(s.temperature, s.humidity);
+      payload?.dht22?.forEach(sensor => {
+        const chart = telemetryCharts[sensor.id];
+        if (chart) {
+          chart.pushPoint(sensor.temperature, sensor.humidity);
+        }
       });
 
       payload?.doors?.forEach(d =>
@@ -276,15 +302,15 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     await conn.start();
-    console.log("🟢 SignalR connected");
+    console.log("🟢 SignalR CONNECTED");
   }
 
   /* =====================================================
-     🚀 STARTUP
+     🚀 STARTUP SEQUENCE
   ===================================================== */
-  setGatewayOffline();
-  resetGatewayFields();
-  resetLatestRecordTable();
-  resetDoorStatus();
-  startSignalR();
+  setGatewayOffline();        // 🔴 badge
+  resetGatewayFields();      // -- gateway fields
+  resetLatestRecordTable();  // -- latest record
+  resetDoorStatus();         // -- doors
+  startSignalR();            // wait for telemetry
 });
