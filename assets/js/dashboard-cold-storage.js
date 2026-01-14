@@ -16,7 +16,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const IMG_CLOSED = "assets/images/door-closed.png";
 
   function renderDoor(doorId, isOpen) {
-    const item = document.querySelector(`.door-item[data-door="${doorId}"]`);
+    const item = document.querySelector(
+      `.door-item[data-door="${doorId}"]`
+    );
     if (!item) return;
 
     const img = item.querySelector(".door-img img");
@@ -25,7 +27,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     img.src = isOpen ? IMG_OPEN : IMG_CLOSED;
     stateEl.textContent = isOpen ? "Open" : "Closed";
-    stateEl.className = isOpen ? "door-state alert" : "door-state ok";
+    stateEl.className = isOpen
+      ? "door-state alert"
+      : "door-state ok";
   }
 
   /* =====================================================
@@ -50,24 +54,41 @@ document.addEventListener("DOMContentLoaded", () => {
           li.appendChild(valueNode);
         }
 
-        if (label.startsWith("Device ID"))
+        if (label.startsWith("Device ID")) {
           valueNode.textContent = " " + (payload.deviceId ?? "NA");
+        }
 
-        if (label.startsWith("Location"))
+        if (label.startsWith("Location")) {
           valueNode.textContent = " " + (payload.location ?? "NA");
+        }
 
-        if (label.startsWith("Firmware"))
+        if (label.startsWith("Firmware")) {
           valueNode.textContent = " " + (payload.firmwareVersion ?? "NA");
+        }
 
-        if (label.startsWith("Last update"))
+        if (label.startsWith("Last update")) {
           valueNode.textContent = payload.ts
             ? " " + new Date(payload.ts * 1000).toLocaleString()
             : " NA";
+        }
 
-        if (label.startsWith("RSSI"))
+        if (label.startsWith("RSSI")) {
           valueNode.textContent =
-            payload.rssi !== undefined ? " " + payload.rssi + " dBm" : " NA";
+            payload.rssi !== undefined
+              ? " " + payload.rssi + " dBm"
+              : " NA";
+        }
       });
+
+      const badge = card.querySelector(".badge");
+      if (badge) {
+        badge.innerHTML = `
+          <span class="badge-dot"></span>
+          ${payload.status === "online"
+            ? "Online – MQTT over LTE"
+            : "Offline"}
+        `;
+      }
     } catch (err) {
       console.error("Gateway UI error:", err);
     }
@@ -86,66 +107,163 @@ document.addEventListener("DOMContentLoaded", () => {
         data: {
           labels: [],
           datasets: [
-            { label: "Temperature (°C)", data: [], borderWidth: 3 },
-            { label: "Humidity (%)", data: [], borderWidth: 3 }
+            {
+              label: "Temperature (°C)",
+              data: [],
+              borderColor: "#f97316",
+              backgroundColor: "#f97316",
+              borderWidth: 3,
+              tension: 0.25,
+              pointRadius: 3,
+              fill: false
+            },
+            {
+              label: "Humidity (%)",
+              data: [],
+              borderColor: "#0f766e",
+              backgroundColor: "#0f766e",
+              borderWidth: 3,
+              tension: 0.25,
+              pointRadius: 3,
+              fill: false
+            }
           ]
         },
-        options: { responsive: true, animation: false }
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: false,
+          layout: {
+            padding: {
+              top: 2,
+              bottom: 16
+            }
+          },
+          plugins: {
+            legend: {
+              display: true,
+              position: "top",
+              align: "start",
+              labels: {
+                boxWidth: 12,
+                boxHeight: 12,
+                padding: 10,
+                font: {
+                  size: 12,
+                  weight: "500"
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: {
+                maxTicksLimit: 6,
+                font: { size: 11 }
+              }
+            },
+            y: {
+              min: 0,
+              max: 100,
+              ticks: {
+                stepSize: 10,
+                font: { size: 11 }
+              }
+            }
+          }
+        }
       });
     }
 
     pushPoint(temp, hum) {
-      const d = this.chart.data;
-      d.labels.push(new Date().toLocaleTimeString());
-      d.datasets[0].data.push(temp);
-      d.datasets[1].data.push(hum);
+      const t = new Date().toLocaleTimeString();
+      const data = this.chart.data;
 
-      if (d.labels.length > 12) {
-        d.labels.shift();
-        d.datasets.forEach(ds => ds.data.shift());
+      data.labels.push(t);
+      data.datasets[0].data.push(temp);
+      data.datasets[1].data.push(hum);
+
+      if (data.labels.length > 12) {
+        data.labels.shift();
+        data.datasets.forEach(ds => ds.data.shift());
       }
+
       this.chart.update("none");
     }
   }
 
+  /* =====================================================
+     📊 INIT CHARTS (UNCHANGED)
+  ===================================================== */
   const telemetryCharts = [];
-  document.querySelectorAll(".telemetry-chart").forEach(c =>
-    telemetryCharts.push(new MiniTelemetryChart(c))
-  );
+  document.querySelectorAll(".telemetry-chart").forEach(canvas => {
+    telemetryCharts.push(new MiniTelemetryChart(canvas));
+  });
 
   /* =====================================================
-     📋 LATEST RECORD TABLE (FIXED + DYNAMIC)
-     👉 ONLY Temp, Hum, Time updated
+     📋 LATEST RECORD TABLE (DYNAMIC FROM JSON)
   ===================================================== */
   function updateLatestRecordTable(payload) {
-    if (!payload?.dht22) return;
-
     const tbody = document.querySelector("#latestRecordTable tbody");
-    if (!tbody) return;
+    if (!tbody || !payload?.dht22) return;
 
-    const time = new Date().toLocaleTimeString();
+    const time = payload.ts
+      ? new Date(payload.ts * 1000).toLocaleTimeString()
+      : new Date().toLocaleTimeString();
 
-    payload.dht22.forEach((sensor, index) => {
-      const row = tbody.querySelector(`tr[data-index="${index}"]`);
-      if (!row) return;
+    payload.dht22.forEach(sensor => {
+      const rowId = `th-row-${sensor.id}`;
+      let row = document.getElementById(rowId);
 
-      const cells = row.children;
+      if (!row) {
+        row = document.createElement("tr");
+        row.id = rowId;
+        row.innerHTML = `
+          <td>TH${sensor.id + 1}</td>
+          <td class="temp">NA</td>
+          <td class="hum">NA</td>
+          <td class="time">NA</td>
+        `;
+        tbody.appendChild(row);
+      }
 
-      // Temp
-      cells[1].textContent =
+      row.querySelector(".temp").textContent =
         sensor.temperature !== undefined
           ? sensor.temperature.toFixed(1)
           : "NA";
 
-      // Humidity
-      cells[2].textContent =
+      row.querySelector(".hum").textContent =
         sensor.humidity !== undefined
           ? sensor.humidity.toFixed(1)
           : "NA";
 
-      // Time
-      cells[3].textContent = time;
+      row.querySelector(".time").textContent = time;
     });
+  }
+
+  /* =====================================================
+     🧾 EVENT LOG (UNCHANGED)
+  ===================================================== */
+  function updateEventLogFullJSON(payload) {
+    const logBox = document.querySelector(".log-box");
+    if (!logBox) return;
+
+    const time = new Date().toLocaleTimeString();
+    const entry = document.createElement("pre");
+
+    entry.className = "log-row";
+    entry.style.whiteSpace = "pre-wrap";
+    entry.style.fontFamily = "monospace";
+    entry.style.fontSize = "12px";
+    entry.textContent =
+      `${time} — FULL TELEMETRY\n` +
+      JSON.stringify(payload, null, 2);
+
+    logBox.prepend(entry);
+
+    while (logBox.children.length > 10) {
+      logBox.removeChild(logBox.lastChild);
+    }
   }
 
   /* =====================================================
@@ -169,16 +287,19 @@ document.addEventListener("DOMContentLoaded", () => {
         log("LIVE JSON:", payload);
 
         updateGatewayInfo(payload);
-        updateLatestRecordTable(payload); // ✅ ONLY TABLE UPDATE
+        updateEventLogFullJSON(payload);
+        updateLatestRecordTable(payload);
 
         payload?.dht22?.forEach(sensor => {
           const chart = telemetryCharts[sensor.id];
-          if (chart) chart.pushPoint(sensor.temperature, sensor.humidity);
+          if (chart) {
+            chart.pushPoint(sensor.temperature, sensor.humidity);
+          }
         });
 
-        payload?.doors?.forEach(d =>
-          renderDoor(`D${d.id + 1}`, d.state === 1)
-        );
+        payload?.doors?.forEach(d => {
+          renderDoor(`D${d.id + 1}`, d.state === 1);
+        });
       });
 
       await conn.start();
