@@ -16,9 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const IMG_CLOSED = "assets/images/door-closed.png";
 
   function renderDoor(doorId, isOpen) {
-    const item = document.querySelector(
-      `.door-item[data-door="${doorId}"]`
-    );
+    const item = document.querySelector(`.door-item[data-door="${doorId}"]`);
     if (!item) return;
 
     const img = item.querySelector(".door-img img");
@@ -27,9 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     img.src = isOpen ? IMG_OPEN : IMG_CLOSED;
     stateEl.textContent = isOpen ? "Open" : "Closed";
-    stateEl.className = isOpen
-      ? "door-state alert"
-      : "door-state ok";
+    stateEl.className = isOpen ? "door-state alert" : "door-state ok";
   }
 
   /* =====================================================
@@ -57,21 +53,17 @@ document.addEventListener("DOMContentLoaded", () => {
         if (label.startsWith("Device ID")) {
           valueNode.textContent = " " + (payload.deviceId ?? "NA");
         }
-
         if (label.startsWith("Location")) {
           valueNode.textContent = " " + (payload.location ?? "NA");
         }
-
         if (label.startsWith("Firmware")) {
           valueNode.textContent = " " + (payload.firmwareVersion ?? "NA");
         }
-
         if (label.startsWith("Last update")) {
           valueNode.textContent = payload.ts
             ? " " + new Date(payload.ts * 1000).toLocaleString()
             : " NA";
         }
-
         if (label.startsWith("RSSI")) {
           valueNode.textContent =
             payload.rssi !== undefined
@@ -133,43 +125,9 @@ document.addEventListener("DOMContentLoaded", () => {
           responsive: true,
           maintainAspectRatio: false,
           animation: false,
-          layout: {
-            padding: {
-              top: 2,
-              bottom: 16
-            }
-          },
-          plugins: {
-            legend: {
-              display: true,
-              position: "top",
-              align: "start",
-              labels: {
-                boxWidth: 12,
-                boxHeight: 12,
-                padding: 10,
-                font: {
-                  size: 12,
-                  weight: "500"
-                }
-              }
-            }
-          },
+          plugins: { legend: { display: true } },
           scales: {
-            x: {
-              ticks: {
-                maxTicksLimit: 6,
-                font: { size: 11 }
-              }
-            },
-            y: {
-              min: 0,
-              max: 100,
-              ticks: {
-                stepSize: 10,
-                font: { size: 11 }
-              }
-            }
+            y: { min: 0, max: 100 }
           }
         }
       });
@@ -252,9 +210,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const entry = document.createElement("pre");
 
     entry.className = "log-row";
-    entry.style.whiteSpace = "pre-wrap";
-    entry.style.fontFamily = "monospace";
-    entry.style.fontSize = "12px";
     entry.textContent =
       `${time} — FULL TELEMETRY\n` +
       JSON.stringify(payload, null, 2);
