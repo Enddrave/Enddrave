@@ -141,7 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
     .forEach(c => telemetryCharts.push(new MiniTelemetryChart(c)));
 
   /* =====================================================
-     📋 LATEST RECORD TABLE (WORKING)
+     📋 LATEST RECORD TABLE (WORKING – DO NOT TOUCH)
   ===================================================== */
   function updateLatestRecordTable(payload) {
     if (!payload?.dht22) return;
@@ -167,7 +167,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =====================================================
-     🧾 EVENT LOG (RESTORED & FIXED)
+     🧾 EVENT LOG (FULL JSON – FINAL)
   ===================================================== */
   function updateEventLogFullJSON(payload) {
     const logBox = document.querySelector(".log-box");
@@ -175,15 +175,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const time = new Date().toLocaleTimeString();
 
-    payload?.dht22?.forEach(sensor => {
-      const div = document.createElement("div");
-      div.className = "log-row";
-      div.textContent =
-        `${time} — Sensor ${sensor.id} → Temp ${sensor.temperature}°C, Hum ${sensor.humidity}%`;
+    const pre = document.createElement("pre");
+    pre.className = "log-row";
+    pre.style.whiteSpace = "pre-wrap";
+    pre.style.fontFamily = "monospace";
+    pre.style.fontSize = "12px";
 
-      logBox.prepend(div);
-    });
+    pre.textContent =
+      `${time} — FULL TELEMETRY PAYLOAD\n` +
+      JSON.stringify(payload, null, 2);
 
+    logBox.prepend(pre);
+
+    // keep last 20 logs only
     while (logBox.children.length > 20) {
       logBox.removeChild(logBox.lastChild);
     }
