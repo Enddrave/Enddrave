@@ -36,9 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const card = document.querySelector(".left-column .card");
       if (!card) return;
 
-      const rows = card.querySelectorAll(".status-list li");
-
-      rows.forEach(li => {
+      card.querySelectorAll(".status-list li").forEach(li => {
         const labelEl = li.querySelector(".status-label");
         if (!labelEl) return;
 
@@ -70,8 +68,8 @@ document.addEventListener("DOMContentLoaded", () => {
               ? " " + payload.rssi + " dBm"
               : " NA";
       });
-    } catch (err) {
-      console.error("Gateway UI error:", err);
+    } catch (e) {
+      console.error(e);
     }
   }
 
@@ -113,36 +111,22 @@ document.addEventListener("DOMContentLoaded", () => {
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          animation: false,
-          layout: {
-            padding: { top: 2, bottom: 16 }
-          },
-          plugins: {
-            legend: {
-              display: true,
-              position: "top",
-              align: "start"
-            }
-          },
-          scales: {
-            x: { ticks: { maxTicksLimit: 6 } },
-            y: { min: 0, max: 100 }
-          }
+          animation: false
         }
       });
     }
 
     pushPoint(temp, hum) {
       const t = new Date().toLocaleTimeString();
-      const data = this.chart.data;
+      const d = this.chart.data;
 
-      data.labels.push(t);
-      data.datasets[0].data.push(temp);
-      data.datasets[1].data.push(hum);
+      d.labels.push(t);
+      d.datasets[0].data.push(temp);
+      d.datasets[1].data.push(hum);
 
-      if (data.labels.length > 12) {
-        data.labels.shift();
-        data.datasets.forEach(ds => ds.data.shift());
+      if (d.labels.length > 12) {
+        d.labels.shift();
+        d.datasets.forEach(ds => ds.data.shift());
       }
 
       this.chart.update("none");
@@ -153,67 +137,36 @@ document.addEventListener("DOMContentLoaded", () => {
      📊 INIT CHARTS
   ===================================================== */
   const telemetryCharts = [];
-  document.querySelectorAll(".telemetry-chart").forEach(canvas => {
-    telemetryCharts.push(new MiniTelemetryChart(canvas));
-  });
+  document.querySelectorAll(".telemetry-chart")
+    .forEach(c => telemetryCharts.push(new MiniTelemetryChart(c)));
 
   /* =====================================================
-     📋 LATEST RECORD TABLE (✅ FINAL FIX)
+     📋 LATEST RECORD TABLE (🔥 REAL FIX)
   ===================================================== */
   function updateLatestRecordTable(payload) {
-    const tbody = document.querySelector("#latestRecordTable tbody");
-    if (!tbody || !payload?.dht22) return;
+    if (!payload?.dht22) return;
 
-    payload.dht22.forEach(sensor => {
-      const rowId = `th-row-${sensor.id}`;
-      let row = document.getElementById(rowId);
+    // Find the visible Latest Record table
+    const rows = document.querySelectorAll(
+      "table tbody tr"
+    );
 
-      if (!row) {
-        row = document.createElement("tr");
-        row.id = rowId;
-        row.innerHTML = `
-          <td>TH${sensor.id + 1}</td>
-          <td class="temp">NA</td>
-          <td class="hum">NA</td>
-          <td class="time">NA</td>
-        `;
-        tbody.appendChild(row);
-      }
+    payload.dht22.forEach((sensor, index) => {
+      const row = rows[index];
+      if (!row) return;
 
-      row.querySelector(".temp").textContent =
-        sensor.temperature !== undefined
-          ? sensor.temperature.toFixed(1)
-          : "NA";
+      const cells = row.querySelectorAll("td");
+      if (cells.length < 4) return;
 
-      row.querySelector(".hum").textContent =
-        sensor.humidity !== undefined
-          ? sensor.humidity.toFixed(1)
-          : "NA";
+      cells[1].textContent =
+        sensor.temperature?.toFixed(1) ?? "NA";
 
-      // 👇 THIS is the real dynamic update
-      row.querySelector(".time").textContent =
+      cells[2].textContent =
+        sensor.humidity?.toFixed(1) ?? "NA";
+
+      cells[3].textContent =
         new Date().toLocaleTimeString();
     });
-  }
-
-  /* =====================================================
-     🧾 EVENT LOG (UNCHANGED)
-  ===================================================== */
-  function updateEventLogFullJSON(payload) {
-    const logBox = document.querySelector(".log-box");
-    if (!logBox) return;
-
-    const entry = document.createElement("pre");
-    entry.className = "log-row";
-    entry.textContent =
-      `${new Date().toLocaleTimeString()} — FULL TELEMETRY\n` +
-      JSON.stringify(payload, null, 2);
-
-    logBox.prepend(entry);
-
-    while (logBox.children.length > 10) {
-      logBox.removeChild(logBox.lastChild);
-    }
   }
 
   /* =====================================================
@@ -234,7 +187,6 @@ document.addEventListener("DOMContentLoaded", () => {
       log("LIVE JSON:", payload);
 
       updateGatewayInfo(payload);
-      updateEventLogFullJSON(payload);
       updateLatestRecordTable(payload);
 
       payload?.dht22?.forEach(sensor => {
@@ -244,9 +196,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       });
 
-      payload?.doors?.forEach(d => {
-        renderDoor(`D${d.id + 1}`, d.state === 1);
-      });
+      payload?.doors?.forEach(d =>
+        renderDoor(`D${d.id + 1}`, d.state === 1)
+      );
     });
 
     await conn.start();
