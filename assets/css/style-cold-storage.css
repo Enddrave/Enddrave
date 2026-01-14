@@ -1,4 +1,3 @@
-
 :root{
 --bg:#f5f5ef;
 --card:#ffffff;
@@ -57,19 +56,13 @@ max-width:1200px;
 margin:0 auto 40px;
 }
 
-/* main grid below */
 .main-grid{
 display:grid;
 grid-template-columns:300px minmax(0,1fr);
 gap:18px;
 }
 
-.left-column{
-display:flex;
-flex-direction:column;
-gap:16px;
-}
-
+.left-column,
 .right-column{
 display:flex;
 flex-direction:column;
@@ -83,7 +76,8 @@ gap:16px;
 }
 
 /* ===== CARD ===== */
-.card{
+.card,
+.card-soft{
 background:var(--card);
 border-radius:18px;
 border:1px solid var(--border);
@@ -92,11 +86,7 @@ padding:16px 18px;
 }
 
 .card-soft{
-background:var(--card-soft);
-border-radius:18px;
-border:1px solid var(--border);
 box-shadow:0 10px 22px rgba(15,23,42,0.05);
-padding:16px 18px;
 }
 
 .card-title{
@@ -132,6 +122,7 @@ font-size:13px;
 .status-list li{margin-bottom:4px;}
 .status-label{color:var(--muted);}
 
+/* badge base */
 .badge{
 display:inline-flex;
 align-items:center;
@@ -140,13 +131,31 @@ font-size:12px;
 margin-top:10px;
 padding:4px 10px;
 border-radius:999px;
-background:#ecfdf5;
-color:#15803d;
+font-weight:500;
 }
+
+/* dot base */
 .badge-dot{
 width:8px;
 height:8px;
 border-radius:50%;
+}
+
+/* 🔴 OFFLINE */
+.badge.offline{
+background:#fef2f2;
+color:var(--red);
+}
+.badge.offline .badge-dot{
+background:var(--red);
+}
+
+/* 🟢 ONLINE */
+.badge.online{
+background:#ecfdf5;
+color:#15803d;
+}
+.badge.online .badge-dot{
 background:#22c55e;
 }
 
@@ -161,7 +170,9 @@ margin-top:10px;
 display:flex;
 align-items:center;
 gap:10px;
+transition:transform .2s ease;
 }
+.door-item:hover{transform:translateX(2px);}
 .door-image{
 width:56px;
 height:56px;
@@ -185,6 +196,8 @@ color:var(--muted);
 font-size:13px;
 margin-top:2px;
 }
+.door-state.ok{color:#2563eb;font-weight:500;}
+.door-state.alert{color:#dc2626;font-weight:600;}
 
 /* ===== THD TELEMETRY MINI CHARTS ===== */
 .env-grid{
@@ -217,6 +230,7 @@ gap:14px;
 margin-top:14px;
 }
 
+/* ===== TABLE ===== */
 table{
 width:100%;
 border-collapse:collapse;
@@ -232,8 +246,9 @@ color:var(--muted);
 font-weight:500;
 }
 
+/* ===== EVENT LOG ===== */
 .log-box{
-padding-top: 0px !important;
+padding-top:0;
 max-height:214px;
 overflow-y:auto;
 border-radius:12px;
@@ -245,6 +260,8 @@ padding:7px 9px;
 border-bottom:1px solid #f3f4f6;
 font-size:12px;
 color:var(--muted);
+white-space:pre-wrap;
+font-family:monospace;
 }
 
 /* ===== BATTERY INFO ===== */
@@ -290,95 +307,21 @@ height:100%;
 border-radius:999px;
 }
 
-/* SOC semicircle */
-.soc-wrap{
-position:relative;
-width:200px;
-margin:8px auto 0;
-}
-.soc-value{
-position:absolute;
-bottom:8px;
-width:100%;
-text-align:center;
-font-size:22px;
-font-weight:600;
-}
-
-/* Errors */
-.error-table th:nth-child(1){width:90px;}
-.bad{color:var(--red)}
-.ok{color:var(--green)}
-.warn{color:var(--amber)}
-
-/* thermal pills */
-.pill{
-display:inline-flex;
-align-items:center;
-gap:6px;
-padding:4px 10px;
-border-radius:999px;
-border:1px solid var(--border);
-font-size:11px;
-color:var(--muted);
-background:#ffffff;
-}
-.pill-dot{
-width:6px;
-height:6px;
-border-radius:50%;
-background:#16a34a;
-}
-
 /* ===== RESPONSIVE ===== */
 @media(max-width:900px){
-body{
-padding:20px 14px 28px;
-}
-.page-header{
-flex-direction:column;
-align-items:flex-start;
-}
-.page-title{
-font-size:16px;
-}
-.main-grid{
-grid-template-columns:1fr;
-}
-.battery-row{
-grid-template-columns:1fr;
-}
-.env-bottom{
-grid-template-columns:1fr;
-}
+body{padding:20px 14px 28px;}
+.page-header{flex-direction:column;align-items:flex-start;}
+.page-title{font-size:16px;}
+.main-grid,
+.battery-row,
+.env-bottom{grid-template-columns:1fr;}
 }
 
 @media(max-width:520px){
-body{
-padding:16px 10px 24px;
+body{padding:16px 10px 24px;}
+.page-title{font-size:14px;letter-spacing:.06em;}
+.card,.card-soft{padding:14px;border-radius:14px;}
+.page-pill{font-size:10px;text-align:center;}
+.summary-value{font-size:24px;}
+.value{font-size:20px;}
 }
-.page-title{
-font-size:14px;
-letter-spacing:.06em;
-}
-.card, .card-soft{
-padding:14px 14px;
-border-radius:14px;
-}
-.page-pill{
-align-self:stretch;
-text-align:center;
-font-size:10px;
-}
-.summary-value{
-font-size:24px;
-}
-.value{
-font-size:20px;
-}
-}
-/* ===== DOOR STATE CALIBRATION ===== */
-.door-state.ok{color:#2563eb;font-weight:500;}
-.door-state.alert{color:#dc2626;font-weight:600;}
-.door-item{transition:transform .2s ease;}
-.door-item:hover{transform:translateX(2px);}
