@@ -79,17 +79,27 @@ document.addEventListener("DOMContentLoaded", () => {
   class MiniTelemetryChart {
     constructor(canvas) {
       canvas.parentElement.style.height = "185px";
+      canvas.style.maxHeight = "100%";
+
       this.chart = new Chart(canvas.getContext("2d"), {
         type: "line",
-        data: { labels: [], datasets: [{ data: [] }, { data: [] }] },
-        options: { animation: false }
+        data: {
+          labels: [],
+          datasets: [
+            { label: "Temperature (°C)", data: [], borderWidth: 3 },
+            { label: "Humidity (%)", data: [], borderWidth: 3 }
+          ]
+        },
+        options: { responsive: true, animation: false }
       });
     }
-    pushPoint(t, h) {
+
+    pushPoint(temp, hum) {
       const d = this.chart.data;
       d.labels.push(new Date().toLocaleTimeString());
-      d.datasets[0].data.push(t);
-      d.datasets[1].data.push(h);
+      d.datasets[0].data.push(temp);
+      d.datasets[1].data.push(hum);
+
       if (d.labels.length > 12) {
         d.labels.shift();
         d.datasets.forEach(ds => ds.data.shift());
@@ -104,7 +114,8 @@ document.addEventListener("DOMContentLoaded", () => {
   );
 
   /* =====================================================
-     📋 LATEST RECORD TABLE – CORRECT FIX
+     📋 LATEST RECORD TABLE (FIXED + DYNAMIC)
+     👉 ONLY Temp, Hum, Time updated
   ===================================================== */
   function updateLatestRecordTable(payload) {
     if (!payload?.dht22) return;
@@ -120,17 +131,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const cells = row.children;
 
-      // Update ONLY required fields
+      // Temp
       cells[1].textContent =
         sensor.temperature !== undefined
           ? sensor.temperature.toFixed(1)
           : "NA";
 
+      // Humidity
       cells[2].textContent =
         sensor.humidity !== undefined
           ? sensor.humidity.toFixed(1)
           : "NA";
 
+      // Time
       cells[3].textContent = time;
     });
   }
@@ -143,6 +156,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const resp = await fetch(
         "https://fun-enddrave-vscode.azurewebsites.net/api/negotiate"
       );
+      if (!resp.ok) throw new Error("Negotiate failed");
+
       const { url, accessToken } = await resp.json();
 
       const conn = new signalR.HubConnectionBuilder()
@@ -154,7 +169,7 @@ document.addEventListener("DOMContentLoaded", () => {
         log("LIVE JSON:", payload);
 
         updateGatewayInfo(payload);
-        updateLatestRecordTable(payload);
+        updateLatestRecordTable(payload); // ✅ ONLY TABLE UPDATE
 
         payload?.dht22?.forEach(sensor => {
           const chart = telemetryCharts[sensor.id];
