@@ -22,7 +22,7 @@ font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,s
 color:var(--text);
 }
 
-/* ===== PAGE HEADER ===== */
+/* page title */
 .page-header{
 max-width:1200px;
 margin:24px auto 20px;
@@ -76,19 +76,17 @@ gap:16px;
 }
 
 /* ===== CARD ===== */
-.card{
+.card,
+.card-soft{
 background:var(--card);
 border-radius:18px;
 border:1px solid var(--border);
 box-shadow:0 12px 25px rgba(15,23,42,0.06);
 padding:16px 18px;
 }
+
 .card-soft{
-background:var(--card-soft);
-border-radius:18px;
-border:1px solid var(--border);
 box-shadow:0 10px 22px rgba(15,23,42,0.05);
-padding:16px 18px;
 }
 
 .card-title{
@@ -99,12 +97,13 @@ text-transform:uppercase;
 color:var(--muted);
 margin-bottom:8px;
 }
+
 .card-sub{
 font-size:12px;
 color:var(--muted);
 }
 
-/* ===== SUMMARY ===== */
+/* ===== SUMMARY VALUE ===== */
 .summary-value{
 font-size:28px;
 font-weight:600;
@@ -123,62 +122,41 @@ font-size:13px;
 .status-list li{margin-bottom:4px;}
 .status-label{color:var(--muted);}
 
-/* --- Badge Base --- */
+/* badge base */
 .badge{
 display:inline-flex;
 align-items:center;
-gap:8px;
-font-size:13px;
-margin-top:12px;
-padding:6px 14px;
+gap:6px;
+font-size:12px;
+margin-top:10px;
+padding:4px 10px;
 border-radius:999px;
-font-weight:600;
-letter-spacing:.02em;
-transition:all .25s ease;
+font-weight:500;
 }
 
-/* --- Dot Base --- */
+/* dot base */
 .badge-dot{
-width:10px;
-height:10px;
+width:8px;
+height:8px;
 border-radius:50%;
-flex-shrink:0;
 }
 
 /* 🔴 OFFLINE */
 .badge.offline{
-background:rgba(220,38,38,0.12);
-color:#b91c1c;
-border:1px solid rgba(220,38,38,0.35);
-box-shadow:
-  0 0 0 3px rgba(220,38,38,0.08),
-  0 6px 14px rgba(220,38,38,0.25);
+background:#fef2f2;
+color:var(--red);
 }
 .badge.offline .badge-dot{
-background:#dc2626;
-box-shadow:0 0 0 4px rgba(220,38,38,0.25);
-animation:pulse-red 1.6s infinite;
+background:var(--red);
 }
 
 /* 🟢 ONLINE */
 .badge.online{
-background:rgba(34,197,94,0.12);
+background:#ecfdf5;
 color:#15803d;
-border:1px solid rgba(34,197,94,0.35);
-box-shadow:
-  0 0 0 3px rgba(34,197,94,0.08),
-  0 6px 14px rgba(34,197,94,0.25);
 }
 .badge.online .badge-dot{
 background:#22c55e;
-box-shadow:0 0 0 4px rgba(34,197,94,0.25);
-}
-
-/* pulse animation */
-@keyframes pulse-red{
-0%{box-shadow:0 0 0 0 rgba(220,38,38,.45);}
-70%{box-shadow:0 0 0 10px rgba(220,38,38,0);}
-100%{box-shadow:0 0 0 0 rgba(220,38,38,0);}
 }
 
 /* ===== DOORS ===== */
@@ -221,7 +199,7 @@ margin-top:2px;
 .door-state.ok{color:#2563eb;font-weight:500;}
 .door-state.alert{color:#dc2626;font-weight:600;}
 
-/* ===== TELEMETRY MINI CHARTS ===== */
+/* ===== THD TELEMETRY MINI CHARTS ===== */
 .env-grid{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
@@ -243,6 +221,13 @@ margin-bottom:6px;
 width:100%;
 height:120px;
 display:block;
+}
+
+.env-bottom{
+display:grid;
+grid-template-columns:1.2fr minmax(0,1.6fr);
+gap:14px;
+margin-top:14px;
 }
 
 /* ===== TABLE ===== */
@@ -279,13 +264,57 @@ white-space:pre-wrap;
 font-family:monospace;
 }
 
+/* ===== BATTERY INFO ===== */
+.section-title{
+font-size:13px;
+font-weight:600;
+letter-spacing:.18em;
+text-transform:uppercase;
+color:var(--muted);
+margin-bottom:6px;
+}
+.section-sub{
+font-size:12px;
+color:var(--muted);
+margin-bottom:10px;
+}
+
+.grid-small{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+gap:12px;
+margin-top:10px;
+}
+
+.value{
+font-size:24px;
+font-weight:600;
+}
+.unit{
+font-size:12px;
+color:var(--muted);
+}
+
+.bar{
+height:6px;
+background:#f3f4f6;
+border-radius:999px;
+overflow:hidden;
+margin-top:8px;
+}
+.fill{
+height:100%;
+border-radius:999px;
+}
+
 /* ===== RESPONSIVE ===== */
 @media(max-width:900px){
 body{padding:20px 14px 28px;}
 .page-header{flex-direction:column;align-items:flex-start;}
 .page-title{font-size:16px;}
 .main-grid,
-.battery-row{grid-template-columns:1fr;}
+.battery-row,
+.env-bottom{grid-template-columns:1fr;}
 }
 
 @media(max-width:520px){
@@ -294,4 +323,5 @@ body{padding:16px 10px 24px;}
 .card,.card-soft{padding:14px;border-radius:14px;}
 .page-pill{font-size:10px;text-align:center;}
 .summary-value{font-size:24px;}
+.value{font-size:20px;}
 }
