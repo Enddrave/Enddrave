@@ -10,7 +10,7 @@ const log = (...args) => DEBUG && console.log(...args);
 document.addEventListener("DOMContentLoaded", () => {
 
   /* =====================================================
-     🔴 DEFAULT OFFLINE STATE (PAGE LOAD)
+     🔴 DEFAULT OFFLINE STATE (BADGE)
   ===================================================== */
   function setGatewayOffline() {
     const badge = document.querySelector(".badge");
@@ -38,6 +38,23 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         valueNode.textContent = " --";
       }
+    });
+  }
+
+  /* =====================================================
+     🔴 RESET LATEST RECORD TABLE (OFFLINE)
+  ===================================================== */
+  function resetLatestRecordTable() {
+    const rows = document.querySelectorAll("table tbody tr");
+    if (!rows.length) return;
+
+    rows.forEach(row => {
+      const cells = row.querySelectorAll("td");
+      if (cells.length < 4) return;
+
+      cells[1].textContent = "--"; // Temp
+      cells[2].textContent = "--"; // Hum
+      cells[3].textContent = "--"; // Time
     });
   }
 
@@ -76,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
         let valueNode = labelEl.nextSibling;
 
         if (!valueNode || valueNode.nodeType !== Node.TEXT_NODE) {
-          valueNode = document.createTextNode(" NA");
+          valueNode = document.createTextNode(" --");
           li.appendChild(valueNode);
         }
 
@@ -182,7 +199,7 @@ document.addEventListener("DOMContentLoaded", () => {
     .forEach(c => telemetryCharts.push(new MiniTelemetryChart(c)));
 
   /* =====================================================
-     📋 LATEST RECORD TABLE (WORKING)
+     📋 LATEST RECORD TABLE (ONLINE UPDATE)
   ===================================================== */
   function updateLatestRecordTable(payload) {
     if (!payload?.dht22) return;
@@ -267,7 +284,8 @@ document.addEventListener("DOMContentLoaded", () => {
   /* =====================================================
      🚀 STARTUP SEQUENCE
   ===================================================== */
-  setGatewayOffline();    // 🔴 default offline
-  resetGatewayFields();  // -- values
-  startSignalR();        // wait for data
+  setGatewayOffline();        // 🔴 badge
+  resetGatewayFields();      // -- gateway fields
+  resetLatestRecordTable();  // -- latest record table
+  startSignalR();            // wait for telemetry
 });
