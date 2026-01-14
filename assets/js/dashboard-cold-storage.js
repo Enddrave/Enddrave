@@ -59,6 +59,28 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =====================================================
+     🔴 RESET DOOR STATUS (OFFLINE)
+  ===================================================== */
+  function resetDoorStatus() {
+    document.querySelectorAll(".door-item").forEach(item => {
+      const img = item.querySelector(".door-img img");
+      const stateEl = item.querySelector(".door-state");
+
+      if (img) {
+        img.src = "assets/images/door-closed.png"; // neutral
+        img.style.opacity = "0.4";                 // dim
+      }
+
+      if (stateEl) {
+        stateEl.textContent = "--";
+        stateEl.className = "door-state";
+        stateEl.style.color = "#9ca3af";
+        stateEl.style.fontWeight = "500";
+      }
+    });
+  }
+
+  /* =====================================================
      🚪 DOOR CONFIG
   ===================================================== */
   const IMG_OPEN = "assets/images/door-open.png";
@@ -73,6 +95,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!img || !stateEl) return;
 
     img.src = isOpen ? IMG_OPEN : IMG_CLOSED;
+    img.style.opacity = "1"; // restore from offline
+
     stateEl.textContent = isOpen ? "Open" : "Closed";
     stateEl.className = isOpen ? "door-state alert" : "door-state ok";
   }
@@ -286,6 +310,7 @@ document.addEventListener("DOMContentLoaded", () => {
   ===================================================== */
   setGatewayOffline();        // 🔴 badge
   resetGatewayFields();      // -- gateway fields
-  resetLatestRecordTable();  // -- latest record table
+  resetLatestRecordTable();  // -- latest record
+  resetDoorStatus();         // -- doors
   startSignalR();            // wait for telemetry
 });
