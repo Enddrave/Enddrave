@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
               : " NA";
       });
     } catch (e) {
-      console.error(e);
+      console.error("Gateway UI error:", e);
     }
   }
 
@@ -141,15 +141,12 @@ document.addEventListener("DOMContentLoaded", () => {
     .forEach(c => telemetryCharts.push(new MiniTelemetryChart(c)));
 
   /* =====================================================
-     📋 LATEST RECORD TABLE (🔥 REAL FIX)
+     📋 LATEST RECORD TABLE (WORKING)
   ===================================================== */
   function updateLatestRecordTable(payload) {
     if (!payload?.dht22) return;
 
-    // Find the visible Latest Record table
-    const rows = document.querySelectorAll(
-      "table tbody tr"
-    );
+    const rows = document.querySelectorAll("table tbody tr");
 
     payload.dht22.forEach((sensor, index) => {
       const row = rows[index];
@@ -167,6 +164,29 @@ document.addEventListener("DOMContentLoaded", () => {
       cells[3].textContent =
         new Date().toLocaleTimeString();
     });
+  }
+
+  /* =====================================================
+     🧾 EVENT LOG (RESTORED & FIXED)
+  ===================================================== */
+  function updateEventLogFullJSON(payload) {
+    const logBox = document.querySelector(".log-box");
+    if (!logBox) return;
+
+    const time = new Date().toLocaleTimeString();
+
+    payload?.dht22?.forEach(sensor => {
+      const div = document.createElement("div");
+      div.className = "log-row";
+      div.textContent =
+        `${time} — Sensor ${sensor.id} → Temp ${sensor.temperature}°C, Hum ${sensor.humidity}%`;
+
+      logBox.prepend(div);
+    });
+
+    while (logBox.children.length > 20) {
+      logBox.removeChild(logBox.lastChild);
+    }
   }
 
   /* =====================================================
@@ -188,6 +208,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       updateGatewayInfo(payload);
       updateLatestRecordTable(payload);
+      updateEventLogFullJSON(payload);
 
       payload?.dht22?.forEach(sensor => {
         const chart = telemetryCharts[sensor.id];
