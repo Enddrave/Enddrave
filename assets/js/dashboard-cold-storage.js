@@ -201,6 +201,31 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /* =====================================================
+     📋 LATEST RECORD TABLE (FIXED TH1–TH5)
+  ===================================================== */
+  function updateLatestRecordTable(payload) {
+    const tbody = document.querySelector("#latestRecordTable tbody");
+    if (!tbody) return;
+
+    tbody.innerHTML = "";
+
+    const time = new Date().toLocaleTimeString();
+
+    for (let i = 0; i < 5; i++) {
+      const sensor = payload?.dht22?.[i];
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>TH${i + 1}</td>
+        <td>${sensor?.temperature?.toFixed(1) ?? "NA"}</td>
+        <td>${sensor?.humidity?.toFixed(1) ?? "NA"}</td>
+        <td>${time}</td>
+      `;
+      tbody.appendChild(tr);
+    }
+  }
+
+  /* =====================================================
      🧾 EVENT LOG (UNCHANGED)
   ===================================================== */
   function updateEventLogFullJSON(payload) {
@@ -247,6 +272,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         updateGatewayInfo(payload);
         updateEventLogFullJSON(payload);
+        updateLatestRecordTable(payload);
 
         payload?.dht22?.forEach(sensor => {
           const chart = telemetryCharts[sensor.id];
