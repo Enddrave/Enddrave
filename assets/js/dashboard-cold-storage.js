@@ -52,9 +52,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const cells = row.querySelectorAll("td");
       if (cells.length < 4) return;
 
-      cells[1].textContent = "--"; // Temp
-      cells[2].textContent = "--"; // Hum
-      cells[3].textContent = "--"; // Time
+      cells[1].textContent = "--";
+      cells[2].textContent = "--";
+      cells[3].textContent = "--";
     });
   }
 
@@ -67,8 +67,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const stateEl = item.querySelector(".door-state");
 
       if (img) {
-        img.src = "assets/images/door-closed.png"; // neutral
-        img.style.opacity = "0.4";                 // dim
+        img.src = "assets/images/door-closed.png";
+        img.style.opacity = "0.4";
       }
 
       if (stateEl) {
@@ -95,14 +95,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!img || !stateEl) return;
 
     img.src = isOpen ? IMG_OPEN : IMG_CLOSED;
-    img.style.opacity = "1"; // restore from offline
-
+    img.style.opacity = "1";
     stateEl.textContent = isOpen ? "Open" : "Closed";
     stateEl.className = isOpen ? "door-state alert" : "door-state ok";
   }
 
   /* =====================================================
-     🛰️ GATEWAY & CONNECTIVITY (ONLINE UPDATE)
+     🛰️ GATEWAY & CONNECTIVITY
   ===================================================== */
   function updateGatewayInfo(payload) {
     try {
@@ -134,35 +133,24 @@ document.addEventListener("DOMContentLoaded", () => {
           valueNode.textContent = payload.ts
             ? " " + new Date(payload.ts * 1000).toLocaleString()
             : " --";
-
-        if (label.startsWith("RSSI"))
-          valueNode.textContent =
-            payload.rssi !== undefined
-              ? " " + payload.rssi + " dBm"
-              : " --";
       });
 
-      /* 🟢 ONLINE BADGE */
       const badge = card.querySelector(".badge");
       if (badge) {
         badge.className = "badge online";
-        badge.innerHTML =
-          `<span class="badge-dot"></span> Online – MQTT over LTE`;
+        badge.innerHTML = `<span class="badge-dot"></span> Online – MQTT over LTE`;
       }
-
     } catch (err) {
       console.error("Gateway UI error:", err);
     }
   }
 
   /* =====================================================
-     📈 MINI TELEMETRY CHARTS (UNCHANGED)
+     📈 MINI TELEMETRY CHARTS (THD)
   ===================================================== */
   class MiniTelemetryChart {
     constructor(canvas) {
-      
       canvas.parentElement.style.height = "200px";
-      //canvas.parentElement.style.height = "auto";
       canvas.style.maxHeight = "100%";
 
       this.chart = new Chart(canvas.getContext("2d"), {
@@ -174,37 +162,24 @@ document.addEventListener("DOMContentLoaded", () => {
               label: "Temperature (°C)",
               data: [],
               borderColor: "#f97316",
-              backgroundColor: "#f97316",
               borderWidth: 3,
               tension: 0.25,
-              pointRadius: 3,
-              fill: false
+              pointRadius: 3
             },
             {
               label: "Humidity (%)",
               data: [],
               borderColor: "#0f766e",
-              backgroundColor: "#0f766e",
               borderWidth: 3,
               tension: 0.25,
-              pointRadius: 3,
-              fill: false
+              pointRadius: 3
             }
           ]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          animation: false,
-         plugins: {
-            legend: {
-               labels: {
-                  boxWidth: 10,   // width of legend marker
-                  boxHeight: 10,  // height of legend marker (same = square)
-                  padding: 12
-               }
-            }
-         }
+          animation: false
         }
       });
     }
@@ -227,72 +202,128 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =====================================================
-     📊 INIT CHARTS
+     🚨 ANOMALY SCORE CHART
   ===================================================== */
-  const telemetryCharts = [];
-  document.querySelectorAll(".telemetry-chart")
-    .forEach(c => telemetryCharts.push(new MiniTelemetryChart(c)));
+  class AnomalyScoreChart {
+    constructor(canvas) {
+      canvas.parentElement.style.height = "200px";
+
+      this.chart = new Chart(canvas.getContext("2d"), {
+        type: "line",
+        data: {
+          labels: [],
+          datasets: [{
+            data: [],
+            borderColor: "#f97316",
+            borderWidth: 3,
+            tension: 0.3,
+            pointRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { min: 0, max: 1, ticks: { stepSize: 0.2 } },
+            x: { grid: { display: false } }
+          }
+        },
+        plugins: [{
+          id: "riskBands",
+          beforeDraw(chart) {
+            const { ctx, chartArea, scales } = chart;
+            if (!chartArea) return;
+            const y = scales.y;
+
+            [
+              { from: 0.0, to: 0.4, c: "rgba(34,197,94,0.15)" },
+              { from: 0.4, to: 0.7, c: "rgba(234,179,8,0.18)" },
+              { from: 0.7, to: 1.0, c: "rgba(239,68,68,0.18)" }
+            ].forEach(b => {
+              ctx.fillStyle = b.c;
+              ctx.fillRect(
+                chartArea.left,
+                y.getPixelForValue(b.to),
+                chartArea.right - chartArea.left,
+                y.getPixelForValue(b.from) - y.getPixelForValue(b.to)
+              );
+            });
+          }
+        }]
+      });
+    }
+
+    push(score) {
+      const d = this.chart.data;
+      d.labels.push(new Date().toLocaleTimeString());
+      d.datasets[0].data.push(score);
+
+      if (d.labels.length > 12) {
+        d.labels.shift();
+        d.datasets[0].data.shift();
+      }
+      this.chart.update("none");
+    }
+  }
 
   /* =====================================================
-     📋 LATEST RECORD TABLE (ONLINE UPDATE)
+     📊 INIT CHARTS
+  ===================================================== */
+  const canvases = document.querySelectorAll(".telemetry-chart");
+  const telemetryCharts = [];
+
+  canvases.forEach((c, i) => {
+    if (i < canvases.length - 1) {
+      telemetryCharts.push(new MiniTelemetryChart(c));
+    }
+  });
+
+  const anomalyChart = new AnomalyScoreChart(
+    canvases[canvases.length - 1]
+  );
+
+  /* =====================================================
+     📋 LATEST RECORD TABLE
   ===================================================== */
   function updateLatestRecordTable(payload) {
     if (!payload?.dht22) return;
-
     const rows = document.querySelectorAll("table tbody tr");
 
     payload.dht22.forEach((sensor, index) => {
       const row = rows[index];
       if (!row) return;
-
       const cells = row.querySelectorAll("td");
-      if (cells.length < 4) return;
-
-      cells[1].textContent =
-        sensor.temperature?.toFixed(1) ?? "NA";
-
-      cells[2].textContent =
-        sensor.humidity?.toFixed(1) ?? "NA";
-
-      cells[3].textContent =
-        new Date().toLocaleTimeString();
+      cells[1].textContent = sensor.temperature?.toFixed(1) ?? "NA";
+      cells[2].textContent = sensor.humidity?.toFixed(1) ?? "NA";
+      cells[3].textContent = new Date().toLocaleTimeString();
     });
   }
 
   /* =====================================================
-     🧾 EVENT LOG (FULL JSON)
+     🧾 EVENT LOG
   ===================================================== */
-function updateEventLogFullJSON(payload) {
-  const logBox = document.querySelector(".log-box");
-  if (!logBox) return;
+  function updateEventLogFullJSON(payload) {
+    const logBox = document.querySelector(".log-box");
+    if (!logBox) return;
+    if (!payload || payload.status !== "online") {
+      logBox.innerHTML = "";
+      return;
+    }
 
-  /* ❌ CLEAR LOG IF NO DATA OR DEVICE OFFLINE */
-  if (
-    !payload ||
-    payload.status !== "online" ||
-    !payload.dht22 ||
-    payload.dht22.length === 0
-  ) {
-    logBox.innerHTML = "";   // 🧹 keep empty
-    return;
+    const pre = document.createElement("pre");
+    pre.textContent =
+      `${new Date().toLocaleTimeString()} — FULL TELEMETRY\n` +
+      JSON.stringify(payload, null, 2);
+
+    logBox.prepend(pre);
+    while (logBox.children.length > 20) {
+      logBox.removeChild(logBox.lastChild);
+    }
   }
 
-  /* ✅ VALID LIVE DATA → SHOW LOG */
-  const pre = document.createElement("pre");
-  pre.className = "log-row";
-  pre.textContent =
-    `${new Date().toLocaleTimeString()} — FULL TELEMETRY\n` +
-    JSON.stringify(payload, null, 2);
-
-  logBox.prepend(pre);
-
-  /* 🔄 LIMIT TO LAST 20 ENTRIES */
-  while (logBox.children.length > 20) {
-    logBox.removeChild(logBox.lastChild);
-  }
-}
   /* =====================================================
-     🌐 SIGNALR CONNECTION
+     🌐 SIGNALR
   ===================================================== */
   async function startSignalR() {
     const resp = await fetch(
@@ -306,18 +337,18 @@ function updateEventLogFullJSON(payload) {
       .build();
 
     conn.on("newtelemetry", payload => {
-      log("LIVE JSON:", payload);
-
       updateGatewayInfo(payload);
       updateLatestRecordTable(payload);
       updateEventLogFullJSON(payload);
 
       payload?.dht22?.forEach(sensor => {
         const chart = telemetryCharts[sensor.id];
-        if (chart) {
-          chart.pushPoint(sensor.temperature, sensor.humidity);
-        }
+        if (chart) chart.pushPoint(sensor.temperature, sensor.humidity);
       });
+
+      if (payload?.abnormality?.score !== undefined) {
+        anomalyChart.push(payload.abnormality.score);
+      }
 
       payload?.doors?.forEach(d =>
         renderDoor(`D${d.id + 1}`, d.state === 1)
@@ -325,15 +356,14 @@ function updateEventLogFullJSON(payload) {
     });
 
     await conn.start();
-    console.log("🟢 SignalR CONNECTED");
   }
 
   /* =====================================================
-     🚀 STARTUP SEQUENCE
+     🚀 START
   ===================================================== */
-  setGatewayOffline();        // 🔴 badge
-  resetGatewayFields();      // -- gateway fields
-  resetLatestRecordTable();  // -- latest record
-  resetDoorStatus();         // -- doors
-  startSignalR();            // wait for telemetry
+  setGatewayOffline();
+  resetGatewayFields();
+  resetLatestRecordTable();
+  resetDoorStatus();
+  startSignalR();
 });
