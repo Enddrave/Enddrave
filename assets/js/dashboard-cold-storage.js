@@ -176,11 +176,22 @@ document.addEventListener("DOMContentLoaded", () => {
             }
           ]
         },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          animation: false
-        }
+         options: {
+           responsive: true,
+           maintainAspectRatio: false,
+           animation: false,
+           plugins: {
+             legend: {
+               labels: {
+                 usePointStyle: true,
+                 pointStyle: "rect",
+                 boxWidth: 14,
+                 boxHeight: 14,
+                 padding: 12
+               }
+             }
+           }
+         }
       });
     }
 
