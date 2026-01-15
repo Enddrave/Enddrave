@@ -279,48 +279,68 @@ class AnomalyScoreChart {
 
         /* 🔹 SCORE + STATE LABELS */
         {
-          id: "scoreStateLabels",
-          afterDatasetsDraw(chart) {
-            const { ctx } = chart;
-            const meta = chart.getDatasetMeta(0);
-            const data = chart.data.datasets[0].data;
+  id: "currentStatusBox",
+  afterDraw(chart) {
+    const { ctx, chartArea, scales } = chart;
+    if (!chartArea) return;
 
-            ctx.save();
-            ctx.font = "12px Inter, sans-serif";
-            ctx.textAlign = "center";
+    const data = chart.data.datasets[0].data;
+    if (!data.length) return;
 
-            meta.data.forEach((point, i) => {
-              const val = data[i];
-              if (val == null) return;
+    const value = data[data.length - 1];
 
-              let state = "NORMAL";
-              let color = "#16a34a"; // green
+    let state = "NORMAL";
+    let color = "#16a34a";
 
-              if (val >= 0.8) {
-                state = "CRITICAL";
-                color = "#dc2626";
-              } else if (val >= 0.6) {
-                state = "RISK";
-                color = "#ea580c";
-              } else if (val >= 0.4) {
-                state = "WARNING";
-                color = "#ca8a04";
-              } else if (val >= 0.2) {
-                state = "OBSERVE";
-                color = "#2563eb";
-              }
+    if (value >= 0.8) {
+      state = "CRITICAL";
+      color = "#dc2626";
+    } else if (value >= 0.6) {
+      state = "RISK";
+      color = "#ea580c";
+    } else if (value >= 0.4) {
+      state = "WARNING";
+      color = "#ca8a04";
+    } else if (value >= 0.2) {
+      state = "OBSERVE";
+      color = "#2563eb";
+    }
 
-              ctx.fillStyle = color;
-              ctx.fillText(
-                `${val.toFixed(2)} • ${state}`,
-                point.x,
-                point.y - 12
-              );
-            });
+    const boxX = chartArea.right - 110;
+    const boxY = chartArea.top + 16;
+    const boxW = 96;
+    const boxH = 64;
 
-            ctx.restore();
-          }
-        }
+    ctx.save();
+
+    /* Background */
+    ctx.fillStyle = "rgba(255,255,255,0.9)";
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.roundRect(boxX, boxY, boxW, boxH, 8);
+    ctx.fill();
+    ctx.stroke();
+
+    /* Title */
+    ctx.fillStyle = "#374151";
+    ctx.font = "11px Inter, sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("ANOMALY", boxX + boxW / 2, boxY + 16);
+
+    /* Value */
+    ctx.font = "bold 16px Inter, sans-serif";
+    ctx.fillStyle = color;
+    ctx.fillText(value.toFixed(2), boxX + boxW / 2, boxY + 36);
+
+    /* State */
+    ctx.font = "12px Inter, sans-serif";
+    ctx.fillText(state, boxX + boxW / 2, boxY + 54);
+
+    ctx.restore();
+  }
+}
+
       ]
     });
   }
