@@ -161,8 +161,8 @@ document.addEventListener("DOMContentLoaded", () => {
   class MiniTelemetryChart {
     constructor(canvas) {
       
-      canvas.parentElement.style.height = "185px"; //185 default
-     // canvas.parentElement.style.height = "auto"; // added line... keep moving down
+      canvas.parentElement.style.height = "147px"; //185 default
+      canvas.parentElement.style.height = "auto"; // added line... keep moving down
       canvas.style.maxHeight = "100%";
 
       this.chart = new Chart(canvas.getContext("2d"), {
