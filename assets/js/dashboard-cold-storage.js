@@ -176,10 +176,10 @@ document.addEventListener("DOMContentLoaded", () => {
             }
           ]
         },
+
          options: {
            responsive: true,
            maintainAspectRatio: false,
-           animation: false,
            plugins: {
              legend: {
                labels: {
@@ -187,11 +187,20 @@ document.addEventListener("DOMContentLoaded", () => {
                  pointStyle: "rect",
                  boxWidth: 14,
                  boxHeight: 14,
-                 padding: 12
+                 padding: 12,
+                 generateLabels(chart) {
+                   const labels =
+                     Chart.defaults.plugins.legend.labels.generateLabels(chart);
+                   labels.forEach(label => {
+                     label.fillStyle = label.strokeStyle; // 🔑 makes it SOLID
+                   });
+                   return labels;
+                 }
                }
              }
            }
          }
+         
       });
     }
 
