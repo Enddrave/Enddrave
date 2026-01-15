@@ -78,6 +78,9 @@ document.addEventListener("DOMContentLoaded", () => {
         stateEl.style.fontWeight = "250";
       }
     });
+
+     const timeEl = item.querySelector(".door-time");
+      if (timeEl) timeEl.textContent = "--";
   }
 
   /* =====================================================
