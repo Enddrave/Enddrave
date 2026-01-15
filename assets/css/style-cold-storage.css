@@ -267,7 +267,7 @@ body {
 .env-mini {
   background: #fbfbf7;
   border-radius: 14px;
-  padding: 10px 10px 12px;
+  padding: 10px 10px 30px;
   border: 1px solid var(--border);
 }
 
