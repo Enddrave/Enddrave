@@ -224,32 +224,37 @@ document.addEventListener("DOMContentLoaded", () => {
   /* =====================================================
      🚨 ANOMALY SCORE CHART
   ===================================================== */
-  class AnomalyScoreChart {
-    constructor(canvas) {
-      canvas.parentElement.style.height = "200px";
+ /* =====================================================
+   🚨 ANOMALY SCORE CHART
+===================================================== */
+class AnomalyScoreChart {
+  constructor(canvas) {
+    canvas.parentElement.style.height = "200px";
 
-      this.chart = new Chart(canvas.getContext("2d"), {
-        type: "line",
-        data: {
-          labels: [],
-          datasets: [{
-            data: [],
-            borderColor: "#f97316",
-            borderWidth: 3,
-            tension: 0.3,
-            pointRadius: 4
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: {
-            y: { min: 0, max: 1, ticks: { stepSize: 0.2 } },
-            x: { grid: { display: false } }
-          }
-        },
-        plugins: [{
+    this.chart = new Chart(canvas.getContext("2d"), {
+      type: "line",
+      data: {
+        labels: [],
+        datasets: [{
+          data: [],
+          borderColor: "#f97316",
+          borderWidth: 3,
+          tension: 0.3,
+          pointRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { min: 0, max: 1, ticks: { stepSize: 0.2 } },
+          x: { grid: { display: false } }
+        }
+      },
+      plugins: [
+        /* 🔹 RISK BANDS */
+        {
           id: "riskBands",
           beforeDraw(chart) {
             const { ctx, chartArea, scales } = chart;
@@ -270,22 +275,69 @@ document.addEventListener("DOMContentLoaded", () => {
               );
             });
           }
-        }]
-      });
-    }
+        },
 
-    push(score) {
-      const d = this.chart.data;
-      d.labels.push(new Date().toLocaleTimeString());
-      d.datasets[0].data.push(score);
+        /* 🔹 SCORE + STATE LABELS */
+        {
+          id: "scoreStateLabels",
+          afterDatasetsDraw(chart) {
+            const { ctx } = chart;
+            const meta = chart.getDatasetMeta(0);
+            const data = chart.data.datasets[0].data;
 
-      if (d.labels.length > 12) {
-        d.labels.shift();
-        d.datasets[0].data.shift();
-      }
-      this.chart.update("none");
-    }
+            ctx.save();
+            ctx.font = "12px Inter, sans-serif";
+            ctx.textAlign = "center";
+
+            meta.data.forEach((point, i) => {
+              const val = data[i];
+              if (val == null) return;
+
+              let state = "NORMAL";
+              let color = "#16a34a"; // green
+
+              if (val >= 0.8) {
+                state = "CRITICAL";
+                color = "#dc2626";
+              } else if (val >= 0.6) {
+                state = "RISK";
+                color = "#ea580c";
+              } else if (val >= 0.4) {
+                state = "WARNING";
+                color = "#ca8a04";
+              } else if (val >= 0.2) {
+                state = "OBSERVE";
+                color = "#2563eb";
+              }
+
+              ctx.fillStyle = color;
+              ctx.fillText(
+                `${val.toFixed(2)} • ${state}`,
+                point.x,
+                point.y - 12
+              );
+            });
+
+            ctx.restore();
+          }
+        }
+      ]
+    });
   }
+
+  push(score) {
+    const d = this.chart.data;
+    d.labels.push(new Date().toLocaleTimeString());
+    d.datasets[0].data.push(score);
+
+    if (d.labels.length > 12) {
+      d.labels.shift();
+      d.datasets[0].data.shift();
+    }
+
+    this.chart.update("none");
+  }
+}
 
   /* =====================================================
      📊 INIT CHARTS
