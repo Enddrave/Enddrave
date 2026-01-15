@@ -61,38 +61,24 @@ document.addEventListener("DOMContentLoaded", () => {
   /* =====================================================
      🔴 RESET DOOR STATUS (OFFLINE)
   ===================================================== */
-  function renderDoor(doorId, isOpen) {
-  const item = document.querySelector(`.door-item[data-door="${doorId}"]`);
-  if (!item) return;
+  function resetDoorStatus() {
+    document.querySelectorAll(".door-item").forEach(item => {
+      const img = item.querySelector(".door-img img");
+      const stateEl = item.querySelector(".door-state");
 
-  const img     = item.querySelector(".door-img img");
-  const stateEl = item.querySelector(".door-state");
-  const timeEl  = item.querySelector(".door-time");
+      if (img) {
+        img.src = "assets/images/door-closed.png";
+        img.style.opacity = "0.4";
+      }
 
-  if (!img || !stateEl) return;
-
-  const newState = isOpen ? "OPEN" : "CLOSED";
-
-  /* ✅ ALWAYS update icon + label */
-  img.src = isOpen ? IMG_OPEN : IMG_CLOSED;
-  img.style.opacity = "1";
-
-  stateEl.textContent = isOpen ? "Open" : "Closed";
-  stateEl.className = isOpen ? "door-state alert" : "door-state ok";
-
-  /* 🕒 Update timestamp ONLY on change */
-  if (doorLastState[doorId] !== newState) {
-    doorLastState[doorId] = newState;
-
-    if (timeEl) {
-      timeEl.textContent = `Updated: ${new Date().toLocaleTimeString()}`;
-      timeEl.style.fontSize = "11px";
-      timeEl.style.color = "#6b7280";
-      timeEl.style.marginTop = "4px";
-    }
+      if (stateEl) {
+        stateEl.textContent = "--";
+        stateEl.className = "door-state";
+        stateEl.style.color = "#000000";
+        stateEl.style.fontWeight = "250";
+      }
+    });
   }
-}
-
 
   /* =====================================================
      🚪 DOOR CONFIG
@@ -100,19 +86,37 @@ document.addEventListener("DOMContentLoaded", () => {
   const IMG_OPEN = "assets/images/door-open.png";
   const IMG_CLOSED = "assets/images/door-closed.png";
 
-  function renderDoor(doorId, isOpen) {
-    const item = document.querySelector(`.door-item[data-door="${doorId}"]`);
-    if (!item) return;
+function renderDoor(doorId, isOpen) {
+  const item = document.querySelector(`.door-item[data-door="${doorId}"]`);
+  if (!item) return;
 
-    const img = item.querySelector(".door-img img");
-    const stateEl = item.querySelector(".door-state");
-    if (!img || !stateEl) return;
+  const img = item.querySelector(".door-img img");
+  const stateEl = item.querySelector(".door-state");
+  const timeEl  = item.querySelector(".door-time");
 
-    img.src = isOpen ? IMG_OPEN : IMG_CLOSED;
-    img.style.opacity = "1";
-    stateEl.textContent = isOpen ? "Open" : "Closed";
-    stateEl.className = isOpen ? "door-state alert" : "door-state ok";
+  if (!img || !stateEl || !timeEl) return;
+
+  const newState = isOpen ? "OPEN" : "CLOSED";
+
+  /* 🔄 Update ONLY if state changed */
+  if (doorLastState[doorId] !== newState) {
+    doorLastState[doorId] = newState;
+
+    const now = new Date().toLocaleTimeString();
+
+    timeEl.textContent = `Updated: ${now}`;
+    timeEl.style.fontSize = "11px";
+    timeEl.style.color = "#6b7280";
+    timeEl.style.marginTop = "4px";
   }
+
+  img.src = isOpen ? IMG_OPEN : IMG_CLOSED;
+  img.style.opacity = "1";
+
+  stateEl.textContent = isOpen ? "Open" : "Closed";
+  stateEl.className = isOpen ? "door-state alert" : "door-state ok";
+}
+
 
   /* =====================================================
      🛰️ GATEWAY & CONNECTIVITY
