@@ -86,37 +86,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const IMG_OPEN = "assets/images/door-open.png";
   const IMG_CLOSED = "assets/images/door-closed.png";
 
-function renderDoor(doorId, isOpen) {
-  const item = document.querySelector(`.door-item[data-door="${doorId}"]`);
-  if (!item) return;
+  function renderDoor(doorId, isOpen) {
+    const item = document.querySelector(`.door-item[data-door="${doorId}"]`);
+    if (!item) return;
 
-  const img = item.querySelector(".door-img img");
-  const stateEl = item.querySelector(".door-state");
-  const timeEl  = item.querySelector(".door-time");
+    const img = item.querySelector(".door-img img");
+    const stateEl = item.querySelector(".door-state");
+    if (!img || !stateEl) return;
 
-  if (!img || !stateEl || !timeEl) return;
-
-  const newState = isOpen ? "OPEN" : "CLOSED";
-
-  /* 🔄 Update ONLY if state changed */
-  if (doorLastState[doorId] !== newState) {
-    doorLastState[doorId] = newState;
-
-    const now = new Date().toLocaleTimeString();
-
-    timeEl.textContent = `Updated: ${now}`;
-    timeEl.style.fontSize = "11px";
-    timeEl.style.color = "#6b7280";
-    timeEl.style.marginTop = "4px";
+    img.src = isOpen ? IMG_OPEN : IMG_CLOSED;
+    img.style.opacity = "1";
+    stateEl.textContent = isOpen ? "Open" : "Closed";
+    stateEl.className = isOpen ? "door-state alert" : "door-state ok";
   }
-
-  img.src = isOpen ? IMG_OPEN : IMG_CLOSED;
-  img.style.opacity = "1";
-
-  stateEl.textContent = isOpen ? "Open" : "Closed";
-  stateEl.className = isOpen ? "door-state alert" : "door-state ok";
-}
-
 
   /* =====================================================
      🛰️ GATEWAY & CONNECTIVITY
