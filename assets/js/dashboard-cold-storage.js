@@ -61,24 +61,38 @@ document.addEventListener("DOMContentLoaded", () => {
   /* =====================================================
      🔴 RESET DOOR STATUS (OFFLINE)
   ===================================================== */
-  function resetDoorStatus() {
-    document.querySelectorAll(".door-item").forEach(item => {
-      const img = item.querySelector(".door-img img");
-      const stateEl = item.querySelector(".door-state");
+  function renderDoor(doorId, isOpen) {
+  const item = document.querySelector(`.door-item[data-door="${doorId}"]`);
+  if (!item) return;
 
-      if (img) {
-        img.src = "assets/images/door-closed.png";
-        img.style.opacity = "0.4";
-      }
+  const img     = item.querySelector(".door-img img");
+  const stateEl = item.querySelector(".door-state");
+  const timeEl  = item.querySelector(".door-time");
 
-      if (stateEl) {
-        stateEl.textContent = "--";
-        stateEl.className = "door-state";
-        stateEl.style.color = "#000000";
-        stateEl.style.fontWeight = "250";
-      }
-    });
+  if (!img || !stateEl) return;
+
+  const newState = isOpen ? "OPEN" : "CLOSED";
+
+  /* ✅ ALWAYS update icon + label */
+  img.src = isOpen ? IMG_OPEN : IMG_CLOSED;
+  img.style.opacity = "1";
+
+  stateEl.textContent = isOpen ? "Open" : "Closed";
+  stateEl.className = isOpen ? "door-state alert" : "door-state ok";
+
+  /* 🕒 Update timestamp ONLY on change */
+  if (doorLastState[doorId] !== newState) {
+    doorLastState[doorId] = newState;
+
+    if (timeEl) {
+      timeEl.textContent = `Updated: ${new Date().toLocaleTimeString()}`;
+      timeEl.style.fontSize = "11px";
+      timeEl.style.color = "#6b7280";
+      timeEl.style.marginTop = "4px";
+    }
   }
+}
+
 
   /* =====================================================
      🚪 DOOR CONFIG
