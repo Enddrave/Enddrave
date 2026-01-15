@@ -224,68 +224,50 @@ document.addEventListener("DOMContentLoaded", () => {
   /* =====================================================
      🚨 ANOMALY SCORE CHART
   ===================================================== */
-  class AnomalyScoreChart {
-    constructor(canvas) {
-      canvas.parentElement.style.height = "200px";
+ {
+  id: "scoreLabels",
+  afterDatasetsDraw(chart) {
+    const { ctx } = chart;
+    const meta = chart.getDatasetMeta(0);
+    const data = chart.data.datasets[0].data;
 
-      this.chart = new Chart(canvas.getContext("2d"), {
-        type: "line",
-        data: {
-          labels: [],
-          datasets: [{
-            data: [],
-            borderColor: "#f97316",
-            borderWidth: 3,
-            tension: 0.3,
-            pointRadius: 4
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: {
-            y: { min: 0, max: 1, ticks: { stepSize: 0.2 } },
-            x: { grid: { display: false } }
-          }
-        },
-        plugins: [{
-          id: "riskBands",
-          beforeDraw(chart) {
-            const { ctx, chartArea, scales } = chart;
-            if (!chartArea) return;
-            const y = scales.y;
+    ctx.save();
+    ctx.font = "12px Inter, sans-serif";
+    ctx.textAlign = "center";
 
-            [
-              { from: 0.0, to: 0.4, c: "rgba(34,197,94,0.15)" },
-              { from: 0.4, to: 0.7, c: "rgba(234,179,8,0.18)" },
-              { from: 0.7, to: 1.0, c: "rgba(239,68,68,0.18)" }
-            ].forEach(b => {
-              ctx.fillStyle = b.c;
-              ctx.fillRect(
-                chartArea.left,
-                y.getPixelForValue(b.to),
-                chartArea.right - chartArea.left,
-                y.getPixelForValue(b.from) - y.getPixelForValue(b.to)
-              );
-            });
-          }
-        }]
-      });
-    }
+    meta.data.forEach((point, i) => {
+      const val = data[i];
+      if (val == null) return;
 
-    push(score) {
-      const d = this.chart.data;
-      d.labels.push(new Date().toLocaleTimeString());
-      d.datasets[0].data.push(score);
+      let state = "NORMAL";
+      let color = "#16a34a"; // green
 
-      if (d.labels.length > 12) {
-        d.labels.shift();
-        d.datasets[0].data.shift();
+      if (val >= 0.8) {
+        state = "CRITICAL";
+        color = "#dc2626";
+      } else if (val >= 0.6) {
+        state = "RISK";
+        color = "#ea580c";
+      } else if (val >= 0.4) {
+        state = "WARNING";
+        color = "#ca8a04";
+      } else if (val >= 0.2) {
+        state = "OBSERVE";
+        color = "#2563eb";
       }
-      this.chart.update("none");
-    }
+
+      ctx.fillStyle = color;
+      ctx.fillText(
+        `${val.toFixed(2)} • ${state}`,
+        point.x,
+        point.y - 12
+      );
+    });
+
+    ctx.restore();
   }
+}
+
 
   /* =====================================================
      📊 INIT CHARTS
