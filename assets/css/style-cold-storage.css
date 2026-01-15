@@ -294,7 +294,10 @@ body {
 table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: 11px;
+  border: 1px solid #b8bbb6;
+  border-radius: 10px;
+  width: 100%;
 }
 
 th,
