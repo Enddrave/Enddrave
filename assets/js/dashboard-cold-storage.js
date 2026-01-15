@@ -1,6 +1,6 @@
 /* =====================================================
    🔧 DEBUG FLAG
-=================================================== == */
+===================================================== */
 const DEBUG = true;
 const log = (...args) => DEBUG && console.log(...args);
 
@@ -161,7 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
   class MiniTelemetryChart {
     constructor(canvas) {
       
-      canvas.parentElement.style.height = "185px";
+      canvas.parentElement.style.height = "200px";
       //canvas.parentElement.style.height = "auto";
       canvas.style.maxHeight = "100%";
 
