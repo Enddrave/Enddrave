@@ -162,7 +162,7 @@ document.addEventListener("DOMContentLoaded", () => {
     constructor(canvas) {
       
       canvas.parentElement.style.minHeight = "147px"; //185 default
-      canvas.parentElement.style.height = "auto"; // added line
+     // canvas.parentElement.style.height = "auto"; // added line... keep moving down
       canvas.style.maxHeight = "100%";
 
       this.chart = new Chart(canvas.getContext("2d"), {
