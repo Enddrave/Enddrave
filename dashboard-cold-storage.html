@@ -20,12 +20,12 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap"
     rel="stylesheet" />
+
   <script defer src="assets/js/main.js"></script>
   <script defer src="assets/js/components.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="assets/js/dashboard-cold-storage.js"></script>
-  
 </head>
 
 <body>
@@ -37,9 +37,29 @@
   <!-- PAGE HEADER -->
   <section class="page-header">
     <h1 class="page-title">
-      COLD STORAGE MONITORING &amp; – INDUSTRIAL IOT 4.0
+      COLD STORAGE MONITORING &amp; ENERGY ANALYTICS – INDUSTRIAL IOT 4.0
     </h1>
     <div class="page-pill">Live Demo · BMS + Environment</div>
+  </section>
+
+  <!-- SYSTEM HEALTH SUMMARY -->
+  <section class="system-health">
+    <div class="health-item">
+      <span class="health-label">Overall Status</span>
+      <span class="health-value observe">OBSERVE</span>
+    </div>
+    <div class="health-item">
+      <span class="health-label">Active Alerts</span>
+      <span class="health-value">0</span>
+    </div>
+    <div class="health-item">
+      <span class="health-label">Data Freshness</span>
+      <span class="health-value">Updated 6s ago</span>
+    </div>
+    <div class="health-item">
+      <span class="health-label">Data Confidence</span>
+      <span class="health-value">High (80%)</span>
+    </div>
   </section>
 
   <!-- MAIN GRID -->
@@ -52,43 +72,50 @@
       <article class="card">
         <div class="card-title">Gateway &amp; Connectivity</div>
         <ul class="status-list">
-          <li><span class="status-label">Device ID:</span> CS-GW-01</li>
-          <li><span class="status-label">Location:</span> Cold Room – Gurugram DC</li>
+          <li><span class="status-label">Device ID:</span> ENV-NODE-01</li>
+          <li><span class="status-label">Location:</span> Factory Lab – Gurugram</li>
           <li><span class="status-label">Firmware:</span> v1.0.3</li>
-          <li><span class="status-label">Last update:</span> --</li>
+          <li><span class="status-label">Last update:</span> 15/01/2026, 22:55:11</li>
         </ul>
-        <div class="badge">
+        <div class="badge online">
           <span class="badge-dot"></span>
           Online – MQTT over LTE
         </div>
       </article>
 
-        <!-- Doors -->
+      <!-- Doors -->
       <article class="card">
-        <div class="card-title">Doors Status</div>=
-            <div class="door-list">
-                <div class="door-item" data-door="D1">
-                    <div class="door-img">
-                        <img src="assets/images/door-closed.png" width="95px;" height="95px;" alt="Door D1">
-                    </div>
-                    <div>
-                    <div class="door-label">Cold storage D1</div>
-                        <div class="door-state alert">Open</div>
-                    </div>
-                </div>
-
-                <div class="door-item" data-door="D2">
-                    <div class="door-img">
-                        <img src="assets/images/door-closed.png" width="95px;" height="95px;" alt="Door D2">
-                    </div>
-
-                    <div>
-                        <div class="door-label">Cold storage D2</div>
-                        <div class="door-state ok">Closed</div>
-                    </div>
-                </div>
+        <div class="card-title">Doors Status</div>
+        <div class="door-list">
+          <div class="door-item">
+            <div class="door-img">
+              <img src="assets/images/door-closed.png" width="95" height="95">
             </div>
+            <div>
+              <div class="door-label">Cold storage D1</div>
+              <div class="door-state ok">Closed · 22:55:11</div>
+            </div>
+          </div>
+
+          <div class="door-item">
+            <div class="door-img">
+              <img src="assets/images/door-closed.png" width="95" height="95">
+            </div>
+            <div>
+              <div class="door-label">Cold storage D2</div>
+              <div class="door-state ok">Closed · 22:55:11</div>
+            </div>
+          </div>
         </div>
+      </article>
+
+      <!-- Thresholds -->
+      <article class="card">
+        <div class="card-title">Operating Thresholds</div>
+        <ul class="status-list">
+          <li>Temperature: <strong>5°C ± 3°C</strong></li>
+          <li>Humidity: <strong>65% ± 10%</strong></li>
+        </ul>
       </article>
 
     </section>
@@ -101,12 +128,20 @@
         <div class="card-title">Environment THD Profile</div>
 
         <div class="env-grid">
-         <div class="env-mini"><div class="env-mini-title">Telemetry · THD 1</div><canvas class="telemetry-chart"></canvas></div>
+          <div class="env-mini"><div class="env-mini-title">Telemetry · THD 1</div><canvas class="telemetry-chart"></canvas></div>
           <div class="env-mini"><div class="env-mini-title">Telemetry · THD 2</div><canvas class="telemetry-chart"></canvas></div>
           <div class="env-mini"><div class="env-mini-title">Telemetry · THD 3</div><canvas class="telemetry-chart"></canvas></div>
           <div class="env-mini"><div class="env-mini-title">Telemetry · THD 4</div><canvas class="telemetry-chart"></canvas></div>
-          <!-- <div class="env-mini"><div class="env-mini-title">Telemetry · THD 5</div><canvas class="telemetry-chart"></canvas></div> -->
-          <div class="env-mini"><div class="env-mini-title">Telemetry · Anomaly Score</div><canvas class="telemetry-chart"></canvas></div>
+
+          <div class="env-mini">
+            <div class="env-mini-title">Telemetry · Anomaly Score</div>
+            <canvas class="telemetry-chart"></canvas>
+            <div class="anomaly-meta">
+              <strong>Status:</strong> OBSERVE<br>
+              <strong>Primary Cause:</strong> Thermal deviation<br>
+              <strong>Recommended Action:</strong> Monitor for next 10 minutes
+            </div>
+          </div>
         </div>
 
         <div class="env-bottom">
@@ -119,31 +154,43 @@
                 <tr><th>Tag</th><th>Temp (°C)</th><th>Hum (%)</th><th>Time</th></tr>
               </thead>
               <tbody>
-                <tr><td>TH1</td><td>18.2</td><td>74.3</td><td>11:56:48</td></tr>
-                <tr><td>TH2</td><td>18.2</td><td>74.3</td><td>11:56:44</td></tr>
-                <tr><td>TH3</td><td>18.2</td><td>74.5</td><td>11:56:37</td></tr>
-                <tr><td>TH4</td><td>18.2</td><td>74.4</td><td>11:56:20</td></tr>
-              <!--  <tr><td>TH5</td><td>18.2</td><td>74.5</td><td>11:56:13</td></tr> -->
+                <tr><td>TH1</td><td>21.0</td><td>58.9</td><td>22:55:11</td></tr>
+                <tr><td>TH2</td><td>21.5</td><td>58.8</td><td>22:55:11</td></tr>
+                <tr><td>TH3</td><td>21.4</td><td>58.6</td><td>22:55:11</td></tr>
+                <tr><td>TH4</td><td>21.2</td><td>60.7</td><td>22:55:11</td></tr>
               </tbody>
             </table>
           </div>
 
           <!-- Logs -->
           <div>
-            <div class="card-sub">Event Log</div>
+            <div class="card-sub log-header">
+              <span>Event Log</span>
+              <button id="download-log-csv" class="btn-download">
+                Download CSV
+              </button>
+            </div>
+
             <div class="log-box">
-                --
+              22:55:11 — FULL TELEMETRY
             </div>
           </div>
 
         </div>
       </article>
 
+      <!-- Alert History -->
+      <article class="card">
+        <div class="card-title">Recent Alerts</div>
+        <ul class="status-list">
+          <li>22:40 – Door opened (cleared)</li>
+          <li>22:12 – Thermal deviation (cleared)</li>
+        </ul>
+      </article>
+
     </section>
 
   </section>
-
-
 
 </main>
 
