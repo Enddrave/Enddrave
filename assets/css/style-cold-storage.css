@@ -312,7 +312,7 @@ th {
 /* ===== EVENT LOG ===== */
 .log-box {
   padding-top: 0;
-  max-height: 214px;
+  max-height: 180px;
   overflow-y: auto;
   border-radius: 12px;
   background: #fbfbf7;
