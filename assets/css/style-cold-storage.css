@@ -65,10 +65,29 @@ body {
   margin: 0 auto 40px;
 }
 
+//.main-grid {
+//  display: grid;
+//  grid-template-columns: 260px minmax(0, 1fr);
+//  gap: 10px;
+//}
+
 .main-grid {
   display: grid;
-  grid-template-columns: 260px minmax(0, 1fr);
-  gap: 10px;
+  grid-template-columns: 320px 1fr 360px; /* left | center | alert */
+  gap: 24px;
+  align-items: start;
+}
+
+/* Right-side anomaly alert rail */
+.alert-column {
+  position: sticky;
+  top: 90px; /* below header */
+  height: fit-content;
+}
+
+/* Optional: breathing space */
+.alert-column #anomalyAlertPanel {
+  min-height: 420px;
 }
 
 .left-column,
