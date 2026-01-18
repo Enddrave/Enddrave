@@ -224,12 +224,9 @@ document.addEventListener("DOMContentLoaded", () => {
   /* =====================================================
      🚨 ANOMALY SCORE CHART
   ===================================================== */
- /* =====================================================
-   🚨 ANOMALY SCORE CHART
-===================================================== */
-class AnomalyScoreChart {
+ class AnomalyScoreChart {
   constructor(canvas) {
-    canvas.parentElement.style.height = "200px";
+    canvas.parentElement.style.height = "220px";
 
     this.chart = new Chart(canvas.getContext("2d"), {
       type: "line",
@@ -237,23 +234,45 @@ class AnomalyScoreChart {
         labels: [],
         datasets: [{
           data: [],
-          borderColor: "#f97316",
-          borderWidth: 3,
-          tension: 0.3,
-          pointRadius: 4
+          borderColor: "#ef4444",
+          borderWidth: 4,
+          tension: 0.35,
+          pointRadius: ctx =>
+            ctx.dataIndex === ctx.dataset.data.length - 1 ? 7 : 3,
+          pointHoverRadius: 9,
+          pointBackgroundColor: "#ef4444",
+          pointBorderColor: "#ffffff",
+          pointBorderWidth: 2,
+          shadowOffsetX: 0,
+          shadowOffsetY: 4,
+          shadowBlur: 12,
+          shadowColor: "rgba(239,68,68,0.6)"
         }]
       },
+
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        animation: { duration: 400 },
         plugins: { legend: { display: false } },
         scales: {
-          y: { min: 0, max: 1, ticks: { stepSize: 0.2 } },
+          y: {
+            min: 0,
+            max: 1,
+            ticks: {
+              stepSize: 0.2,
+              font: { weight: "600" }
+            }
+          },
           x: { grid: { display: false } }
         }
       },
+
       plugins: [
-        /* 🔹 RISK BANDS */
+
+        /* ==========================
+           🔥 STRONG RISK BANDS
+        ========================== */
         {
           id: "riskBands",
           beforeDraw(chart) {
@@ -261,11 +280,13 @@ class AnomalyScoreChart {
             if (!chartArea) return;
             const y = scales.y;
 
-            [
-              { from: 0.0, to: 0.4, c: "rgba(34,197,94,0.15)" },
-              { from: 0.4, to: 0.7, c: "rgba(234,179,8,0.18)" },
-              { from: 0.7, to: 1.0, c: "rgba(239,68,68,0.18)" }
-            ].forEach(b => {
+            const bands = [
+              { from: 0.0, to: 0.4, c: "rgba(34,197,94,0.25)" },
+              { from: 0.4, to: 0.7, c: "rgba(234,179,8,0.35)" },
+              { from: 0.7, to: 1.0, c: "rgba(239,68,68,0.35)" }
+            ];
+
+            bands.forEach(b => {
               ctx.fillStyle = b.c;
               ctx.fillRect(
                 chartArea.left,
@@ -277,70 +298,82 @@ class AnomalyScoreChart {
           }
         },
 
-        /* 🔹 SCORE + STATE LABELS */
+        /* ==========================
+           🚨 BOLD CURRENT SCORE LINE
+        ========================== */
         {
-  id: "currentStatusBox",
-  afterDraw(chart) {
-    const { ctx, chartArea, scales } = chart;
-    if (!chartArea) return;
+          id: "currentScoreLine",
+          afterDatasetsDraw(chart) {
+            const { ctx, chartArea, scales } = chart;
+            const data = chart.data.datasets[0].data;
+            if (!data.length) return;
 
-    const data = chart.data.datasets[0].data;
-    if (!data.length) return;
+            const value = data[data.length - 1];
+            const y = scales.y.getPixelForValue(value);
 
-    const value = data[data.length - 1];
+            ctx.save();
+            ctx.strokeStyle = "rgba(239,68,68,0.9)";
+            ctx.lineWidth = 2.5;
+            ctx.setLineDash([6, 6]);
 
-    let state = "NORMAL";
-    let color = "#16a34a";
+            ctx.beginPath();
+            ctx.moveTo(chartArea.left, y);
+            ctx.lineTo(chartArea.right, y);
+            ctx.stroke();
+            ctx.restore();
+          }
+        },
 
-    if (value >= 0.8) {
-      state = "CRITICAL";
-      color = "#dc2626";
-    } else if (value >= 0.6) {
-      state = "RISK";
-      color = "#ea580c";
-    } else if (value >= 0.4) {
-      state = "WARNING";
-      color = "#ca8a04";
-    } else if (value >= 0.2) {
-      state = "OBSERVE";
-      color = "#2563eb";
-    }
+        /* ==========================
+           🧠 STATUS BOX (EXISTING – IMPROVED)
+        ========================== */
+        {
+          id: "currentStatusBox",
+          afterDraw(chart) {
+            const { ctx, chartArea } = chart;
+            const data = chart.data.datasets[0].data;
+            if (!data.length) return;
 
-    const boxX = chartArea.right - 110;
-    const boxY = chartArea.top + 16;
-    const boxW = 96;
-    const boxH = 64;
+            const value = data[data.length - 1];
 
-    ctx.save();
+            let state = "NORMAL";
+            let color = "#16a34a";
 
-    /* Background */
-    ctx.fillStyle = "rgba(255,255,255,0.9)";
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.roundRect(boxX, boxY, boxW, boxH, 8);
-    ctx.fill();
-    ctx.stroke();
+            if (value >= 0.8) { state = "CRITICAL"; color = "#dc2626"; }
+            else if (value >= 0.6) { state = "RISK"; color = "#ea580c"; }
+            else if (value >= 0.4) { state = "WARNING"; color = "#ca8a04"; }
+            else if (value >= 0.2) { state = "OBSERVE"; color = "#2563eb"; }
 
-    /* Title */
-    ctx.fillStyle = "#374151";
-    ctx.font = "11px Inter, sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText("ANOMALY", boxX + boxW / 2, boxY + 16);
+            const x = chartArea.right - 118;
+            const y = chartArea.top + 14;
 
-    /* Value */
-    ctx.font = "bold 16px Inter, sans-serif";
-    ctx.fillStyle = color;
-    ctx.fillText(value.toFixed(2), boxX + boxW / 2, boxY + 36);
+            ctx.save();
+            ctx.shadowColor = "rgba(0,0,0,0.15)";
+            ctx.shadowBlur = 12;
 
-    /* State */
-    ctx.font = "12px Inter, sans-serif";
-    ctx.fillText(state, boxX + boxW / 2, boxY + 54);
+            ctx.fillStyle = "#ffffff";
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.roundRect(x, y, 104, 72, 10);
+            ctx.fill();
+            ctx.stroke();
 
-    ctx.restore();
-  }
-}
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = "#374151";
+            ctx.font = "600 11px Inter, sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText("ANOMALY SCORE", x + 52, y + 18);
 
+            ctx.font = "700 18px Inter, sans-serif";
+            ctx.fillStyle = color;
+            ctx.fillText(value.toFixed(2), x + 52, y + 40);
+
+            ctx.font = "600 12px Inter, sans-serif";
+            ctx.fillText(state, x + 52, y + 60);
+            ctx.restore();
+          }
+        }
       ]
     });
   }
