@@ -36,7 +36,6 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
 }
 
 .page-title {
@@ -46,16 +45,16 @@ body {
   text-transform: uppercase;
 }
 
-/* ===== DASHBOARD LAYOUT ===== */
+/* ===== DASHBOARD ===== */
 .dashboard {
+  max-width: 1200px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 18px;
-  max-width: 1200px;
-  margin: 0 auto 40px;
 }
 
-/* 🔥 MAIN GRID — 3 COLUMN FIX */
+/* ===== MAIN GRID — 3 COLUMN LAYOUT ===== */
 .main-grid {
   display: grid;
   grid-template-columns: 260px minmax(0, 1fr) 320px;
@@ -63,28 +62,25 @@ body {
   align-items: start;
 }
 
-/* LEFT COLUMN */
+/* ===== COLUMNS ===== */
 .left-column {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-/* CENTER COLUMN (ENVIRONMENT / TABLES / LOGS) */
 .center-column {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-/* RIGHT COLUMN — ANOMALY ALERT ONLY */
 .alert-column {
   display: flex;
   flex-direction: column;
   gap: 16px;
   position: sticky;
   top: 90px;
-  align-self: start;
 }
 
 /* ===== CARD ===== */
@@ -111,7 +107,7 @@ body {
   color: var(--muted);
 }
 
-/* ===== GATEWAY / STATUS ===== */
+/* ===== GATEWAY STATUS ===== */
 .status-list {
   list-style: none;
   margin-top: 8px;
@@ -139,6 +135,7 @@ body {
   border-radius: 50%;
 }
 
+/* ONLINE */
 .badge.online {
   background: #ecfdf5;
   color: #15803d;
@@ -148,11 +145,22 @@ body {
   background: #22c55e;
 }
 
+/* OFFLINE */
+.badge.offline {
+  background: #fef2f2;
+  color: var(--red);
+}
+
+.badge.offline .badge-dot {
+  background: var(--red);
+}
+
 /* ===== DOORS ===== */
 .door-list {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  margin-top: 10px;
 }
 
 .door-item {
@@ -166,6 +174,7 @@ body {
   color: var(--muted);
 }
 
+/* ===== DOOR STATE (ORIGINAL — RESTORED) ===== */
 .door-state {
   display: inline-flex;
   align-items: center;
@@ -174,8 +183,24 @@ body {
   font-weight: 500;
   padding: 6px 14px;
   border-radius: 999px;
+  margin-top: 6px;
+  color: #111827;
 }
 
+/* 🚨 OPEN — RED (UNCHANGED) */
+.door-state.alert {
+  background: #fef2f2;
+}
+
+.door-state.alert::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #dc2626;
+}
+
+/* 🔒 CLOSED — BLUE (UNCHANGED) */
 .door-state.ok {
   background: #eff6ff;
 }
@@ -200,6 +225,12 @@ body {
   border-radius: 14px;
   padding: 10px 10px 30px;
   border: 1px solid var(--border);
+}
+
+.env-mini-title {
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 6px;
 }
 
 .telemetry-chart {
@@ -242,7 +273,6 @@ th {
 
   .alert-column {
     position: static;
-    order: 3;
   }
 }
 
