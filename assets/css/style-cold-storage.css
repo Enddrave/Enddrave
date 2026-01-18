@@ -1,3 +1,4 @@
+/* ================= ROOT VARIABLES ================= */
 :root {
   --bg: #f5f5ef;
   --card: #ffffff;
@@ -13,15 +14,15 @@
   --red: #dc2626;
 }
 
-/* ===== RESET ===== */
+/* ================= RESET ================= */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
+/* ================= BODY ================= */
 body {
-  margin: 0;
   padding: 32px 24px 40px;
   background: var(--bg);
   font-family: system-ui, -apple-system, BlinkMacSystemFont,
@@ -29,14 +30,13 @@ body {
   color: var(--text);
 }
 
-/* ===== PAGE HEADER ===== */
+/* ================= PAGE HEADER ================= */
 .page-header {
   max-width: 1200px;
   margin: 24px auto 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
 }
 
 .page-title {
@@ -46,50 +46,25 @@ body {
   text-transform: uppercase;
 }
 
-.page-pill {
-  padding: 4px 12px;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  font-size: 11px;
-  color: var(--muted);
-  background: #ffffff;
-  white-space: nowrap;
-}
-
-/* ===== LAYOUT ===== */
+/* ================= DASHBOARD ================= */
 .dashboard {
+  max-width: 1200px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 18px;
-  max-width: 1200px;
-  margin: 0 auto 40px;
 }
 
-//.main-grid {
-//  display: grid;
-//  grid-template-columns: 260px minmax(0, 1fr);
-//  gap: 10px;
-//}
-
+/* ================= MAIN GRID ================= */
+/* LEFT | CENTER | ALERT */
 .main-grid {
   display: grid;
-  grid-template-columns: 320px 1fr 360px; /* left | center | alert */
+  grid-template-columns: 320px minmax(0, 1fr) 360px;
   gap: 24px;
   align-items: start;
 }
 
-/* Right-side anomaly alert rail */
-.alert-column {
-  position: sticky;
-  top: 90px; /* below header */
-  height: fit-content;
-}
-
-/* Optional: breathing space */
-.alert-column #anomalyAlertPanel {
-  min-height: 420px;
-}
-
+/* ================= COLUMNS ================= */
 .left-column,
 .right-column {
   display: flex;
@@ -97,13 +72,37 @@ body {
   gap: 16px;
 }
 
-.battery-row {
-  display: grid;
-  grid-template-columns: minmax(0, 2.1fr) minmax(260px, 0.9fr);
-  gap: 16px;
+/* ================= ALERT COLUMN (RED AREA) ================= */
+.alert-column {
+  position: sticky;
+  top: 88px;
+  align-self: start;
 }
 
-/* ===== CARD ===== */
+.alert-column #anomalyAlertPanel {
+  width: 100%;
+  min-height: 420px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Vertical divider for visual separation */
+.alert-column::before {
+  content: "";
+  position: absolute;
+  left: -12px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(0, 0, 0, 0.08),
+    transparent
+  );
+}
+
+/* ================= CARD ================= */
 .card,
 .card-soft {
   background: var(--card);
@@ -111,10 +110,6 @@ body {
   border: 1px solid var(--border);
   box-shadow: 0 12px 25px rgba(15, 23, 42, 0.06);
   padding: 16px 18px;
-}
-
-.card-soft {
-  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.05);
 }
 
 .card-title {
@@ -131,21 +126,9 @@ body {
   color: var(--muted);
 }
 
-/* ===== SUMMARY ===== */
-.summary-value {
-  font-size: 28px;
-  font-weight: 600;
-}
-
-.summary-unit {
-  font-size: 13px;
-  color: var(--muted);
-}
-
-/* ===== DEVICE / GATEWAY STATUS ===== */
+/* ================= STATUS ================= */
 .status-list {
   list-style: none;
-  margin-top: 8px;
   font-size: 13px;
 }
 
@@ -157,7 +140,7 @@ body {
   color: var(--muted);
 }
 
-/* Badge base */
+/* ================= BADGE ================= */
 .badge {
   display: inline-flex;
   align-items: center;
@@ -175,17 +158,6 @@ body {
   border-radius: 50%;
 }
 
-/* OFFLINE */
-.badge.offline {
-  background: #fef2f2;
-  color: var(--red);
-}
-
-.badge.offline .badge-dot {
-  background: var(--red);
-}
-
-/* ONLINE */
 .badge.online {
   background: #ecfdf5;
   color: #15803d;
@@ -195,40 +167,26 @@ body {
   background: #22c55e;
 }
 
-/* ===== DOORS ===== */
+.badge.offline {
+  background: #fef2f2;
+  color: var(--red);
+}
+
+.badge.offline .badge-dot {
+  background: var(--red);
+}
+
+/* ================= DOORS ================= */
 .door-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-top: 10px;
+  gap: 12px;
 }
 
 .door-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  transition: transform 0.2s ease;
-}
-
-.door-item:hover {
-  transform: translateX(2px);
-}
-
-.door-image {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  overflow: hidden;
-  flex-shrink: 0;
-  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.12);
-  border: 1px solid #d4d4cf;
-  background: #f9fafb;
-}
-
-.door-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  gap: 12px;
 }
 
 .door-label {
@@ -236,20 +194,15 @@ body {
   color: var(--muted);
 }
 
-/* ===== DOOR STATE — MATCH ONLINE / OFFLINE STYLE ===== */
 .door-state {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   font-size: 13px;
-  font-weight: 500;
   padding: 6px 14px;
   border-radius: 999px;
-  margin-top: 6px;
-  color: #111827;
 }
 
-/* OPEN */
 .door-state.alert {
   background: #fef2f2;
 }
@@ -259,10 +212,9 @@ body {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: #dc2626;
+  background: var(--red);
 }
 
-/* CLOSED */
 .door-state.ok {
   background: #eff6ff;
 }
@@ -275,7 +227,7 @@ body {
   background: #2563eb;
 }
 
-/* ===== TELEMETRY MINI CHARTS ===== */
+/* ================= TELEMETRY ================= */
 .env-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -299,150 +251,67 @@ body {
 .telemetry-chart {
   width: 100%;
   height: 120px;
-  display: block;
 }
 
-.env-bottom {
-  display: grid;
-  grid-template-columns: 1.2fr minmax(0, 1.6fr);
-  gap: 14px;
-  margin-top: 14px;
-}
-
-/* ===== TABLE ===== */
+/* ================= TABLE ================= */
 table {
   width: 100%;
   font-size: 11px;
-  border: 1px solid #b8bbb6;
+  border: 1px solid var(--border);
   border-radius: 10px;
-  
 }
 
 th,
 td {
   padding: 7px 8px;
   border-bottom: 1px solid var(--border);
-  text-align: left;
 }
 
 th {
   color: var(--muted);
-  font-weight: 500;
 }
 
-/* ===== EVENT LOG ===== */
+/* ================= EVENT LOG ================= */
 .log-box {
-  padding-top: 0;
   max-height: 180px;
   overflow-y: auto;
   border-radius: 12px;
   background: #fbfbf7;
   border: 1px solid var(--border);
-}
-
-.log-row {
-  padding: 7px 9px;
-  border-bottom: 1px solid #f3f4f6;
-  font-size: 12px;
-  color: var(--muted);
-  white-space: pre-wrap;
   font-family: monospace;
-}
-
-/* ===== BATTERY INFO ===== */
-.section-title {
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 6px;
-}
-
-.section-sub {
   font-size: 12px;
-  color: var(--muted);
-  margin-bottom: 10px;
 }
 
-.grid-small {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  gap: 12px;
-  margin-top: 10px;
+/* ================= CRITICAL ALERT EFFECT ================= */
+#anomalyAlertPanel .critical {
+  animation: pulse 2.2s infinite;
 }
 
-.value {
-  font-size: 24px;
-  font-weight: 600;
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 rgba(220,38,38,0.3); }
+  50% { box-shadow: 0 0 36px rgba(220,38,38,0.6); }
+  100% { box-shadow: 0 0 0 rgba(220,38,38,0.3); }
 }
 
-.unit {
-  font-size: 12px;
-  color: var(--muted);
+/* ================= RESPONSIVE ================= */
+@media (max-width: 1100px) {
+  .main-grid {
+    grid-template-columns: 280px 1fr;
+  }
+
+  .alert-column {
+    position: relative;
+    top: auto;
+    margin-top: 16px;
+  }
 }
 
-.bar {
-  height: 6px;
-  background: #f3f4f6;
-  border-radius: 999px;
-  overflow: hidden;
-  margin-top: 8px;
-}
-
-.fill {
-  height: 100%;
-  border-radius: 999px;
-}
-
-/* ===== RESPONSIVE ===== */
 @media (max-width: 900px) {
-  body {
-    padding: 20px 14px 28px;
-  }
-
-  .page-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .page-title {
-    font-size: 16px;
-  }
-
-  .main-grid,
-  .battery-row,
-  .env-bottom {
+  .main-grid {
     grid-template-columns: 1fr;
   }
-}
 
-@media (max-width: 520px) {
-  body {
-    padding: 16px 10px 24px;
-  }
-
-  .page-title {
-    font-size: 14px;
-    letter-spacing: 0.06em;
-  }
-
-  .card,
-  .card-soft {
-    padding: 14px;
-    border-radius: 14px;
-  }
-
-  .page-pill {
-    font-size: 10px;
-    text-align: center;
-  }
-
-  .summary-value {
-    font-size: 24px;
-  }
-
-  .value {
-    font-size: 20px;
+  .alert-column {
+    order: -1;
   }
 }
