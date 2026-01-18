@@ -240,6 +240,10 @@ body {
 .tel-anomaly {
   width: 550px; 
 }
+.alignment {
+  width: 250px;
+}
+
 /* ===== TABLE ===== */
 table {
   width: 100%;
