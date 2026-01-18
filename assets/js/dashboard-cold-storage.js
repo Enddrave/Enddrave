@@ -224,9 +224,9 @@ document.addEventListener("DOMContentLoaded", () => {
   /* =====================================================
      🚨 ANOMALY SCORE CHART
   ===================================================== */
- class AnomalyScoreChart {
+class AnomalyScoreChart {
   constructor(canvas) {
-    canvas.parentElement.style.height = "220px";
+    canvas.parentElement.style.height = "230px";
 
     this.chart = new Chart(canvas.getContext("2d"), {
       type: "line",
@@ -234,45 +234,52 @@ document.addEventListener("DOMContentLoaded", () => {
         labels: [],
         datasets: [{
           data: [],
-          borderColor: "#ef4444",
-          borderWidth: 4,
-          tension: 0.35,
+          borderColor: "#dc2626",
+          borderWidth: 3.5,
+          tension: 0.32,
+
           pointRadius: ctx =>
-            ctx.dataIndex === ctx.dataset.data.length - 1 ? 7 : 3,
-          pointHoverRadius: 9,
-          pointBackgroundColor: "#ef4444",
-          pointBorderColor: "#ffffff",
-          pointBorderWidth: 2,
-          shadowOffsetX: 0,
-          shadowOffsetY: 4,
-          shadowBlur: 12,
-          shadowColor: "rgba(239,68,68,0.6)"
+            ctx.dataIndex === ctx.dataset.data.length - 1 ? 9 : 3,
+
+          pointBackgroundColor: ctx =>
+            ctx.dataIndex === ctx.dataset.data.length - 1
+              ? "#dc2626"
+              : "#ffffff",
+
+          pointBorderColor: "#dc2626",
+          pointBorderWidth: 2
         }]
       },
 
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        animation: { duration: 400 },
+        animation: { duration: 450 },
         plugins: { legend: { display: false } },
+
         scales: {
           y: {
             min: 0,
             max: 1,
             ticks: {
               stepSize: 0.2,
-              font: { weight: "600" }
-            }
+              font: { size: 12, weight: "600" },
+              color: "#374151"
+            },
+            grid: { color: "rgba(0,0,0,0.06)" }
           },
-          x: { grid: { display: false } }
+          x: {
+            ticks: { color: "#6b7280", font: { size: 11 } },
+            grid: { display: false }
+          }
         }
       },
 
       plugins: [
 
-        /* ==========================
-           🔥 STRONG RISK BANDS
-        ========================== */
+        /* ===============================
+           🟢🟡🔴 INDUSTRIAL RISK ZONES
+        =============================== */
         {
           id: "riskBands",
           beforeDraw(chart) {
@@ -281,9 +288,9 @@ document.addEventListener("DOMContentLoaded", () => {
             const y = scales.y;
 
             const bands = [
-              { from: 0.0, to: 0.4, c: "rgba(34,197,94,0.25)" },
-              { from: 0.4, to: 0.7, c: "rgba(234,179,8,0.35)" },
-              { from: 0.7, to: 1.0, c: "rgba(239,68,68,0.35)" }
+              { from: 0.0, to: 0.4, c: "rgba(22,163,74,0.18)" },
+              { from: 0.4, to: 0.7, c: "rgba(234,179,8,0.28)" },
+              { from: 0.7, to: 1.0, c: "rgba(220,38,38,0.30)" }
             ];
 
             bands.forEach(b => {
@@ -298,9 +305,9 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         },
 
-        /* ==========================
-           🚨 BOLD CURRENT SCORE LINE
-        ========================== */
+        /* ===============================
+           🚨 CURRENT SCORE LASER LINE
+        =============================== */
         {
           id: "currentScoreLine",
           afterDatasetsDraw(chart) {
@@ -312,9 +319,9 @@ document.addEventListener("DOMContentLoaded", () => {
             const y = scales.y.getPixelForValue(value);
 
             ctx.save();
-            ctx.strokeStyle = "rgba(239,68,68,0.9)";
-            ctx.lineWidth = 2.5;
-            ctx.setLineDash([6, 6]);
+            ctx.strokeStyle = "rgba(220,38,38,0.9)";
+            ctx.lineWidth = 2.2;
+            ctx.setLineDash([8, 6]);
 
             ctx.beginPath();
             ctx.moveTo(chartArea.left, y);
@@ -324,11 +331,11 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         },
 
-        /* ==========================
-           🧠 STATUS BOX (EXISTING – IMPROVED)
-        ========================== */
+        /* ===============================
+           🧠 INDUSTRIAL STATUS PANEL
+        =============================== */
         {
-          id: "currentStatusBox",
+          id: "statusPanel",
           afterDraw(chart) {
             const { ctx, chartArea } = chart;
             const data = chart.data.datasets[0].data;
@@ -336,41 +343,46 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const value = data[data.length - 1];
 
-            let state = "NORMAL";
+            let label = "NORMAL";
             let color = "#16a34a";
 
-            if (value >= 0.8) { state = "CRITICAL"; color = "#dc2626"; }
-            else if (value >= 0.6) { state = "RISK"; color = "#ea580c"; }
-            else if (value >= 0.4) { state = "WARNING"; color = "#ca8a04"; }
-            else if (value >= 0.2) { state = "OBSERVE"; color = "#2563eb"; }
+            if (value >= 0.8) { label = "CRITICAL"; color = "#dc2626"; }
+            else if (value >= 0.6) { label = "RISK"; color = "#ea580c"; }
+            else if (value >= 0.4) { label = "WARNING"; color = "#ca8a04"; }
+            else if (value >= 0.2) { label = "OBSERVE"; color = "#2563eb"; }
 
-            const x = chartArea.right - 118;
+            const x = chartArea.right - 140;
             const y = chartArea.top + 14;
+            const w = 124;
+            const h = 76;
 
             ctx.save();
-            ctx.shadowColor = "rgba(0,0,0,0.15)";
-            ctx.shadowBlur = 12;
+
+            ctx.shadowColor = "rgba(0,0,0,0.25)";
+            ctx.shadowBlur = 14;
 
             ctx.fillStyle = "#ffffff";
             ctx.strokeStyle = color;
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 2.5;
             ctx.beginPath();
-            ctx.roundRect(x, y, 104, 72, 10);
+            ctx.roundRect(x, y, w, h, 10);
             ctx.fill();
             ctx.stroke();
 
             ctx.shadowBlur = 0;
-            ctx.fillStyle = "#374151";
-            ctx.font = "600 11px Inter, sans-serif";
             ctx.textAlign = "center";
-            ctx.fillText("ANOMALY SCORE", x + 52, y + 18);
 
-            ctx.font = "700 18px Inter, sans-serif";
+            ctx.fillStyle = "#374151";
+            ctx.font = "700 11px Inter, system-ui";
+            ctx.fillText("ANOMALY SCORE", x + w / 2, y + 18);
+
+            ctx.font = "800 22px Inter, system-ui";
             ctx.fillStyle = color;
-            ctx.fillText(value.toFixed(2), x + 52, y + 40);
+            ctx.fillText(value.toFixed(2), x + w / 2, y + 44);
 
-            ctx.font = "600 12px Inter, sans-serif";
-            ctx.fillText(state, x + 52, y + 60);
+            ctx.font = "700 12px Inter, system-ui";
+            ctx.fillText(label, x + w / 2, y + 64);
+
             ctx.restore();
           }
         }
