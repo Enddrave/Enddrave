@@ -224,6 +224,7 @@ document.addEventListener("DOMContentLoaded", () => {
   /* =====================================================
      🚨 ANOMALY SCORE CHART
   ===================================================== */
+
 class AnomalyScoreChart {
   constructor(canvas) {
     canvas.parentElement.style.height = "230px";
@@ -404,6 +405,117 @@ class AnomalyScoreChart {
   }
 }
 
+
+   //-------additional chart code-----//
+function renderAnomalyAlert(payload) {
+  const panel = document.getElementById("anomalyAlertPanel");
+  if (!panel) return;
+
+  const score = payload?.abnormality?.score;
+  if (score === undefined) {
+    panel.innerHTML = "";
+    return;
+  }
+
+  let level = "NORMAL";
+  let color = "#16a34a";
+  let bg = "rgba(22,163,74,0.08)";
+  let icon = "✔️";
+
+  if (score >= 0.8) {
+    level = "CRITICAL";
+    color = "#dc2626";
+    bg = "rgba(220,38,38,0.12)";
+    icon = "⚠️";
+  } else if (score >= 0.6) {
+    level = "RISK";
+    color = "#ea580c";
+    bg = "rgba(234,88,12,0.12)";
+    icon = "⚠️";
+  } else if (score >= 0.4) {
+    level = "WARNING";
+    color = "#ca8a04";
+    bg = "rgba(202,138,4,0.12)";
+    icon = "⚠️";
+  }
+
+  /* 🔍 Intelligent reasons (example logic) */
+  const reasons = [];
+
+  payload?.dht22?.forEach((s, i) => {
+    if (s.temperature > 25) {
+      reasons.push(`TH${i + 1} temperature exceeded safe limit`);
+    }
+  });
+
+  payload?.doors?.forEach((d, i) => {
+    if (d.state === 0 && score >= 0.6) {
+      reasons.push(`Door D${i + 1} closed during temperature rise`);
+    }
+  });
+
+  if (!reasons.length) {
+    reasons.push("Environmental deviation detected");
+  }
+
+  panel.innerHTML = `
+    <div style="
+      border: 2px solid ${color};
+      border-radius: 16px;
+      padding: 18px 20px;
+      background: linear-gradient(135deg, #ffffff, ${bg});
+      box-shadow: 0 14px 40px rgba(0,0,0,0.08);
+      font-family: Inter, system-ui;
+    ">
+
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <span style="font-size:22px">${icon}</span>
+        <div style="font-size:18px;font-weight:800;color:${color}">
+          ANOMALY ALERT
+        </div>
+      </div>
+
+      <div style="
+        font-size:42px;
+        font-weight:900;
+        color:${color};
+        line-height:1;
+      ">
+        ${score.toFixed(2)}
+        <span style="font-size:20px;font-weight:700;margin-left:8px">
+          ${level}
+        </span>
+      </div>
+
+      <hr style="margin:14px 0;border:none;border-top:1px solid rgba(0,0,0,0.1)" />
+
+      <div style="font-size:14px;font-weight:700;margin-bottom:6px">
+        Reason:
+      </div>
+
+      <ul style="padding-left:18px;margin:0">
+        ${reasons
+          .map(
+            r =>
+              `<li style="margin-bottom:6px;font-size:14px">${r}</li>`
+          )
+          .join("")}
+      </ul>
+
+      <div style="
+        margin-top:14px;
+        font-size:12px;
+        color:#6b7280;
+        display:flex;
+        justify-content:space-between;
+      ">
+        <span>Auto-detected</span>
+        <span>${new Date().toLocaleTimeString()}</span>
+      </div>
+    </div>
+  `;
+}
+
   /* =====================================================
      📊 INIT CHARTS
   ===================================================== */
@@ -485,6 +597,7 @@ class AnomalyScoreChart {
 
       if (payload?.abnormality?.score !== undefined) {
         anomalyChart.push(payload.abnormality.score);
+         renderAnomalyAlert(payload); // 🔥 THIS LINE
       }
 
       payload?.doors?.forEach(d =>
