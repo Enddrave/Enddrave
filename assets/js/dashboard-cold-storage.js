@@ -463,8 +463,19 @@ function renderAnomalyAlert(payload) {
   payload?.doors?.forEach((d, i) => {
          console.log(d.state);
     console.log(score);
-    if (d.state === 0 && score >= 0.6) {
+    if (score >= 0.2 && score <= 0.25) {
+      reasons.push(`Door D${i + 1} is open`);
+    }
+    if (score >= 0.25 && score <= 0.45) {
+      reasons.push(`Door D${i + 2} is open`);
+    }
+
+   if (d.state === 0 && score <= 0.45 && score <= 0.6) {
       reasons.push(`Door D${i + 1} closed during temperature rise`);
+    }
+
+   if (score >= 0.45) {
+      reasons.push(`Door D${i + 1} and D${i + 2} both are open`);
     }
   });
    
