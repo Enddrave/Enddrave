@@ -461,6 +461,8 @@ function renderAnomalyAlert(payload) {
   });
 
   payload?.doors?.forEach((d, i) => {
+         console.log(d.state);
+    console.log(score);
     if (d.state === 0 && score >= 0.6) {
       reasons.push(`Door D${i + 1} closed during temperature rise`);
     }
