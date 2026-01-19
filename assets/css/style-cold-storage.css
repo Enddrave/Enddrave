@@ -6,14 +6,16 @@
   --text: #111827;
   --muted: #6b7280;
 
-  --blue: #0f766e;
+  --blue: #2563eb;
   --green: #16a34a;
   --orange: #ea580c;
   --amber: #d97706;
   --red: #dc2626;
 }
 
-/* ===== RESET ===== */
+/* =====================================================
+   RESET
+===================================================== */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -21,32 +23,34 @@
 }
 
 body {
-  margin: 0;
-  padding: 32px 24px 40px;
   background: var(--bg);
   font-family: system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", Roboto, Arial, sans-serif;
   color: var(--text);
+  padding: 28px 22px 40px;
 }
 
-/* ===== PAGE HEADER ===== */
+/* =====================================================
+   PAGE HEADER
+===================================================== */
 .page-header {
   max-width: 1200px;
-  margin: 24px auto 20px;
+  margin: 20px auto 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
 }
 
 .page-title {
-  font-size: 20px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
-/* ===== DASHBOARD ===== */
+/* =====================================================
+   DASHBOARD
+===================================================== */
 .dashboard {
   max-width: 1200px;
   margin: 0 auto;
@@ -55,7 +59,9 @@ body {
   gap: 18px;
 }
 
-/* ===== MAIN GRID ===== */
+/* =====================================================
+   MAIN GRID
+===================================================== */
 .main-grid {
   display: grid;
   grid-template-columns: 260px minmax(0, 1fr) 320px;
@@ -63,7 +69,9 @@ body {
   align-items: start;
 }
 
-/* ===== COLUMNS ===== */
+/* =====================================================
+   COLUMNS
+===================================================== */
 .left-column,
 .center-column,
 .alert-column {
@@ -77,7 +85,9 @@ body {
   top: 90px;
 }
 
-/* ===== CARD ===== */
+/* =====================================================
+   CARD
+===================================================== */
 .card,
 .card-soft {
   background: var(--card);
@@ -89,8 +99,8 @@ body {
 
 .card-title {
   font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.18em;
+  font-weight: 700;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--muted);
   margin-bottom: 8px;
@@ -101,15 +111,13 @@ body {
   color: var(--muted);
 }
 
-/* ===== STATUS ===== */
+/* =====================================================
+   STATUS / BADGES
+===================================================== */
 .status-list {
   list-style: none;
-  margin-top: 8px;
   font-size: 13px;
-}
-
-.status-label {
-  color: var(--muted);
+  margin-top: 8px;
 }
 
 .badge {
@@ -120,7 +128,7 @@ body {
   margin-top: 10px;
   padding: 4px 10px;
   border-radius: 999px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .badge-dot {
@@ -131,11 +139,11 @@ body {
 
 .badge.online {
   background: #ecfdf5;
-  color: #15803d;
+  color: var(--green);
 }
 
 .badge.online .badge-dot {
-  background: #22c55e;
+  background: var(--green);
 }
 
 .badge.offline {
@@ -147,19 +155,20 @@ body {
   background: var(--red);
 }
 
-/* ===== DOORS ===== */
+/* =====================================================
+   DOORS
+===================================================== */
 .door-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   margin-top: 10px;
 }
 
 .door-item {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .door-label {
@@ -172,11 +181,9 @@ body {
   align-items: center;
   gap: 8px;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   padding: 6px 14px;
   border-radius: 999px;
-  margin-top: 6px;
-  color: #111827;
 }
 
 .door-state.alert {
@@ -188,7 +195,7 @@ body {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: #dc2626;
+  background: var(--red);
 }
 
 .door-state.ok {
@@ -200,137 +207,121 @@ body {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: #2563eb;
+  background: var(--blue);
 }
 
 .door-time {
-  font-weight: 700;
   font-size: 11px;
-  margin-top: 7px;
-  color: red;
+  font-weight: 600;
+  color: var(--muted);
 }
 
-/* ===== TELEMETRY ===== */
+/* =====================================================
+   TELEMETRY GRID (MATCH IMAGE)
+===================================================== */
 .env-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
 }
 
+/* TELEMETRY CARD */
 .env-mini {
   background: #fbfbf7;
-  border-radius: 14px;
-  padding: 10px 10px 30px;
+  border-radius: 18px;
+  padding: 14px 16px 28px;
   border: 1px solid var(--border);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.05);
 }
 
 .env-mini-title {
-  font-size: 11px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   color: var(--muted);
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .telemetry-chart {
-  width: 100%;
-  height: 120px;
+  width: 100% !important;
+  height: 120px !important;
 }
 
+/* =====================================================
+   ANOMALY SCORE — FULL WIDTH
+===================================================== */
 .tel-anomaly {
-  width: 100%;
-  max-width: 550px;
+  grid-column: 1 / -1;
+  padding: 16px 18px 24px;
 }
 
-.alignment {
-  width: 100%;
-  max-width: 250px;
+.tel-anomaly .telemetry-chart {
+  height: 220px !important;
 }
 
-/* ===== TABLE ===== */
+.anomaly-highlight {
+  border: 2px solid #d1fae5;
+}
+
+/* =====================================================
+   TABLE
+===================================================== */
 table {
   width: 100%;
   font-size: 11px;
-  border: 1px solid var(--border);
+  border-collapse: collapse;
   border-radius: 10px;
-  overflow-x: auto;
-  display: block;
+  overflow: hidden;
 }
 
 th,
 td {
-  padding: 7px 8px;
+  padding: 8px;
   border-bottom: 1px solid var(--border);
 }
 
 th {
   color: var(--muted);
+  font-weight: 600;
 }
 
-/* ===== EVENT LOG ===== */
+/* =====================================================
+   EVENT LOG
+===================================================== */
 .log-box {
   max-height: 180px;
   overflow-y: auto;
   border-radius: 12px;
   background: #fbfbf7;
   border: 1px solid var(--border);
+  padding: 8px;
 }
 
-/* ================= RESPONSIVE ================= */
-
-/* Tablets */
+/* =====================================================
+   RESPONSIVE — TABLET
+===================================================== */
 @media (max-width: 1100px) {
-  .main-grid {
-    grid-template-columns: 260px 1fr;
-  }
-
-  .alert-column {
-    position: static;
-  }
-}
-
-/* Small tablets & large phones */
-@media (max-width: 900px) {
-  body {
-    padding: 20px 16px 30px;
-  }
-
-  .page-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
   .main-grid {
     grid-template-columns: 1fr;
   }
 
   .alert-column {
+    position: static;
     order: -1;
   }
 }
 
-/* Phones */
+/* =====================================================
+   RESPONSIVE — MOBILE
+===================================================== */
 @media (max-width: 600px) {
   body {
-    padding: 16px 12px 24px;
+    padding: 18px 14px 32px;
   }
 
   .page-title {
-    font-size: 16px;
-  }
-
-  .card,
-  .card-soft {
-    padding: 14px 14px;
-    border-radius: 14px;
-  }
-
-  .door-item {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .door-state {
-    font-size: 12px;
-    padding: 5px 12px;
+    font-size: 15px;
   }
 
   .env-grid {
@@ -338,25 +329,10 @@ th {
   }
 
   .telemetry-chart {
-    height: 100px;
+    height: 100px !important;
   }
 
-  table {
-    font-size: 10px;
-  }
-}
-
-/* Very small phones */
-@media (max-width: 360px) {
-  .page-title {
-    font-size: 14px;
-  }
-
-  .card-title {
-    font-size: 11px;
-  }
-
-  .door-time {
-    font-size: 10px;
+  .tel-anomaly .telemetry-chart {
+    height: 160px !important;
   }
 }
