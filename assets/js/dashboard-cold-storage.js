@@ -461,6 +461,7 @@ function renderAnomalyAlert(payload) {
   });
 
   payload?.doors?.forEach((d, i) => {
+     console.log(d);
          console.log(d.state);
     console.log(score);
     if (score >= 0.2 && score <= 0.25) {
