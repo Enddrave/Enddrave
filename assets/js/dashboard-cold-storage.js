@@ -86,7 +86,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const IMG_OPEN = "assets/images/door-open.png";
   const IMG_CLOSED = "assets/images/door-closed.png";
 
-  function renderDoor(doorId, isOpen) {
+  function renderDoor(doorId, isOpen, time) {
+     console.log("Processing time");
+     console.log(time);
     const item = document.querySelector(`.door-item[data-door="${doorId}"]`);
     if (!item) return;
 
@@ -601,7 +603,7 @@ function renderAnomalyAlert(payload) {
       }
 
       payload?.doors?.forEach(d =>
-        renderDoor(`D${d.id + 1}`, d.state === 1)
+        renderDoor(`D${d.id + 1}`, d.state === 1, d.changedAt)
       );
     });
 
