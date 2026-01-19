@@ -2,7 +2,7 @@
    THEME VARIABLES
 ===================================================== */
 :root {
-  --bg: #f5f6f2;
+  --bg: #f6f7f3;
   --card: #ffffff;
   --card-soft: #fbfbf7;
   --border: #e5e7eb;
@@ -16,13 +16,12 @@
   --amber: #d97706;
   --red: #dc2626;
 
-  --radius-lg: 18px;
+  --radius-lg: 20px;
   --radius-md: 14px;
   --radius-sm: 10px;
 
-  --shadow:
-    0 12px 28px rgba(15, 23, 42, 0.06),
-    0 2px 6px rgba(15, 23, 42, 0.04);
+  --shadow-soft: 0 6px 18px rgba(15, 23, 42, 0.06);
+  --shadow-strong: 0 18px 40px rgba(15, 23, 42, 0.10);
 }
 
 /* =====================================================
@@ -45,75 +44,31 @@ body {
   color: var(--text);
   font-family: system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", Roboto, Arial, sans-serif;
-  line-height: 1.4;
-  padding: 24px;
+  line-height: 1.45;
+  padding: 28px;
 }
 
 /* =====================================================
-   PAGE HEADER
-===================================================== */
-.page-header {
-  max-width: 1200px;
-  margin: 0 auto 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.page-title {
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-/* =====================================================
-   DASHBOARD WRAPPER
+   DASHBOARD
 ===================================================== */
 .dashboard {
   max-width: 1200px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 22px;
 }
 
 /* =====================================================
-   MAIN GRID (DESKTOP)
-===================================================== */
-.main-grid {
-  display: grid;
-  grid-template-columns: 260px minmax(0, 1fr) 320px;
-  gap: 18px;
-  align-items: start;
-}
-
-/* =====================================================
-   COLUMNS
-===================================================== */
-.left-column,
-.center-column,
-.alert-column {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.alert-column {
-  position: sticky;
-  top: 90px;
-}
-
-/* =====================================================
-   CARD
+   CARDS
 ===================================================== */
 .card,
 .card-soft {
   background: var(--card);
   border-radius: var(--radius-lg);
   border: 1px solid var(--border);
-  box-shadow: var(--shadow);
-  padding: 16px 18px;
+  box-shadow: var(--shadow-soft);
+  padding: 18px 20px;
 }
 
 .card-soft {
@@ -121,200 +76,137 @@ body {
 }
 
 .card-title {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--muted);
-  margin-bottom: 10px;
-}
-
-.card-sub {
-  font-size: 12px;
-  color: var(--muted);
+  margin-bottom: 12px;
 }
 
 /* =====================================================
-   STATUS BADGES
-===================================================== */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  padding: 4px 12px;
-  border-radius: 999px;
-  font-weight: 600;
-}
-
-.badge-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-}
-
-.badge.online {
-  background: #ecfdf5;
-  color: #15803d;
-}
-.badge.online .badge-dot {
-  background: #22c55e;
-}
-
-.badge.offline {
-  background: #fef2f2;
-  color: var(--red);
-}
-.badge.offline .badge-dot {
-  background: var(--red);
-}
-
-/* =====================================================
-   DOORS
-===================================================== */
-.door-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.door-item {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.door-label {
-  font-size: 13px;
-  color: var(--muted);
-}
-
-.door-state {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  padding: 6px 14px;
-  border-radius: 999px;
-}
-
-.door-state.alert {
-  background: #fef2f2;
-  color: var(--red);
-}
-.door-state.alert::before {
-  content: "";
-  width: 10px;
-  height: 10px;
-  background: var(--red);
-  border-radius: 50%;
-}
-
-.door-state.ok {
-  background: #eff6ff;
-  color: var(--blue);
-}
-.door-state.ok::before {
-  content: "";
-  width: 10px;
-  height: 10px;
-  background: var(--blue);
-  border-radius: 50%;
-}
-
-.door-time {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--muted);
-}
-
-/* =====================================================
-   ENV TELEMETRY GRID
+   ENV GRID
 ===================================================== */
 .env-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  gap: 18px;
 }
 
+/* =====================================================
+   MINI TELEMETRY CARDS
+===================================================== */
 .env-mini {
   background: var(--card-soft);
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
-  padding: 12px;
-  box-shadow: var(--shadow);
+  padding: 14px;
+  box-shadow: var(--shadow-soft);
 }
 
 .env-mini-title {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--muted);
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .telemetry-chart {
   width: 100%;
-  height: 130px;
+  height: 140px;
 }
 
 /* =====================================================
-   ANOMALY GRAPH (HIGHLIGHT)
+   ANOMALY GRAPH (PRIMARY FOCUS)
 ===================================================== */
 .tel-anomaly {
   grid-column: 1 / -1;
-  padding: 16px;
+  margin-top: 10px;               /* separation from THD grid */
+  padding: 22px;
   border-radius: var(--radius-lg);
   background: linear-gradient(
     180deg,
-    #ffffff,
-    #fafafa
+    #ffffff 0%,
+    #fafafa 100%
   );
   border: 1px solid var(--border);
+  box-shadow: var(--shadow-strong);
+}
+
+.tel-anomaly .env-mini-title {
+  font-size: 14px;
+  font-weight: 700;
 }
 
 .tel-anomaly .telemetry-chart {
-  height: 200px;
-}
-
-.anomaly-highlight {
-  box-shadow:
-    0 18px 36px rgba(220, 38, 38, 0.15),
-    0 4px 12px rgba(15, 23, 42, 0.08);
+  height: 220px;
 }
 
 /* =====================================================
-   TABLE
+   SPACER BETWEEN GRAPH & TABLE
 ===================================================== */
+.section-spacer {
+  height: 26px;
+}
+
+/* =====================================================
+   LATEST RECORD TABLE
+===================================================== */
+.latest-record {
+  margin-top: 6px;
+}
+
+.latest-record-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+
 table {
   width: 100%;
-  font-size: 12px;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+  background: var(--card);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+}
+
+thead {
+  background: #f9fafb;
 }
 
 th,
 td {
-  padding: 8px 10px;
+  padding: 14px 16px;
   border-bottom: 1px solid var(--border);
 }
 
 th {
   text-align: left;
-  color: var(--muted);
   font-weight: 600;
+  color: var(--muted);
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
 }
 
 /* =====================================================
    EVENT LOG
 ===================================================== */
 .log-box {
-  max-height: 200px;
-  overflow-y: auto;
-  border-radius: var(--radius-md);
+  margin-top: 18px;
+  min-height: 64px;
+  padding: 14px 16px;
   background: var(--card-soft);
+  border-radius: var(--radius-md);
   border: 1px solid var(--border);
-  padding: 10px;
-  font-size: 12px;
+  box-shadow: var(--shadow-soft);
+  font-size: 13px;
+  color: var(--muted);
 }
 
 /* =====================================================
@@ -322,15 +214,7 @@ th {
 ===================================================== */
 @media (max-width: 1024px) {
   body {
-    padding: 16px;
-  }
-
-  .main-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .alert-column {
-    position: static;
+    padding: 20px;
   }
 
   .env-grid {
@@ -340,30 +224,35 @@ th {
   .telemetry-chart {
     height: 150px;
   }
+
+  .tel-anomaly .telemetry-chart {
+    height: 200px;
+  }
 }
 
 /* =====================================================
    RESPONSIVE — MOBILE
 ===================================================== */
 @media (max-width: 600px) {
-  .page-title {
-    font-size: 15px;
-  }
-
-  .card,
-  .card-soft {
-    padding: 14px;
-  }
-
-  .env-mini {
-    padding: 10px;
+  body {
+    padding: 16px;
   }
 
   .telemetry-chart {
     height: 140px;
   }
 
+  .tel-anomaly {
+    padding: 18px;
+  }
+
   .tel-anomaly .telemetry-chart {
     height: 180px;
+  }
+
+  th,
+  td {
+    padding: 12px;
+    font-size: 12px;
   }
 }
