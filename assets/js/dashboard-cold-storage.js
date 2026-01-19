@@ -447,8 +447,12 @@ function renderAnomalyAlert(payload) {
     color = "#ca8a04";
     bg = "rgba(202,138,4,0.12)";
     icon = "⚠️";
+  } else if (score >= 0.2) {
+    level = "OBSERVE";
+    color = "#2563eb";
+    bg = "rgba(37, 99, 235, 1)";
+    icon = "⚠️";
   }
-
   /* 🔍 Intelligent reasons (example logic) */
   const reasons = [];
 
