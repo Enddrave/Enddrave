@@ -1,8 +1,12 @@
+/* =====================================================
+   THEME VARIABLES
+===================================================== */
 :root {
-  --bg: #f5f5ef;
+  --bg: #f5f6f2;
   --card: #ffffff;
-  --card-soft: #ffffff;
-  --border: #e5e5de;
+  --card-soft: #fbfbf7;
+  --border: #e5e7eb;
+
   --text: #111827;
   --muted: #6b7280;
 
@@ -11,23 +15,38 @@
   --orange: #ea580c;
   --amber: #d97706;
   --red: #dc2626;
+
+  --radius-lg: 18px;
+  --radius-md: 14px;
+  --radius-sm: 10px;
+
+  --shadow:
+    0 12px 28px rgba(15, 23, 42, 0.06),
+    0 2px 6px rgba(15, 23, 42, 0.04);
 }
 
 /* =====================================================
    RESET
 ===================================================== */
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
+}
+
+html,
+body {
   margin: 0;
   padding: 0;
 }
 
 body {
   background: var(--bg);
+  color: var(--text);
   font-family: system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", Roboto, Arial, sans-serif;
-  color: var(--text);
-  padding: 28px 22px 40px;
+  line-height: 1.4;
+  padding: 24px;
 }
 
 /* =====================================================
@@ -35,10 +54,10 @@ body {
 ===================================================== */
 .page-header {
   max-width: 1200px;
-  margin: 20px auto 18px;
+  margin: 0 auto 20px;
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
 }
 
 .page-title {
@@ -49,7 +68,7 @@ body {
 }
 
 /* =====================================================
-   DASHBOARD
+   DASHBOARD WRAPPER
 ===================================================== */
 .dashboard {
   max-width: 1200px;
@@ -60,12 +79,12 @@ body {
 }
 
 /* =====================================================
-   MAIN GRID
+   MAIN GRID (DESKTOP)
 ===================================================== */
 .main-grid {
   display: grid;
   grid-template-columns: 260px minmax(0, 1fr) 320px;
-  gap: 16px;
+  gap: 18px;
   align-items: start;
 }
 
@@ -91,19 +110,23 @@ body {
 .card,
 .card-soft {
   background: var(--card);
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--border);
-  box-shadow: 0 12px 25px rgba(15, 23, 42, 0.06);
+  box-shadow: var(--shadow);
   padding: 16px 18px;
 }
 
+.card-soft {
+  background: var(--card-soft);
+}
+
 .card-title {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--muted);
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .card-sub {
@@ -112,21 +135,14 @@ body {
 }
 
 /* =====================================================
-   STATUS / BADGES
+   STATUS BADGES
 ===================================================== */
-.status-list {
-  list-style: none;
-  font-size: 13px;
-  margin-top: 8px;
-}
-
 .badge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   font-size: 12px;
-  margin-top: 10px;
-  padding: 4px 10px;
+  padding: 4px 12px;
   border-radius: 999px;
   font-weight: 600;
 }
@@ -139,18 +155,16 @@ body {
 
 .badge.online {
   background: #ecfdf5;
-  color: var(--green);
+  color: #15803d;
 }
-
 .badge.online .badge-dot {
-  background: var(--green);
+  background: #22c55e;
 }
 
 .badge.offline {
   background: #fef2f2;
   color: var(--red);
 }
-
 .badge.offline .badge-dot {
   background: var(--red);
 }
@@ -162,13 +176,12 @@ body {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-top: 10px;
 }
 
 .door-item {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
 .door-label {
@@ -188,26 +201,26 @@ body {
 
 .door-state.alert {
   background: #fef2f2;
+  color: var(--red);
 }
-
 .door-state.alert::before {
   content: "";
   width: 10px;
   height: 10px;
-  border-radius: 50%;
   background: var(--red);
+  border-radius: 50%;
 }
 
 .door-state.ok {
   background: #eff6ff;
+  color: var(--blue);
 }
-
 .door-state.ok::before {
   content: "";
   width: 10px;
   height: 10px;
-  border-radius: 50%;
   background: var(--blue);
+  border-radius: 50%;
 }
 
 .door-time {
@@ -217,7 +230,7 @@ body {
 }
 
 /* =====================================================
-   TELEMETRY GRID (MATCH IMAGE)
+   ENV TELEMETRY GRID
 ===================================================== */
 .env-grid {
   display: grid;
@@ -225,43 +238,49 @@ body {
   gap: 16px;
 }
 
-/* TELEMETRY CARD */
 .env-mini {
-  background: #fbfbf7;
-  border-radius: 18px;
-  padding: 14px 16px 28px;
+  background: var(--card-soft);
+  border-radius: var(--radius-md);
   border: 1px solid var(--border);
-  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.05);
+  padding: 12px;
+  box-shadow: var(--shadow);
 }
 
 .env-mini-title {
   font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  font-weight: 600;
   color: var(--muted);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .telemetry-chart {
-  width: 100% !important;
-  height: 120px !important;
+  width: 100%;
+  height: 130px;
 }
 
 /* =====================================================
-   ANOMALY SCORE — FULL WIDTH
+   ANOMALY GRAPH (HIGHLIGHT)
 ===================================================== */
 .tel-anomaly {
   grid-column: 1 / -1;
-  padding: 16px 18px 24px;
+  padding: 16px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(
+    180deg,
+    #ffffff,
+    #fafafa
+  );
+  border: 1px solid var(--border);
 }
 
 .tel-anomaly .telemetry-chart {
-  height: 220px !important;
+  height: 200px;
 }
 
 .anomaly-highlight {
-  border: 2px solid #d1fae5;
+  box-shadow:
+    0 18px 36px rgba(220, 38, 38, 0.15),
+    0 4px 12px rgba(15, 23, 42, 0.08);
 }
 
 /* =====================================================
@@ -269,19 +288,18 @@ body {
 ===================================================== */
 table {
   width: 100%;
-  font-size: 11px;
+  font-size: 12px;
   border-collapse: collapse;
-  border-radius: 10px;
-  overflow: hidden;
 }
 
 th,
 td {
-  padding: 8px;
+  padding: 8px 10px;
   border-bottom: 1px solid var(--border);
 }
 
 th {
+  text-align: left;
   color: var(--muted);
   font-weight: 600;
 }
@@ -290,38 +308,29 @@ th {
    EVENT LOG
 ===================================================== */
 .log-box {
-  max-height: 180px;
+  max-height: 200px;
   overflow-y: auto;
-  border-radius: 12px;
-  background: #fbfbf7;
+  border-radius: var(--radius-md);
+  background: var(--card-soft);
   border: 1px solid var(--border);
-  padding: 8px;
+  padding: 10px;
+  font-size: 12px;
 }
 
 /* =====================================================
    RESPONSIVE — TABLET
 ===================================================== */
-@media (max-width: 1100px) {
+@media (max-width: 1024px) {
+  body {
+    padding: 16px;
+  }
+
   .main-grid {
     grid-template-columns: 1fr;
   }
 
   .alert-column {
     position: static;
-    order: -1;
-  }
-}
-
-/* =====================================================
-   RESPONSIVE — MOBILE
-===================================================== */
-@media (max-width: 600px) {
-  body {
-    padding: 18px 14px 32px;
-  }
-
-  .page-title {
-    font-size: 15px;
   }
 
   .env-grid {
@@ -329,10 +338,32 @@ th {
   }
 
   .telemetry-chart {
-    height: 100px !important;
+    height: 150px;
+  }
+}
+
+/* =====================================================
+   RESPONSIVE — MOBILE
+===================================================== */
+@media (max-width: 600px) {
+  .page-title {
+    font-size: 15px;
+  }
+
+  .card,
+  .card-soft {
+    padding: 14px;
+  }
+
+  .env-mini {
+    padding: 10px;
+  }
+
+  .telemetry-chart {
+    height: 140px;
   }
 
   .tel-anomaly .telemetry-chart {
-    height: 160px !important;
+    height: 180px;
   }
 }
