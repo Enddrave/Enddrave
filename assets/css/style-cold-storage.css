@@ -213,6 +213,13 @@ body {
   background: #2563eb;
 }
 
+.door-time{
+  font-weight: 700;
+  font-size: 11px;
+  margin-top: 7px;
+  color: red;
+}
+
 /* ===== TELEMETRY ===== */
 .env-grid {
   display: grid;
