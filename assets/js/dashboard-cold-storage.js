@@ -92,8 +92,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const IMG_CLOSED = "assets/images/door-closed.png";
 
   function renderDoor(doorId, isOpen, time) {
-     console.log("Processing time");
-     console.log(time);
     const item = document.querySelector(`.door-item[data-door="${doorId}"]`);
     if (!item) return;
 
