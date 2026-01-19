@@ -465,7 +465,7 @@ function renderAnomalyAlert(payload) {
       reasons.push(`Door D${i + 1} closed during temperature rise`);
     }
   });
-
+   
   if (!reasons.length) {
     reasons.push("Environmental deviation detected");
   }
