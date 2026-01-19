@@ -65,6 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".door-item").forEach(item => {
       const img = item.querySelector(".door-img img");
       const stateEl = item.querySelector(".door-state");
+      const stateTime = item.querySelector(".door-time");
 
       if (img) {
         img.src = "assets/images/door-closed.png";
@@ -76,6 +77,10 @@ document.addEventListener("DOMContentLoaded", () => {
         stateEl.className = "door-state";
         stateEl.style.color = "#000000";
         stateEl.style.fontWeight = "250";
+      }
+
+      if (stateTime) {
+        stateTime.textContent = "--";
       }
     });
   }
@@ -94,12 +99,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const img = item.querySelector(".door-img img");
     const stateEl = item.querySelector(".door-state");
-    if (!img || !stateEl) return;
+    const stateTime = item.querySelector(".door-time");
+
+    if (!img || !stateEl || !stateTime) return;
 
     img.src = isOpen ? IMG_OPEN : IMG_CLOSED;
     img.style.opacity = "1";
     stateEl.textContent = isOpen ? "Open" : "Closed";
     stateEl.className = isOpen ? "door-state alert" : "door-state ok";
+    stateTime.textContent = time ? time : "--";
   }
 
   /* =====================================================
