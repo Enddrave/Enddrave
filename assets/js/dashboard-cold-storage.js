@@ -464,20 +464,16 @@ function renderAnomalyAlert(payload) {
      console.log(d);
          console.log(d.state);
     console.log(score);
-    if (score >= 0.2 && score <= 0.25) {
-      reasons.push(`Door D${i + 1} is open`);
+    if (d.id == 0 && score == 0.2) {
+      reasons.push(`Door 1 is open`);
     }
-    if (score >= 0.25 && score <= 0.45) {
-      reasons.push(`Door D${i + 2} is open`);
+   if (d.id == 1 && score == 0.2) {
+      reasons.push(`Door 2 is open`);
     }
-
-   if (d.state === 0 && score <= 0.45 && score <= 0.6) {
-      reasons.push(`Door D${i + 1} closed during temperature rise`);
+    if (d.id == 0 && d.id == 1) {
+      reasons.push(`Door 1 && 2 are open`);
     }
-
-   if (score >= 0.45) {
-      reasons.push(`Door D${i + 1} and D${i + 2} both are open`);
-    }
+  
   });
    
   if (!reasons.length) {
