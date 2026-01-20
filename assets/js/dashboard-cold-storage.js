@@ -461,6 +461,7 @@ function renderAnomalyAlert(payload) {
 
 
 
+
    /* ================================
    ⚙️ BASE CONFIG
 ================================ */
@@ -480,7 +481,10 @@ const reasons = [];
 let anomalyScore = 0;
 
 /* ================================
-   🌡️ DHT22 LOGIC (THRESHOLD + DRIFT)
+   🌡️ DHT22 LOGIC
+   - Threshold
+   - Combined rise
+   - Individual drift (TEMP or HUM)
 ================================ */
 payload?.dht22?.forEach((s, i) => {
   const sensorId = `TH${i + 1}`;
@@ -505,12 +509,11 @@ payload?.dht22?.forEach((s, i) => {
     anomalyScore += CONFIG.DIFF_SCORE;
   }
 
-  /* ---------- Drift checks (NEW) ---------- */
+  /* ---------- Drift checks (REQUIREMENT) ---------- */
 
   const tempDrift = Math.abs(temp - CONFIG.BASE_TEMP);
   const humDrift  = Math.abs(hum - CONFIG.BASE_HUM);
 
-  // Temperature drift
   if (tempDrift >= CONFIG.SENSOR_DIFF) {
     reasons.push(
       `${sensorId}: temperature drift ${tempDrift.toFixed(1)}°C from baseline`
@@ -518,7 +521,6 @@ payload?.dht22?.forEach((s, i) => {
     anomalyScore += CONFIG.DIFF_SCORE;
   }
 
-  // Humidity drift
   if (humDrift >= CONFIG.SENSOR_DIFF) {
     reasons.push(
       `${sensorId}: humidity drift ${humDrift.toFixed(1)}% from baseline`
@@ -528,7 +530,7 @@ payload?.dht22?.forEach((s, i) => {
 });
 
 /* ================================
-   🚪 DOOR LOGIC
+   🚪 DOOR LOGIC (KEPT EXACTLY SAME)
    state: 0 = OPEN, 1 = CLOSED
 ================================ */
 let door1Open = true;
@@ -540,7 +542,7 @@ payload?.doors?.forEach((d) => {
 });
 
 /* ================================
-   🔗 DOOR REASONS
+   🔗 DOOR REASONS (UNCHANGED)
 ================================ */
 if (door1Open && door2Open) {
   reasons.push(`Door 1 & Door 2 are open`);
@@ -561,10 +563,6 @@ anomalyScore = Math.min(anomalyScore, 1);
 if (!reasons.length) {
   reasons.push(`Temperature, humidity, and door states are normal`);
 }
-
-
-   
-
 
    
  
