@@ -179,10 +179,7 @@ body {
   background: #2563eb;
 }
 
-/* ================================================= */
-/* ✅ LAST UPDATED — FIXED VISIBILITY & ALIGNMENT */
-/* ================================================= */
-
+/* ===== LAST UPDATED ===== */
 .door-update {
   display: flex;
   align-items: center;
@@ -190,7 +187,7 @@ body {
   margin-top: 6px;
   font-size: 11px;
   color: var(--muted);
-  flex-wrap: wrap;          /* allow wrap */
+  flex-wrap: wrap;
   line-height: 1.4;
 }
 
@@ -207,10 +204,7 @@ body {
   word-break: break-word;
 }
 
-/* ================================================= */
-/* ✅ LATEST RECORD + EVENT LOG — SIDE BY SIDE */
-/* ================================================= */
-
+/* ===== LATEST RECORD + EVENT LOG ===== */
 .record-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -274,9 +268,63 @@ th {
   border: 1px solid var(--border);
 }
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 900px) {
+/* ================================================= */
+/* ✅ MOBILE RESPONSIVENESS — ONLY ADDITION */
+/* ================================================= */
+
+@media (max-width: 768px) {
+
+  body {
+    padding: 20px 14px 28px;
+  }
+
+  .main-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .alert-column {
+    position: static;
+  }
+
+  .card,
+  .card-soft {
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  /* Door card stacking */
+  .door-item {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .door-header {
+    align-items: center;
+  }
+
+  .door-update {
+    justify-content: center;
+  }
+
+  /* Record + Event log already stacked */
   .record-row {
     grid-template-columns: 1fr;
+  }
+
+  /* Tables scroll safely */
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  /* Charts scale */
+  .telemetry-chart {
+    height: 100px;
+  }
+
+  .tel-anomaly {
+    width: 100%;
   }
 }
