@@ -460,16 +460,14 @@ function renderAnomalyAlert(payload) {
 
 
 
-
-
-   /* ================================
+/* ================================
    ⚙️ BASE CONFIG
 ================================ */
 const CONFIG = {
   BASE_TEMP: 19.0,
   BASE_HUM: 85.0,
-  SENSOR_LIMIT: 6.0,
-  SENSOR_DIFF: 10.0,   // drift threshold (±)
+  SENSOR_LIMIT: 6.0,    // ± limit threshold
+  SENSOR_DIFF: 10.0,    // major drift threshold
   SENSOR_SCORE: 0.50,
   DIFF_SCORE: 0.30,
 };
@@ -482,9 +480,9 @@ let anomalyScore = 0;
 
 /* ================================
    🌡️ DHT22 LOGIC
-   - Threshold
-   - Combined rise
-   - Individual drift (TEMP or HUM)
+   - SENSOR_LIMIT (±)
+   - SENSOR_DIFF (±)
+   - Combined temp + hum
 ================================ */
 payload?.dht22?.forEach((s, i) => {
   const sensorId = `TH${i + 1}`;
@@ -492,45 +490,56 @@ payload?.dht22?.forEach((s, i) => {
   const temp = s.temperature;
   const hum  = s.humidity;
 
-  /* ---------- Threshold checks ---------- */
+  const tempDelta = Math.abs(temp - CONFIG.BASE_TEMP);
+  const humDelta  = Math.abs(hum - CONFIG.BASE_HUM);
 
-  if (temp > CONFIG.BASE_TEMP) {
-    reasons.push(`${sensorId}: temperature high (${temp}°C)`);
-    anomalyScore += CONFIG.SENSOR_SCORE;
-  }
+  /* ---------- SENSOR_LIMIT checks (±6) ---------- */
 
-  if (hum > CONFIG.BASE_HUM) {
-    reasons.push(`${sensorId}: humidity high (${hum}%)`);
-    anomalyScore += CONFIG.SENSOR_SCORE;
-  }
-
-  if (temp > CONFIG.BASE_TEMP && hum > CONFIG.BASE_HUM) {
-    reasons.push(`${sensorId}: temperature & humidity rising together`);
-    anomalyScore += CONFIG.DIFF_SCORE;
-  }
-
-  /* ---------- Drift checks (REQUIREMENT) ---------- */
-
-  const tempDrift = Math.abs(temp - CONFIG.BASE_TEMP);
-  const humDrift  = Math.abs(hum - CONFIG.BASE_HUM);
-
-  if (tempDrift >= CONFIG.SENSOR_DIFF) {
+  if (tempDelta >= CONFIG.SENSOR_LIMIT) {
     reasons.push(
-      `${sensorId}: temperature drift ${tempDrift.toFixed(1)}°C from baseline`
+      `${sensorId}: temperature out of range (${temp}°C)`
+    );
+    anomalyScore += CONFIG.SENSOR_SCORE;
+  }
+
+  if (humDelta >= CONFIG.SENSOR_LIMIT) {
+    reasons.push(
+      `${sensorId}: humidity out of range (${hum}%)`
+    );
+    anomalyScore += CONFIG.SENSOR_SCORE;
+  }
+
+  /* ---------- Combined temp + humidity ---------- */
+
+  if (
+    tempDelta >= CONFIG.SENSOR_LIMIT &&
+    humDelta >= CONFIG.SENSOR_LIMIT
+  ) {
+    reasons.push(
+      `${sensorId}: temperature & humidity deviated together`
     );
     anomalyScore += CONFIG.DIFF_SCORE;
   }
 
-  if (humDrift >= CONFIG.SENSOR_DIFF) {
+  /* ---------- SENSOR_DIFF checks (±10) ---------- */
+
+  if (tempDelta >= CONFIG.SENSOR_DIFF) {
     reasons.push(
-      `${sensorId}: humidity drift ${humDrift.toFixed(1)}% from baseline`
+      `${sensorId}: temperature major drift ${tempDelta.toFixed(1)}°C from baseline`
+    );
+    anomalyScore += CONFIG.DIFF_SCORE;
+  }
+
+  if (humDelta >= CONFIG.SENSOR_DIFF) {
+    reasons.push(
+      `${sensorId}: humidity major drift ${humDelta.toFixed(1)}% from baseline`
     );
     anomalyScore += CONFIG.DIFF_SCORE;
   }
 });
 
 /* ================================
-   🚪 DOOR LOGIC (KEPT EXACTLY SAME)
+   🚪 DOOR LOGIC (KEPT AS-IS)
    state: 0 = OPEN, 1 = CLOSED
 ================================ */
 let door1Open = true;
@@ -542,7 +551,7 @@ payload?.doors?.forEach((d) => {
 });
 
 /* ================================
-   🔗 DOOR REASONS (UNCHANGED)
+   🔗 DOOR REASONS
 ================================ */
 if (door1Open && door2Open) {
   reasons.push(`Door 1 & Door 2 are open`);
@@ -563,6 +572,10 @@ anomalyScore = Math.min(anomalyScore, 1);
 if (!reasons.length) {
   reasons.push(`Temperature, humidity, and door states are normal`);
 }
+
+
+   
+
 
    
  
