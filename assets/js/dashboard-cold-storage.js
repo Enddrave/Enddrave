@@ -460,21 +460,33 @@ function renderAnomalyAlert(payload) {
     }
   });
 
-  payload?.doors?.forEach((d, i) => {
-     console.log(d);
-         console.log(d.state);
-    console.log(score);
-    if (d.id == 0 && score == 0.2) {
-      reasons.push(`Door 1 is open`);
-    }
-   if (d.id == 1 && score == 0.2) {
-      reasons.push(`Door 2 is open`);
-    }
-    if (d.id == 0 && d.id == 1) {
-      reasons.push(`Door 1 && 2 are open`);
-    }
-  
-  });
+let door1Open = false;
+let door2Open = false;
+
+payload?.doors?.forEach((d) => {
+  console.log(d);
+  console.log(d.state);
+  console.log(score);
+
+  // Door 1
+  if (d.id === 0 && d.state === 0 && score === 0.2) {
+    door1Open = true;
+  }
+
+  // Door 2
+  if (d.id === 1 && d.state === 0 && score === 0.2) {
+    door2Open = true;
+  }
+});
+
+// Post-loop combined logic
+if (door1Open && door2Open) {
+  reasons.push(`Door 1 & Door 2 are open`);
+} else if (door1Open) {
+  reasons.push(`Door 1 is open`);
+} else if (door2Open) {
+  reasons.push(`Door 2 is open`);
+}
    
   if (!reasons.length) {
     reasons.push("Environmental deviation detected");
