@@ -219,11 +219,28 @@ body {
   background: #2563eb;
 }
 
-.door-time {
-  font-weight: 700;
+/* ================================================= */
+/* ✅ UPDATED — DOOR LAST UPDATED UI (ONLY CHANGE) */
+/* ================================================= */
+
+.door-update {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
   font-size: 11px;
-  margin-top: 7px;
-  color: red;
+  color: var(--muted);
+}
+
+.door-update::before {
+  content: "🕒";
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.door-time {
+  font-weight: 500;
+  color: var(--muted);
 }
 
 /* ===== TELEMETRY ===== */
