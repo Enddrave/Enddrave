@@ -524,3 +524,33 @@ th {
   }
 }
 
+/* ================================================ */
+/* 🧱 TABLE + EVENT LOG — SIDE BY SIDE (DESKTOP) */
+/* ================================================ */
+
+.table-log-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 16px;
+  align-items: stretch;
+}
+
+/* Ensure both cards align equally */
+.latest-record,
+.event-log {
+  min-width: 0;
+}
+
+/* ================================================ */
+/* 📱 MOBILE — KEEP SAME BEHAVIOR */
+/* ================================================ */
+
+@media (max-width: 900px) {
+  .table-log-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.event-log .log-box {
+  height: 100%;
+}
