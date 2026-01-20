@@ -469,12 +469,12 @@ payload?.doors?.forEach((d) => {
   console.log(score);
 
   // Door 1
-  if (d.id === 0 && d.state === 0 && score === 0.2) {
+  if (d.id === 0 && d.state === 0) {
     door1Open = true;
   }
 
   // Door 2
-  if (d.id === 1 && d.state === 0 && score === 0.2) {
+  if (d.id === 1 && d.state === 0) {
     door2Open = true;
   }
 });
