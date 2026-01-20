@@ -182,8 +182,11 @@ body {
 
 /* ===== DOOR INFO LAYOUT (NEW) ===== */
 .door-info {
+      flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
+
 }
 
 .door-header {
@@ -243,24 +246,29 @@ body {
 /* ================================================= */
 
 .door-update {
+  display: flex;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  margin-top: 8px;
+  margin-top: 6px;
   font-size: 11px;
   color: var(--muted);
+    flex-wrap: wrap;
   white-space: nowrap;
+  line-height: 1.4;
 }
 
 .door-update::before {
   content: "🕒";
   font-size: 11px;
   opacity: 0.6;
+  flex-shrink: 0;
 }
 
 .door-time {
   font-weight: 500;
   color: var(--muted);
+   word-break: break-word;
 }
 
 /* ===== TELEMETRY ===== */
