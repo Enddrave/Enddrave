@@ -39,7 +39,8 @@ body {
 }
 
 .page-title {
-  font-size: 20px;
+  font-size: 24px;
+  color: indigo;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
