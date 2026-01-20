@@ -64,15 +64,22 @@ body {
 }
 
 /* ===== COLUMNS ===== */
-.left-column,
-.center-column,
-.alert-column {
+.left-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.center-column {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
 .alert-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
   position: sticky;
   top: 90px;
 }
@@ -106,6 +113,54 @@ body {
   color: var(--muted);
 }
 
+/* ===== GATEWAY STATUS ===== */
+.status-list {
+  list-style: none;
+  margin-top: 8px;
+  font-size: 13px;
+}
+
+.status-label {
+  color: var(--muted);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  margin-top: 10px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 500;
+}
+
+.badge-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+/* ONLINE */
+.badge.online {
+  background: #ecfdf5;
+  color: #15803d;
+}
+
+.badge.online .badge-dot {
+  background: #22c55e;
+}
+
+/* OFFLINE */
+.badge.offline {
+  background: #fef2f2;
+  color: var(--red);
+}
+
+.badge.offline .badge-dot {
+  background: var(--red);
+}
+
 /* ===== DOORS ===== */
 .door-list {
   display: flex;
@@ -120,11 +175,18 @@ body {
   gap: 10px;
 }
 
+.door-label {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ===== DOOR INFO LAYOUT (NEW) ===== */
 .door-info {
-  flex: 1;
+      flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
+
 }
 
 .door-header {
@@ -142,14 +204,14 @@ body {
   font-weight: 500;
   padding: 6px 14px;
   border-radius: 999px;
+  margin-top: 0;
   margin-bottom: 6px;
   color: #111827;
   order: 1;
 }
 
+/* Door label below pill */
 .door-label {
-  font-size: 13px;
-  color: var(--muted);
   order: 2;
 }
 
@@ -180,17 +242,19 @@ body {
 }
 
 /* ================================================= */
-/* ✅ LAST UPDATED — FIXED VISIBILITY & ALIGNMENT */
+/* ✅ LAST UPDATED — CLEAN METADATA STYLE */
 /* ================================================= */
 
 .door-update {
   display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
   margin-top: 6px;
   font-size: 11px;
   color: var(--muted);
-  flex-wrap: wrap;          /* allow wrap */
+    flex-wrap: wrap;
+  white-space: nowrap;
   line-height: 1.4;
 }
 
@@ -204,17 +268,7 @@ body {
 .door-time {
   font-weight: 500;
   color: var(--muted);
-  word-break: break-word;
-}
-
-/* ================================================= */
-/* ✅ LATEST RECORD + EVENT LOG — SIDE BY SIDE */
-/* ================================================= */
-
-.record-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+   word-break: break-word;
 }
 
 /* ===== TELEMETRY ===== */
@@ -246,6 +300,10 @@ body {
   width: 680px;
 }
 
+.alignment {
+  width: 300px;
+}
+
 /* ===== TABLE ===== */
 table {
   background-color: #faf9f6;
@@ -274,9 +332,72 @@ th {
   border: 1px solid var(--border);
 }
 
-/* ===== RESPONSIVE ===== */
+/* ================================================= */
+/* RESPONSIVE */
+/* ================================================= */
+
+@media (max-width: 1100px) {
+  .main-grid {
+    grid-template-columns: 260px 1fr;
+  }
+
+  .alert-column {
+    position: static;
+  }
+}
+
 @media (max-width: 900px) {
-  .record-row {
+  body {
+    padding: 20px 14px 28px;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .page-title {
+    font-size: 20px;
+  }
+
+  .main-grid {
     grid-template-columns: 1fr;
+  }
+
+  .alert-column {
+    order: -1;
+  }
+
+  .tel-anomaly,
+  .alignment {
+    width: 100%;
+  }
+
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .card,
+  .card-soft {
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  .card-title {
+    font-size: 11px;
+  }
+
+  .door-state {
+    font-size: 12px;
+    padding: 5px 12px;
+  }
+
+  .telemetry-chart {
+    height: 100px;
   }
 }
