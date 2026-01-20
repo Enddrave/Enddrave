@@ -460,22 +460,18 @@ function renderAnomalyAlert(payload) {
     }
   });
 
-let door1Open = false;
-let door2Open = false;
+let door1Open = true;
+let door2Open = true;
 
 payload?.doors?.forEach((d) => {
-  console.log(d);
-  console.log(d.state);
-  console.log(score);
-
   // Door 1
   if (d.id === 0 && d.state === 0) {
-    door1Open = true;
+    door1Open = false;
   }
 
   // Door 2
   if (d.id === 1 && d.state === 0) {
-    door2Open = true;
+    door2Open = false;
   }
 });
 
