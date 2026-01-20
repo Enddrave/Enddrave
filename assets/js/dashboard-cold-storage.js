@@ -485,7 +485,7 @@ if (door1Open && door2Open) {
 }
    
   if (!reasons.length) {
-    reasons.push("Environmental deviation detected");
+    reasons.push("Temperature, humidity, and door states are normal");
   }
 
   panel.innerHTML = `
