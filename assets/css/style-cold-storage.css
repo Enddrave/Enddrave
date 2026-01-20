@@ -180,6 +180,18 @@ body {
   color: var(--muted);
 }
 
+/* ===== DOOR INFO LAYOUT (NEW) ===== */
+.door-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.door-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
 /* ===== DOOR STATE ===== */
 .door-state {
   display: inline-flex;
@@ -189,8 +201,15 @@ body {
   font-weight: 500;
   padding: 6px 14px;
   border-radius: 999px;
-  margin-top: 6px;
+  margin-top: 0;
+  margin-bottom: 6px;
   color: #111827;
+  order: 1;
+}
+
+/* Door label below pill */
+.door-label {
+  order: 2;
 }
 
 /* OPEN */
@@ -220,22 +239,23 @@ body {
 }
 
 /* ================================================= */
-/* ✅ UPDATED — DOOR LAST UPDATED UI (ONLY CHANGE) */
+/* ✅ LAST UPDATED — CLEAN METADATA STYLE */
 /* ================================================= */
 
 .door-update {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
-  margin-top: 6px;
+  margin-top: 8px;
   font-size: 11px;
   color: var(--muted);
+  white-space: nowrap;
 }
 
 .door-update::before {
   content: "🕒";
-  font-size: 12px;
-  opacity: 0.7;
+  font-size: 11px;
+  opacity: 0.6;
 }
 
 .door-time {
@@ -305,7 +325,7 @@ th {
 }
 
 /* ================================================= */
-/* ✅ RESPONSIVE — ONLY SECTION UPDATED */
+/* RESPONSIVE */
 /* ================================================= */
 
 @media (max-width: 1100px) {
