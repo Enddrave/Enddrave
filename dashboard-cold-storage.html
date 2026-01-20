@@ -115,74 +115,73 @@
     <section class="center-column">
 
       <article class="card">
-        <div class="card-title">Environment THD Profile</div>
+  <div class="card-title">Environment THD Profile</div>
 
-        
+  <div class="env-grid">
 
-        <div class="env-grid">
+    <div class="env-mini">
+      <div class="env-mini-title">Telemetry · THD 1</div>
+      <canvas class="telemetry-chart"></canvas>
+    </div>
 
-            
+    <div class="env-mini">
+      <div class="env-mini-title">Telemetry · THD 2</div>
+      <canvas class="telemetry-chart"></canvas>
+    </div>
 
-          
-          <div class="env-mini">
-            <div class="env-mini-title">Telemetry · THD 1</div>
-            <canvas class="telemetry-chart"></canvas>
-          </div>
+    <div class="env-mini">
+      <div class="env-mini-title">Telemetry · THD 3</div>
+      <canvas class="telemetry-chart"></canvas>
+    </div>
 
-          <div class="env-mini">
-            <div class="env-mini-title">Telemetry · THD 2</div>
-            <canvas class="telemetry-chart"></canvas>
-          </div>
+    <div class="env-mini">
+      <div class="env-mini-title">Telemetry · THD 4</div>
+      <canvas class="telemetry-chart"></canvas>
+    </div>
 
-          <div class="env-mini">
-            <div class="env-mini-title">Telemetry · THD 3</div>
-            <canvas class="telemetry-chart"></canvas>
-          </div>
+    <div class="env-mini tel-anomaly anomaly-highlight">
+      <div class="env-mini-title">Telemetry · Anomaly Score</div>
+      <canvas class="telemetry-chart"></canvas>
+    </div>
 
-          <div class="env-mini">
-            <div class="env-mini-title">Telemetry · THD 4</div>
-            <canvas class="telemetry-chart"></canvas>
-          </div>
-          <div class="env-mini tel-anomaly anomaly-highlight">
-            <div class="env-mini-title">Telemetry · Anomaly Score</div>
-            <canvas class="telemetry-chart"></canvas>
-          </div>
-     
-        </div>
+  </div>
 
-       
+  <!-- ========================= -->
+  <!-- ✅ SIDE-BY-SIDE SECTION -->
+  <!-- ========================= -->
+  <div class="env-bottom record-row">
 
-        <div class="env-bottom">
+    <!-- Latest Record -->
+    <div class="latest-record">
+      <div class="card-sub">Latest Record</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Tag</th>
+            <th>Temp (°C)</th>
+            <th>Hum (%)</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>TH1</td><td>18.2</td><td>74.3</td><td>11:56:48</td></tr>
+          <tr><td>TH2</td><td>18.2</td><td>74.3</td><td>11:56:44</td></tr>
+          <tr><td>TH3</td><td>18.2</td><td>74.5</td><td>11:56:37</td></tr>
+          <tr><td>TH4</td><td>18.2</td><td>74.4</td><td>11:56:20</td></tr>
+        </tbody>
+      </table>
+    </div>
 
-          <!-- Latest Record -->
-          <div>
-            <div class="card-sub">Latest Record</div>
-            <table>
-              <thead>
-                <tr>
-                  <th>Tag</th>
-                  <th>Temp (°C)</th>
-                  <th>Hum (%)</th>
-                  <th>Time</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr><td>TH1</td><td>18.2</td><td>74.3</td><td>11:56:48</td></tr>
-                <tr><td>TH2</td><td>18.2</td><td>74.3</td><td>11:56:44</td></tr>
-                <tr><td>TH3</td><td>18.2</td><td>74.5</td><td>11:56:37</td></tr>
-                <tr><td>TH4</td><td>18.2</td><td>74.4</td><td>11:56:20</td></tr>
-              </tbody>
-            </table>
-          </div>
+    <!-- Event Log -->
+    <div class="event-log">
+      <div class="card-sub">Event Log</div>
+      <div class="log-box">--</div>
+    </div>
 
-          <!-- Event Log -->
-          <div>
-            <div class="card-sub">Event Log</div>
-            <div class="log-box">--</div>
-          </div>
+  </div>
+</article>
 
-        </div>
-      </article>
+
 
     </section>
 
