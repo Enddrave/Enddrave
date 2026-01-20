@@ -106,7 +106,6 @@ body {
 .card-sub {
   letter-spacing: 0.18em;
   font-weight: 900;
-  letterSpacing: '0.18em';
   padding: 5px;
   margin: 10px;
   text-transform: uppercase;
@@ -181,7 +180,7 @@ body {
   color: var(--muted);
 }
 
-/* ===== DOOR STATE (ORIGINAL — RESTORED) ===== */
+/* ===== DOOR STATE ===== */
 .door-state {
   display: inline-flex;
   align-items: center;
@@ -194,7 +193,7 @@ body {
   color: #111827;
 }
 
-/* 🚨 OPEN — RED (UNCHANGED) */
+/* OPEN */
 .door-state.alert {
   background: #fef2f2;
 }
@@ -207,7 +206,7 @@ body {
   background: #dc2626;
 }
 
-/* 🔒 CLOSED — BLUE (UNCHANGED) */
+/* CLOSED */
 .door-state.ok {
   background: #eff6ff;
 }
@@ -220,7 +219,7 @@ body {
   background: #2563eb;
 }
 
-.door-time{
+.door-time {
   font-weight: 700;
   font-size: 11px;
   margin-top: 7px;
@@ -251,9 +250,11 @@ body {
   width: 100%;
   height: 120px;
 }
+
 .tel-anomaly {
-  width: 550px; 
+  width: 550px;
 }
+
 .alignment {
   width: 300px;
 }
@@ -286,7 +287,10 @@ th {
   border: 1px solid var(--border);
 }
 
-/* ===== RESPONSIVE ===== */
+/* ================================================= */
+/* ✅ RESPONSIVE — ONLY SECTION UPDATED */
+/* ================================================= */
+
 @media (max-width: 1100px) {
   .main-grid {
     grid-template-columns: 260px 1fr;
@@ -298,11 +302,57 @@ th {
 }
 
 @media (max-width: 900px) {
+  body {
+    padding: 20px 14px 28px;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .page-title {
+    font-size: 20px;
+  }
+
   .main-grid {
     grid-template-columns: 1fr;
   }
 
   .alert-column {
     order: -1;
+  }
+
+  .tel-anomaly,
+  .alignment {
+    width: 100%;
+  }
+
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .card,
+  .card-soft {
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  .card-title {
+    font-size: 11px;
+  }
+
+  .door-state {
+    font-size: 12px;
+    padding: 5px 12px;
+  }
+
+  .telemetry-chart {
+    height: 100px;
   }
 }
