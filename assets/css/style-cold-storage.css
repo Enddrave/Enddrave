@@ -48,7 +48,7 @@ body {
 
 /* ===== DASHBOARD ===== */
 .dashboard {
-  max-width: 1200px;
+  max-width: 1330px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -252,7 +252,7 @@ body {
 }
 
 .tel-anomaly {
-  width: 550px;
+  width: 680px;
 }
 
 .alignment {
