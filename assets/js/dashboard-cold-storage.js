@@ -451,31 +451,81 @@ function renderAnomalyAlert(payload) {
     bg = "rgba(37, 99, 235, 1)";
     icon = "⚠️";
   }
-  /* 🔍 Intelligent reasons (example logic) */
-  const reasons = [];
 
-  payload?.dht22?.forEach((s, i) => {
-    if (s.temperature > 25) {
-      reasons.push(`TH${i + 1} temperature exceeded safe limit`);
-    }
-  });
 
-let door1Open = true;
-let door2Open = true;
 
-payload?.doors?.forEach((d) => {
-  // Door 1
-  if (d.id === 0 && d.state === 0) {
-    door1Open = false;
+
+
+
+
+
+   /* ================================
+   ⚙️ BASE CONFIG
+================================ */
+const CONFIG = {
+  BASE_TEMP: 19.0,
+  BASE_HUM: 85.0,
+  SENSOR_LIMIT: 100.0,
+  SENSOR_DIFF: 100.0,
+  SENSOR_SCORE: 0.50,
+  DIFF_SCORE: 0.30,
+};
+
+/* ================================
+   🔍 INTELLIGENT REASONS
+================================ */
+const reasons = [];
+let anomalyScore = 0;
+
+/* ================================
+   🌡️ DHT22 LOGIC
+================================ */
+payload?.dht22?.forEach((s, i) => {
+  const sensorId = `TH${i + 1}`;
+
+  // Temperature check
+  if (s.temperature > CONFIG.BASE_TEMP) {
+    reasons.push(
+      `${sensorId}: temperature high (${s.temperature}°C)`
+    );
+    anomalyScore += CONFIG.SENSOR_SCORE;
   }
 
-  // Door 2
-  if (d.id === 1 && d.state === 0) {
-    door2Open = false;
+  // Humidity check
+  if (s.humidity > CONFIG.BASE_HUM) {
+    reasons.push(
+      `${sensorId}: humidity high (${s.humidity}%)`
+    );
+    anomalyScore += CONFIG.SENSOR_SCORE;
+  }
+
+  // Combined temp + humidity rise
+  if (
+    s.temperature > CONFIG.BASE_TEMP &&
+    s.humidity > CONFIG.BASE_HUM
+  ) {
+    reasons.push(
+      `${sensorId}: temperature & humidity rising together`
+    );
+    anomalyScore += CONFIG.DIFF_SCORE;
   }
 });
 
-// Post-loop combined logic
+/* ================================
+   🚪 DOOR LOGIC
+   state: 0 = OPEN, 1 = CLOSED
+================================ */
+let door1Open = false;
+let door2Open = false;
+
+payload?.doors?.forEach((d) => {
+  if (d.id === 0 && d.state === 0) door1Open = true;
+  if (d.id === 1 && d.state === 0) door2Open = true;
+});
+
+/* ================================
+   🔗 DOOR REASONS
+================================ */
 if (door1Open && door2Open) {
   reasons.push(`Door 1 & Door 2 are open`);
 } else if (door1Open) {
@@ -483,11 +533,30 @@ if (door1Open && door2Open) {
 } else if (door2Open) {
   reasons.push(`Door 2 is open`);
 }
-   
-  if (!reasons.length) {
-    reasons.push("Temperature, humidity, and door states are normal");
-  }
 
+/* ================================
+   📊 SCORE NORMALIZATION
+================================ */
+anomalyScore = Math.min(anomalyScore, 1);
+
+/* ================================
+   ✅ NORMAL FALLBACK
+================================ */
+if (!reasons.length) {
+  reasons.push(
+    `Temperature, humidity, and door states are normal`
+  );
+}
+
+   
+
+
+   
+ 
+
+
+
+   
   panel.innerHTML = `
     <div style="
       border: 2px solid ${color};
