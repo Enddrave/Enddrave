@@ -467,7 +467,7 @@ function renderAnomalyAlert(payload) {
 const CONFIG = {
   BASE_TEMP: 19.0,
   BASE_HUM: 85.0,
-  SENSOR_LIMIT: 100.0,
+  SENSOR_LIMIT: 6.0,
   SENSOR_DIFF: 10.0,   // drift threshold (±)
   SENSOR_SCORE: 0.50,
   DIFF_SCORE: 0.30,
@@ -531,12 +531,12 @@ payload?.dht22?.forEach((s, i) => {
    🚪 DOOR LOGIC
    state: 0 = OPEN, 1 = CLOSED
 ================================ */
-let door1Open = false;
-let door2Open = false;
+let door1Open = true;
+let door2Open = true;
 
 payload?.doors?.forEach((d) => {
-  if (d.id === 0 && d.state === 0) door1Open = true;
-  if (d.id === 1 && d.state === 0) door2Open = true;
+  if (d.id === 0 && d.state === 0) door1Open = false;
+  if (d.id === 1 && d.state === 0) door2Open = false;
 });
 
 /* ================================
