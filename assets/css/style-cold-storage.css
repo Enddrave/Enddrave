@@ -1,12 +1,8 @@
-/* =====================================================
-   THEME VARIABLES
-===================================================== */
 :root {
-  --bg: #f6f7f3;
+  --bg: #f5f5ef;
   --card: #ffffff;
-  --card-soft: #fbfbf7;
-  --border: #e5e7eb;
-
+  --card-soft: #ffffff;
+  --border: #e5e5de;
   --text: #111827;
   --muted: #6b7280;
 
@@ -15,37 +11,41 @@
   --orange: #ea580c;
   --amber: #d97706;
   --red: #dc2626;
-
-  --radius-lg: 20px;
-  --radius-md: 14px;
-  --radius-sm: 10px;
-
-  --shadow-soft: 0 6px 18px rgba(15, 23, 42, 0.06);
-  --shadow-strong: 0 18px 40px rgba(15, 23, 42, 0.10);
 }
 
 /* =====================================================
    RESET
 ===================================================== */
-*,
-*::before,
-*::after {
+* {
   box-sizing: border-box;
-}
-
-html,
-body {
   margin: 0;
   padding: 0;
 }
 
 body {
   background: var(--bg);
-  color: var(--text);
   font-family: system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", Roboto, Arial, sans-serif;
-  line-height: 1.45;
-  padding: 28px;
+  color: var(--text);
+  padding: 28px 22px 40px;
+}
+
+/* =====================================================
+   PAGE HEADER
+===================================================== */
+.page-header {
+  max-width: 1200px;
+  margin: 20px auto 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.page-title {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 /* =====================================================
@@ -56,23 +56,45 @@ body {
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 18px;
 }
 
 /* =====================================================
-   CARDS
+   MAIN GRID
+===================================================== */
+.main-grid {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr) 320px;
+  gap: 16px;
+  align-items: start;
+}
+
+/* =====================================================
+   COLUMNS
+===================================================== */
+.left-column,
+.center-column,
+.alert-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.alert-column {
+  position: sticky;
+  top: 90px;
+}
+
+/* =====================================================
+   CARD
 ===================================================== */
 .card,
 .card-soft {
   background: var(--card);
-  border-radius: var(--radius-lg);
+  border-radius: 18px;
   border: 1px solid var(--border);
-  box-shadow: var(--shadow-soft);
-  padding: 18px 20px;
-}
-
-.card-soft {
-  background: var(--card-soft);
+  box-shadow: 0 12px 25px rgba(15, 23, 42, 0.06);
+  padding: 16px 18px;
 }
 
 .card-title {
@@ -81,152 +103,212 @@ body {
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--muted);
-  margin-bottom: 12px;
+  margin-bottom: 8px;
+}
+
+.card-sub {
+  font-size: 12px;
+  color: var(--muted);
 }
 
 /* =====================================================
-   ENV GRID
+   STATUS / BADGES
+===================================================== */
+.status-list {
+  list-style: none;
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  margin-top: 10px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.badge-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.badge.online {
+  background: #ecfdf5;
+  color: var(--green);
+}
+
+.badge.online .badge-dot {
+  background: var(--green);
+}
+
+.badge.offline {
+  background: #fef2f2;
+  color: var(--red);
+}
+
+.badge.offline .badge-dot {
+  background: var(--red);
+}
+
+/* =====================================================
+   DOORS
+===================================================== */
+.door-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.door-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.door-label {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.door-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 999px;
+}
+
+.door-state.alert {
+  background: #fef2f2;
+}
+
+.door-state.alert::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--red);
+}
+
+.door-state.ok {
+  background: #eff6ff;
+}
+
+.door-state.ok::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--blue);
+}
+
+.door-time {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+/* =====================================================
+   TELEMETRY GRID (MATCH IMAGE)
 ===================================================== */
 .env-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
+  gap: 16px;
 }
 
-/* =====================================================
-   MINI TELEMETRY CARDS
-===================================================== */
+/* TELEMETRY CARD */
 .env-mini {
-  background: var(--card-soft);
-  border-radius: var(--radius-md);
+  background: #fbfbf7;
+  border-radius: 18px;
+  padding: 14px 16px 28px;
   border: 1px solid var(--border);
-  padding: 14px;
-  box-shadow: var(--shadow-soft);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.05);
 }
 
 .env-mini-title {
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   color: var(--muted);
   margin-bottom: 8px;
 }
 
 .telemetry-chart {
-  width: 100%;
-  height: 140px;
+  width: 100% !important;
+  height: 120px !important;
 }
 
 /* =====================================================
-   ANOMALY GRAPH (PRIMARY FOCUS)
+   ANOMALY SCORE — FULL WIDTH
 ===================================================== */
 .tel-anomaly {
   grid-column: 1 / -1;
-  margin-top: 10px;               /* separation from THD grid */
-  padding: 22px;
-  border-radius: var(--radius-lg);
-  background: linear-gradient(
-    180deg,
-    #ffffff 0%,
-    #fafafa 100%
-  );
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-strong);
-}
-
-.tel-anomaly .env-mini-title {
-  font-size: 14px;
-  font-weight: 700;
+  padding: 16px 18px 24px;
 }
 
 .tel-anomaly .telemetry-chart {
-  height: 220px;
+  height: 220px !important;
+}
+
+.anomaly-highlight {
+  border: 2px solid #d1fae5;
 }
 
 /* =====================================================
-   SPACER BETWEEN GRAPH & TABLE
+   TABLE
 ===================================================== */
-.section-spacer {
-  height: 26px;
-}
-
-/* =====================================================
-   LATEST RECORD TABLE
-===================================================== */
-.latest-record {
-  margin-top: 6px;
-}
-
-.latest-record-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--muted);
-  margin-bottom: 14px;
-}
-
 table {
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  font-size: 13px;
-  background: var(--card);
-  border-radius: var(--radius-md);
+  font-size: 11px;
+  border-collapse: collapse;
+  border-radius: 10px;
   overflow: hidden;
-  box-shadow: var(--shadow-soft);
-}
-
-thead {
-  background: #f9fafb;
 }
 
 th,
 td {
-  padding: 14px 16px;
+  padding: 8px;
   border-bottom: 1px solid var(--border);
 }
 
 th {
-  text-align: left;
-  font-weight: 600;
   color: var(--muted);
-}
-
-tbody tr:last-child td {
-  border-bottom: none;
+  font-weight: 600;
 }
 
 /* =====================================================
    EVENT LOG
 ===================================================== */
 .log-box {
-  margin-top: 18px;
-  min-height: 64px;
-  padding: 14px 16px;
-  background: var(--card-soft);
-  border-radius: var(--radius-md);
+  max-height: 180px;
+  overflow-y: auto;
+  border-radius: 12px;
+  background: #fbfbf7;
   border: 1px solid var(--border);
-  box-shadow: var(--shadow-soft);
-  font-size: 13px;
-  color: var(--muted);
+  padding: 8px;
 }
 
 /* =====================================================
    RESPONSIVE — TABLET
 ===================================================== */
-@media (max-width: 1024px) {
-  body {
-    padding: 20px;
-  }
-
-  .env-grid {
+@media (max-width: 1100px) {
+  .main-grid {
     grid-template-columns: 1fr;
   }
 
-  .telemetry-chart {
-    height: 150px;
-  }
-
-  .tel-anomaly .telemetry-chart {
-    height: 200px;
+  .alert-column {
+    position: static;
+    order: -1;
   }
 }
 
@@ -235,24 +317,22 @@ tbody tr:last-child td {
 ===================================================== */
 @media (max-width: 600px) {
   body {
-    padding: 16px;
+    padding: 18px 14px 32px;
+  }
+
+  .page-title {
+    font-size: 15px;
+  }
+
+  .env-grid {
+    grid-template-columns: 1fr;
   }
 
   .telemetry-chart {
-    height: 140px;
-  }
-
-  .tel-anomaly {
-    padding: 18px;
+    height: 100px !important;
   }
 
   .tel-anomaly .telemetry-chart {
-    height: 180px;
-  }
-
-  th,
-  td {
-    padding: 12px;
-    font-size: 12px;
+    height: 160px !important;
   }
 }
