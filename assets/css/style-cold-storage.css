@@ -401,3 +401,126 @@ th {
     height: 100px;
   }
 }
+
+/* ================================================= */
+/* 🌐 RESPONSIVE LAYOUT ENHANCEMENTS */
+/* (Keep all existing styles unchanged) */
+/* ================================================= */
+
+/* ---------- Large laptops / small desktops ---------- */
+@media (max-width: 1280px) {
+  .main-grid {
+    grid-template-columns: 240px minmax(0, 1fr) 300px;
+    gap: 14px;
+  }
+
+  .dashboard {
+    gap: 16px;
+  }
+}
+
+/* ---------- Tablets / medium screens ---------- */
+@media (max-width: 1100px) {
+  .main-grid {
+    grid-template-columns: 260px 1fr;
+  }
+
+  .alert-column {
+    position: static;
+    top: auto;
+  }
+
+  .tel-anomaly,
+  .alignment {
+    width: 100%;
+  }
+}
+
+/* ---------- Tablets & small laptops ---------- */
+@media (max-width: 900px) {
+  body {
+    padding: 20px 14px 28px;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .page-title {
+    font-size: 20px;
+  }
+
+  .main-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .alert-column {
+    order: -1;
+  }
+
+  table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}
+
+/* ---------- Large phones ---------- */
+@media (max-width: 640px) {
+  .card,
+  .card-soft {
+    padding: 14px 14px;
+    border-radius: 16px;
+  }
+
+  .card-title {
+    font-size: 11px;
+  }
+
+  .door-item {
+    align-items: flex-start;
+  }
+
+  .door-state {
+    font-size: 12px;
+    padding: 5px 12px;
+  }
+
+  .door-update {
+    font-size: 10px;
+    white-space: normal;
+  }
+
+  .env-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Small phones ---------- */
+@media (max-width: 480px) {
+  body {
+    padding: 16px 12px 24px;
+  }
+
+  .page-title {
+    font-size: 18px;
+  }
+
+  .telemetry-chart {
+    height: 100px;
+  }
+
+  .log-box {
+    max-height: 160px;
+  }
+
+  th,
+  td {
+    padding: 6px 6px;
+  }
+}
+
