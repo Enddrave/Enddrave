@@ -468,7 +468,7 @@ const CONFIG = {
   BASE_HUM: 70.0,
   SENSOR_LIMIT: 6.0,    // ± limit threshold
   SENSOR_DIFF: 10.0,    // major drift threshold
-  SENSOR_SCORE: 0.0625,
+  SENSOR_SCORE: 0.125,
   DIFF_SCORE: 0.30,
 };
 
