@@ -464,8 +464,8 @@ function renderAnomalyAlert(payload) {
    ⚙️ BASE CONFIG
 ================================ */
 const CONFIG = {
-  BASE_TEMP: 18.0,
-  BASE_HUM: 81.0,
+  BASE_TEMP: 20.0,
+  BASE_HUM: 70.0,
   SENSOR_LIMIT: 6.0,    // ± limit threshold
   SENSOR_DIFF: 10.0,    // major drift threshold
   SENSOR_SCORE: 0.0625,
