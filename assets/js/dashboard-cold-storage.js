@@ -701,6 +701,7 @@ if (!reasons.length) {
   ===================================================== */
 
 function updateRuntimeConfig(cfg) {
+   console.log(cfg);
   if (!cfg) return;
 
   if (cfg.baseTemp !== undefined) CONFIG.BASE_TEMP = cfg.baseTemp;
@@ -714,6 +715,7 @@ function updateRuntimeConfig(cfg) {
 }
 
 function updateConfigUI(cfg) {
+   console.log(cfg);
   document.getElementById("cfgBaseTemp").textContent = cfg.BASE_TEMP + " °C";
   document.getElementById("cfgBaseHum").textContent = cfg.BASE_HUM + " %";
   document.getElementById("cfgSensorLimit").textContent = "±" + cfg.SENSOR_LIMIT;
