@@ -33,3 +33,43 @@ nav a.active::after {
 nav a {
   transition: color 0.2s ease, background-color 0.2s ease;
 }
+
+
+/* ============================= */
+/* Reference Range Card (Left) */
+/* ============================= */
+
+.reference-card {
+  margin-top: 16px;
+}
+
+.reference-card .ref-item {
+  background: #f9fafb;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.reference-card .ref-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.reference-card .ref-value {
+  font-size: 18px;
+  font-weight: 600;
+  color: #0f766e;
+  margin-top: 2px;
+}
+
+.reference-card .ref-base {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.reference-card .ref-note {
+  font-size: 11px;
+  text-align: center;
+  color: #9ca3af;
+}
