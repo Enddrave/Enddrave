@@ -738,15 +738,16 @@ function updateConfigUI(cfg) {
       .build();
 
     conn.on("newtelemetry", payload => {
+
+       // 🔧 CONFIG HANDLING (dynamic)
+        if (payload?.config) {
+          updateRuntimeConfig(payload.config);
+        }
+       
       updateGatewayInfo(payload);
       updateLatestRecordTable(payload);
       updateEventLogFullJSON(payload);
-
-     // 🔧 CONFIG HANDLING (dynamic)
-     if (payload?.config) {
-       updateRuntimeConfig(payload.config);
-     }
-
+       
       payload?.dht22?.forEach(sensor => {
         const chart = telemetryCharts[sensor.id];
         if (chart) chart.pushPoint(sensor.temperature, sensor.humidity);
