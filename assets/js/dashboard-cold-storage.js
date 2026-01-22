@@ -464,12 +464,12 @@ function renderAnomalyAlert(payload) {
    ⚙️ BASE CONFIG
 ================================ */
 const CONFIG = {
-  BASE_TEMP: 20.0,
-  BASE_HUM: 80.0,
-  SENSOR_LIMIT: 6.0,    // ± limit threshold
-  SENSOR_DIFF: 10.0,    // major drift threshold
-  SENSOR_SCORE: 0.125,
-  DIFF_SCORE: 0.30,
+  BASE_TEMP: 00.0,
+  BASE_HUM: 00.0,
+  SENSOR_LIMIT: 0.0,    // ± limit threshold
+  SENSOR_DIFF: 00.0,    // major drift threshold
+  SENSOR_SCORE: 0.0,
+  DIFF_SCORE: 0.0,
 };
 
 /* ================================
@@ -713,16 +713,13 @@ function updateRuntimeConfig(cfg) {
   updateConfigUI(CONFIG); // 🔥 update displayed values
 }
 
-function updateConfigUI(config) {
-  document.getElementById("baseTemp").textContent = config.baseTemp;
-  document.getElementById("baseHum").textContent = config.baseHum;
-  document.getElementById("sensorLimit").textContent = config.sensorLimit;
-  document.getElementById("sensorDiff").textContent = config.sensorDiff;
-  document.getElementById("sensorScore").textContent = config.sensorScore;
-  document.getElementById("diffScore").textContent = config.diffScore;
-  document.getElementById("doorScore").textContent = config.doorScore;
-  document.getElementById("telemetryPeriod").textContent =
-    config.telemetryPeriodMs + " ms";
+function updateConfigUI(cfg) {
+  document.getElementById("cfgBaseTemp").textContent = cfg.BASE_TEMP + " °C";
+  document.getElementById("cfgBaseHum").textContent = cfg.BASE_HUM + " %";
+  document.getElementById("cfgSensorLimit").textContent = "±" + cfg.SENSOR_LIMIT;
+  document.getElementById("cfgSensorDiff").textContent = cfg.SENSOR_DIFF;
+  document.getElementById("cfgSensorScore").textContent = cfg.SENSOR_SCORE;
+  document.getElementById("cfgDiffScore").textContent = cfg.DIFF_SCORE;
 }
   /* =====================================================
      🌐 SIGNALR
