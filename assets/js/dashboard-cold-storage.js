@@ -696,6 +696,34 @@ if (!reasons.length) {
     }
   }
 
+   /* =====================================================
+     🌐 Update Runtime Config
+  ===================================================== */
+
+function updateRuntimeConfig(cfg) {
+  if (!cfg) return;
+
+  if (cfg.baseTemp !== undefined) CONFIG.BASE_TEMP = cfg.baseTemp;
+  if (cfg.baseHum !== undefined) CONFIG.BASE_HUM = cfg.baseHum;
+  if (cfg.sensorLimit !== undefined) CONFIG.SENSOR_LIMIT = cfg.sensorLimit;
+  if (cfg.sensorDiff !== undefined) CONFIG.SENSOR_DIFF = cfg.sensorDiff;
+  if (cfg.sensorScore !== undefined) CONFIG.SENSOR_SCORE = cfg.sensorScore;
+  if (cfg.diffScore !== undefined) CONFIG.DIFF_SCORE = cfg.diffScore;
+
+  updateConfigUI(CONFIG); // 🔥 update displayed values
+}
+
+function updateConfigUI(config) {
+  document.getElementById("baseTemp").textContent = config.baseTemp;
+  document.getElementById("baseHum").textContent = config.baseHum;
+  document.getElementById("sensorLimit").textContent = config.sensorLimit;
+  document.getElementById("sensorDiff").textContent = config.sensorDiff;
+  document.getElementById("sensorScore").textContent = config.sensorScore;
+  document.getElementById("diffScore").textContent = config.diffScore;
+  document.getElementById("doorScore").textContent = config.doorScore;
+  document.getElementById("telemetryPeriod").textContent =
+    config.telemetryPeriodMs + " ms";
+}
   /* =====================================================
      🌐 SIGNALR
   ===================================================== */
@@ -715,6 +743,11 @@ if (!reasons.length) {
       updateLatestRecordTable(payload);
       updateEventLogFullJSON(payload);
 
+     // 🔧 CONFIG HANDLING (dynamic)
+     if (payload?.config) {
+       updateRuntimeConfig(payload.config);
+     }
+
       payload?.dht22?.forEach(sensor => {
         const chart = telemetryCharts[sensor.id];
         if (chart) chart.pushPoint(sensor.temperature, sensor.humidity);
@@ -724,7 +757,6 @@ if (!reasons.length) {
         anomalyChart.push(payload.abnormality.score);
          renderAnomalyAlert(payload); // 🔥 THIS LINE
       }
-
       payload?.doors?.forEach(d =>
         renderDoor(`D${d.id + 1}`, d.state === 1, d.changedAt)
       );
