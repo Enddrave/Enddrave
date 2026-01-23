@@ -110,21 +110,27 @@
 
       <!-- Reference Ranges -->
 <article class="card reference-card">
-  <div class="card-title">Configured Limits</div>
+<div class="config-card">
+  <div class="config-title">CONFIGURED LIMITS</div>
 
-  <div class="ref-item">
-    <div class="ref-label">Temperature (°C)</div>
-    <div class="ref-value">BASE_TEMP: 20 (± ...SENSOR_LIMIT:...) </div>
+  <div class="config-box">
+    <div class="config-label">Temperature (°C)</div>
+    <div class="config-value" id="cfgTemp">
+      BASE_TEMP: -- (± --)
+    </div>
   </div>
 
-  <div class="ref-item">
-    <div class="ref-label">Humidity (%)</div>
-    <div class="ref-base">BASE_HUM: 80.0 (± ...SENSOR_LIMIT:...)</div>
+  <div class="config-box muted">
+    <div class="config-label">Humidity (%)</div>
+    <div class="config-value" id="cfgHum">
+      BASE_HUM: -- (± --)
+    </div>
   </div>
 
-  <div class="ref-note">
+  <div class="config-footer">
     Derived from firmware thresholds
   </div>
+</div>
 </article>
 
 
