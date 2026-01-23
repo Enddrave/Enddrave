@@ -19,7 +19,23 @@ document.addEventListener("DOMContentLoaded", () => {
     badge.className = "badge offline";
     badge.innerHTML = `<span class="badge-dot"></span> Offline`;
   }
+   /* ================================
+   🔄 UPDATE CONFIG FROM SIGNALR
+================================ */
+function updateConfigFromPayload(payload) {
+  if (!payload?.config) return;
 
+  const cfg = payload.config;
+
+  CONFIG.BASE_TEMP    = cfg.baseTemp    ?? CONFIG.BASE_TEMP;
+  CONFIG.BASE_HUM     = cfg.baseHum     ?? CONFIG.BASE_HUM;
+  CONFIG.SENSOR_LIMIT = cfg.sensorLimit ?? CONFIG.SENSOR_LIMIT;
+  CONFIG.SENSOR_DIFF  = cfg.sensorDiff  ?? CONFIG.SENSOR_DIFF;
+  CONFIG.SENSOR_SCORE = cfg.sensorScore ?? CONFIG.SENSOR_SCORE;
+  CONFIG.DIFF_SCORE   = cfg.diffScore   ?? CONFIG.DIFF_SCORE;
+
+  log("🔧 CONFIG UPDATED FROM SIGNALR:", CONFIG);
+}
   /* =====================================================
      🔴 RESET GATEWAY FIELDS (OFFLINE)
   ===================================================== */
@@ -473,23 +489,7 @@ const CONFIG = {
 };
 
 
-   /* ================================
-   🔄 UPDATE CONFIG FROM SIGNALR
-================================ */
-function updateConfigFromPayload(payload) {
-  if (!payload?.config) return;
 
-  const cfg = payload.config;
-
-  CONFIG.BASE_TEMP    = cfg.baseTemp    ?? CONFIG.BASE_TEMP;
-  CONFIG.BASE_HUM     = cfg.baseHum     ?? CONFIG.BASE_HUM;
-  CONFIG.SENSOR_LIMIT = cfg.sensorLimit ?? CONFIG.SENSOR_LIMIT;
-  CONFIG.SENSOR_DIFF  = cfg.sensorDiff  ?? CONFIG.SENSOR_DIFF;
-  CONFIG.SENSOR_SCORE = cfg.sensorScore ?? CONFIG.SENSOR_SCORE;
-  CONFIG.DIFF_SCORE   = cfg.diffScore   ?? CONFIG.DIFF_SCORE;
-
-  log("🔧 CONFIG UPDATED FROM SIGNALR:", CONFIG);
-}
 
 /* ================================
    🔍 INTELLIGENT REASONS
