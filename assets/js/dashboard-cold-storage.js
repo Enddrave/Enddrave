@@ -2,12 +2,12 @@
    ⚙️ BASE CONFIG (GLOBAL DEFAULTS)
 ================================ */
 const CONFIG = {
-  BASE_TEMP: 20.0,
-  BASE_HUM: 70.0,
-  SENSOR_LIMIT: 6.0,
-  SENSOR_DIFF: 10.0,
-  SENSOR_SCORE: 0.125,
-  DIFF_SCORE: 0.30,
+  BASE_TEMP: null,
+  BASE_HUM: null,
+  SENSOR_LIMIT: null,
+  SENSOR_DIFF: null,
+  SENSOR_SCORE: null,
+  DIFF_SCORE: null,
 };
 
 
@@ -43,14 +43,18 @@ function renderConfigUI() {
 
   if (!tempEl || !humEl) return;
 
+  const baseTemp = CONFIG.BASE_TEMP ?? "--";
+  const baseHum  = CONFIG.BASE_HUM ?? "--";
+  const limit    = CONFIG.SENSOR_LIMIT ?? "--";
+
   tempEl.innerHTML = `
-    <strong>BASE_TEMP:</strong> ${CONFIG.BASE_TEMP}
-    <span style="opacity:.7">(± ${CONFIG.SENSOR_LIMIT})</span>
+    <strong>BASE_TEMP:</strong> ${baseTemp}
+    <span style="opacity:.7">(± ${limit})</span>
   `;
 
   humEl.innerHTML = `
-    <strong>BASE_HUM:</strong> ${CONFIG.BASE_HUM}
-    <span style="opacity:.7">(± ${CONFIG.SENSOR_LIMIT})</span>
+    <strong>BASE_HUM:</strong> ${baseHum}
+    <span style="opacity:.7">(± ${limit})</span>
   `;
 }
 
