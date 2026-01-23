@@ -48,6 +48,7 @@ function updateConfigFromPayload(payload) {
   CONFIG.DIFF_SCORE   = cfg.diffScore   ?? CONFIG.DIFF_SCORE;
 
   log("🔧 CONFIG UPDATED FROM SIGNALR:", CONFIG);
+   renderConfigUI();
 }
   /* =====================================================
      🔴 RESET GATEWAY FIELDS (OFFLINE)
@@ -714,6 +715,26 @@ if (!reasons.length) {
     }
   }
 
+
+   /* ================================
+   🧩 RENDER CONFIGURED LIMITS UI
+================================ */
+function renderConfigUI() {
+  const tempEl = document.getElementById("cfgTemp");
+  const humEl  = document.getElementById("cfgHum");
+
+  if (!tempEl || !humEl) return;
+
+  tempEl.innerHTML = `
+    <strong>BASE_TEMP:</strong> ${CONFIG.BASE_TEMP}
+    <span style="opacity:.7">(± ${CONFIG.SENSOR_LIMIT})</span>
+  `;
+
+  humEl.innerHTML = `
+    <strong>BASE_HUM:</strong> ${CONFIG.BASE_HUM}
+    <span style="opacity:.7">(± ${CONFIG.SENSOR_LIMIT})</span>
+  `;
+}
   /* =====================================================
      🌐 SIGNALR
   ===================================================== */
