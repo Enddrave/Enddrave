@@ -32,6 +32,29 @@ document.addEventListener("DOMContentLoaded", () => {
     badge.className = "badge offline";
     badge.innerHTML = `<span class="badge-dot"></span> Offline`;
   }
+
+
+      /* ================================
+   🧩 RENDER CONFIGURED LIMITS UI
+================================ */
+function renderConfigUI() {
+  const tempEl = document.getElementById("cfgTemp");
+  const humEl  = document.getElementById("cfgHum");
+
+  if (!tempEl || !humEl) return;
+
+  tempEl.innerHTML = `
+    <strong>BASE_TEMP:</strong> ${CONFIG.BASE_TEMP}
+    <span style="opacity:.7">(± ${CONFIG.SENSOR_LIMIT})</span>
+  `;
+
+  humEl.innerHTML = `
+    <strong>BASE_HUM:</strong> ${CONFIG.BASE_HUM}
+    <span style="opacity:.7">(± ${CONFIG.SENSOR_LIMIT})</span>
+  `;
+}
+
+   
    /* ================================
    🔄 UPDATE CONFIG FROM SIGNALR
 ================================ */
@@ -716,25 +739,7 @@ if (!reasons.length) {
   }
 
 
-   /* ================================
-   🧩 RENDER CONFIGURED LIMITS UI
-================================ */
-function renderConfigUI() {
-  const tempEl = document.getElementById("cfgTemp");
-  const humEl  = document.getElementById("cfgHum");
 
-  if (!tempEl || !humEl) return;
-
-  tempEl.innerHTML = `
-    <strong>BASE_TEMP:</strong> ${CONFIG.BASE_TEMP}
-    <span style="opacity:.7">(± ${CONFIG.SENSOR_LIMIT})</span>
-  `;
-
-  humEl.innerHTML = `
-    <strong>BASE_HUM:</strong> ${CONFIG.BASE_HUM}
-    <span style="opacity:.7">(± ${CONFIG.SENSOR_LIMIT})</span>
-  `;
-}
   /* =====================================================
      🌐 SIGNALR
   ===================================================== */
@@ -782,4 +787,5 @@ function renderConfigUI() {
   resetLatestRecordTable();
   resetDoorStatus();
   startSignalR();
+  renderConfigUI();
 });
