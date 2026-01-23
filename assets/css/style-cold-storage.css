@@ -403,76 +403,74 @@ th {
 }
 
 
-
-/* ============================= */
-/* Reference Range Card (Left) */
-/* ============================= */
-/* ============================= */
-/* Reference Ranges – Modern UI */
-/* ============================= */
+/* ================================
+   📦 Reference Ranges – Safe UI
+================================ */
 
 .reference-card {
-  padding: 14px;
-  border-radius: 14px;
-  background: #ffffff;
+  padding: 0;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #ffffff, #f8fafc);
   border: 1px solid #eef2f7;
-  transition: box-shadow 0.25s ease, transform 0.25s ease;
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
 }
 
-.reference-card:hover {
-  box-shadow: 0 10px 28px rgba(15, 118, 110, 0.12);
-  transform: translateY(-2px);
+/* Inner container */
+.config-card {
+  padding: 20px 22px;
+  font-family: Inter, system-ui, sans-serif;
 }
 
 /* Title */
-.reference-card .card-title {
-  font-size: 11px;
-  font-weight: 600;
+.config-title {
+  font-size: 12px;
+  font-weight: 800;
   letter-spacing: 0.12em;
   color: #6b7280;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
-/* Item blocks */
-.reference-card .ref-item {
-  padding: 10px 12px;
-  border-radius: 10px;
-  background: #f9fafb;
+/* Config blocks */
+.config-box {
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: #ffffff;
   margin-bottom: 10px;
-  transition: background 0.2s ease, transform 0.2s ease;
+  box-shadow:
+    inset 0 0 0 1px rgba(0,0,0,0.04),
+    0 6px 14px rgba(0,0,0,0.04);
 }
 
-.reference-card .ref-item:hover {
+/* Muted block */
+.config-box.muted {
   background: #f1f5f9;
-  transform: scale(1.01);
 }
 
 /* Labels */
-.reference-card .ref-label {
+.config-label {
   font-size: 12px;
-  font-weight: 500;
-  color: #374151;
-}
-
-/* Main value (range) */
-.reference-card .ref-value {
-  font-size: 15px;
   font-weight: 600;
+  color: #374151;
+  margin-bottom: 4px;
+}
+
+/* Value line (works for numbers AND --) */
+.config-value {
+  font-size: 16px;
+  font-weight: 700;
   color: #0f766e;
-  margin: 2px 0;
+  white-space: nowrap;
 }
 
-/* Base text */
-.reference-card .ref-base {
+/* Footer */
+.config-footer {
+  margin-top: 12px;
   font-size: 11px;
-  color: #6b7280;
-}
-
-/* Footer note */
-.reference-card .ref-note {
-  margin-top: 6px;
-  font-size: 10.5px;
   color: #9ca3af;
   text-align: center;
 }
+
+
 
