@@ -464,12 +464,12 @@ function renderAnomalyAlert(payload) {
    ⚙️ BASE CONFIG
 ================================ */
 const CONFIG = {
-  BASE_TEMP: 00.0,
-  BASE_HUM: 00.0,
-  SENSOR_LIMIT: 0.0,    // ± limit threshold
-  SENSOR_DIFF: 00.0,    // major drift threshold
-  SENSOR_SCORE: 0.0,
-  DIFF_SCORE: 0.0,
+  BASE_TEMP: 20.0,
+  BASE_HUM: 70.0,
+  SENSOR_LIMIT: 6.0,    // ± limit threshold
+  SENSOR_DIFF: 10.0,    // major drift threshold
+  SENSOR_SCORE: 0.125,
+  DIFF_SCORE: 0.30,
 };
 
 /* ================================
@@ -696,33 +696,6 @@ if (!reasons.length) {
     }
   }
 
-   /* =====================================================
-     🌐 Update Runtime Config
-  ===================================================== */
-
-function updateRuntimeConfig(cfg) {
-   console.log(cfg);
-  if (!cfg) return;
-
-  if (cfg.baseTemp !== undefined) CONFIG.BASE_TEMP = cfg.baseTemp;
-  if (cfg.baseHum !== undefined) CONFIG.BASE_HUM = cfg.baseHum;
-  if (cfg.sensorLimit !== undefined) CONFIG.SENSOR_LIMIT = cfg.sensorLimit;
-  if (cfg.sensorDiff !== undefined) CONFIG.SENSOR_DIFF = cfg.sensorDiff;
-  if (cfg.sensorScore !== undefined) CONFIG.SENSOR_SCORE = cfg.sensorScore;
-  if (cfg.diffScore !== undefined) CONFIG.DIFF_SCORE = cfg.diffScore;
-
-  updateConfigUI(CONFIG); // 🔥 update displayed values
-}
-
-function updateConfigUI(cfg) {
-   console.log(cfg);
-  document.getElementById("cfgBaseTemp").textContent = cfg.BASE_TEMP + " °C";
-  document.getElementById("cfgBaseHum").textContent = cfg.BASE_HUM + " %";
-  document.getElementById("cfgSensorLimit").textContent = "±" + cfg.SENSOR_LIMIT;
-  document.getElementById("cfgSensorDiff").textContent = cfg.SENSOR_DIFF;
-  document.getElementById("cfgSensorScore").textContent = cfg.SENSOR_SCORE;
-  document.getElementById("cfgDiffScore").textContent = cfg.DIFF_SCORE;
-}
   /* =====================================================
      🌐 SIGNALR
   ===================================================== */
@@ -738,16 +711,10 @@ function updateConfigUI(cfg) {
       .build();
 
     conn.on("newtelemetry", payload => {
-
-       // 🔧 CONFIG HANDLING (dynamic)
-        if (payload?.config) {
-          updateRuntimeConfig(payload.config);
-        }
-       
       updateGatewayInfo(payload);
       updateLatestRecordTable(payload);
       updateEventLogFullJSON(payload);
-       
+
       payload?.dht22?.forEach(sensor => {
         const chart = telemetryCharts[sensor.id];
         if (chart) chart.pushPoint(sensor.temperature, sensor.humidity);
@@ -757,6 +724,7 @@ function updateConfigUI(cfg) {
         anomalyChart.push(payload.abnormality.score);
          renderAnomalyAlert(payload); // 🔥 THIS LINE
       }
+
       payload?.doors?.forEach(d =>
         renderDoor(`D${d.id + 1}`, d.state === 1, d.changedAt)
       );
