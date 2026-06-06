@@ -170,14 +170,112 @@
   color:#4f6f69;
   line-height:1.6;
 }
+<!-- Core Services & Development Process start -->
+.section-title{
+    text-align:center;
+    font-size:32px;
+    color:#0f4c3a;
+    margin-bottom:40px;s
+    font-weight:700;
+}
+
+.services-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:20px;
+}
+
+.service-card{
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:12px;
+    padding:25px;
+    text-align:center;
+    transition:.3s;
+}
+
+.service-card:hover{
+    transform:translateY(-5px);
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+}
+
+.icon{
+    font-size:42px;
+    margin-bottom:15px;
+}
+
+.service-card h3{
+    color:#0f4c3a;
+    margin-bottom:10px;
+}
+
+.service-card p{
+    color:#555;
+    font-size:14px;
+    line-height:1.6;
+}
+
+.process-grid{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    align-items:center;
+    gap:20px;
+}
+
+.step{
+    width:150px;
+    text-align:center;
+}
+
+.step-icon{
+    width:70px;
+    height:70px;
+    margin:auto;
+    border:2px solid #0f4c3a;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:30px;
+    color:#0f4c3a;
+}
+
+.arrow{
+    font-size:24px;
+    color:#0f4c3a;
+}
+
+.step h4{
+    margin-top:15px;
+    font-size:16px;
+    color:#0f4c3a;
+}
+
+.step p{
+    font-size:13px;
+    color:#666;
+}
+
+@media(max-width:768px){
+
+    .process-grid{
+        flex-direction:column;
+    }
+
+    .arrow{
+        transform:rotate(90deg);
+    }
+
+}
+<!-- Core Services & Development Process end -->
 </style>
 </head>
 
 <body>
 
 <div id="header-placeholder"></div>
-include('assets/includes/header.html');
-<?php echo "Hello"; ?>
+
 <main>
 
 <!-- ================= HOME PAGE (UNCHANGED) ================= -->
@@ -211,8 +309,9 @@ include('assets/includes/header.html');
   </div>
 </section>
 
+<!-- Core Services -->
 <section class="services-section">
-    <h2 class="section-title">Our Core Services</h2>
+    <h2 class="section-title h2-title">Our Core Services</h2>
 
     <div class="services-grid">
 
@@ -253,6 +352,66 @@ include('assets/includes/header.html');
         </div>
 
     </div>
+</section>
+
+
+<!-- Development Process -->
+<section class="process-section">
+
+    <h2 class="section-title h2-title">
+        End-to-End Product Development Process
+    </h2>
+
+    <div class="process-grid">
+
+        <div class="step">
+            <div class="step-icon">💡</div>
+            <h4>1. Concept & Idea</h4>
+            <p>Understanding requirements</p>
+        </div>
+
+        <div class="arrow">➜</div>
+
+        <div class="step">
+            <div class="step-icon">✏️</div>
+            <h4>2. Design</h4>
+            <p>PCB, Schematic, System Design</p>
+        </div>
+
+        <div class="arrow">➜</div>
+
+        <div class="step">
+            <div class="step-icon">&lt;/&gt;</div>
+            <h4>3. Development</h4>
+            <p>Firmware, Drivers, Applications</p>
+        </div>
+
+        <div class="arrow">➜</div>
+
+        <div class="step">
+            <div class="step-icon">🛡️</div>
+            <h4>4. Testing</h4>
+            <p>Validation, Debug, Quality Check</p>
+        </div>
+
+        <div class="arrow">➜</div>
+
+        <div class="step">
+            <div class="step-icon">🏭</div>
+            <h4>5. Production</h4>
+            <p>Manufacturing Support</p>
+        </div>
+
+        <div class="arrow">➜</div>
+
+        <div class="step">
+            <div class="step-icon">☁️</div>
+            <h4>6. Deployment</h4>
+            <p>IoT, Cloud, Monitor & Maintain</p>
+        </div>
+
+    </div>
+
 </section>
 
 <!-- ================= PORTFOLIO ================= -->
