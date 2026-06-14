@@ -102,6 +102,10 @@ a{color:var(--primary);text-decoration:none}
   border-top:1px solid var(--border);
   background:#fff
 }
+.footer-grid a {
+    color: #116e5a;
+    text-decoration: none;
+}
 
 /* ============================= */
 /* Dashboard Panels */
