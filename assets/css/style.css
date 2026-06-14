@@ -65,7 +65,9 @@ a{color:var(--primary);text-decoration:none}
 .nav nav a{
   margin:0;
   padding:0 5px;
-  border-radius:8px
+  border-radius:8px;
+  text-decoration: none;
+  color: #116e5a;
 }
 .nav nav a:hover{background:var(--grey)}
 
