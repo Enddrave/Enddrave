@@ -51,7 +51,8 @@ a{color:var(--primary);text-decoration:none}
   display:flex;
   align-items:center;
   justify-content:space-between;
-  height:64px
+  height:64px;
+  flex-wrap: unset !important;
 }
 .brand{
   display:flex;
